@@ -6,15 +6,17 @@
     "node": "26.13.0"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "tokens": "node scripts/build-design-tokens.mjs",
+    "tokens:check": "node scripts/build-design-tokens.mjs --check && node scripts/build-design-tokens.mjs --audit",
+    "dev": "npm run tokens && next dev",
+    "build": "npm run tokens && next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run lint && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run tokens:check && npm run test"
   },
   "dependencies": {
     "next": "16.4.6",
