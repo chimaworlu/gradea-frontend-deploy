@@ -16,6 +16,8 @@ Intended audience: engineers and designers building Gradea, and the founder, for
 
 Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js) and `gradea-backend` (a standalone API server), both in the `usegradea` GitHub organization, with **TypeScript** throughout, **PostgreSQL** as the primary datastore, and **Prisma** as the ORM (backend only). They talk only through the backend's HTTP API. This keeps the API reusable by the planned mobile app (PRD Section 21, Mobile app direction).
 
+**Technology choices (locked 13 Nov).** Backend: Node 26.13.0 (exact version, set in `engines`), npm, TypeScript in strict mode, **Fastify 5** as the HTTP framework (with `@fastify/cors`), **Zod** for request and environment validation, **Prisma 7** with PostgreSQL 18 (Prisma 7 also needs the `@prisma/adapter-pg` and `pg` packages before any endpoint reads or writes the database), **Vitest** for tests, **ESLint** (with typescript-eslint) and **Prettier** for code checks and formatting, and `tsx` to run TypeScript in development. The local database runs in **Docker** (a pinned PostgreSQL 18 image, port set by `DB_PORT`, bound to 127.0.0.1 only). Frontend: Next.js (App Router), TypeScript in strict mode, CSS Modules with the design tokens as CSS variables (no Tailwind), Vitest, ESLint and Prettier. A new library is added to this list here first, with the founder's approval.
+
 **Repository layout:** `gradea-frontend` holds everything the user sees (pages, components, `content/` JSON files, design tokens, design PNGs and screen notes). `gradea-backend` holds everything behind the scenes (API routes, database and Prisma, `lib/ai/`, payments and webhooks, scheduled jobs, emails) and the master copies of the PRD, SRS and Build Plan. Each repo has its own `AGENTS.md`, `CLAUDE.md`, `.claude/rules/` and `.claude/skills/`, with only what that side needs. The backend's Zod schemas are the single source of the API data shapes. The backend writes them, together with the shared analytics event list, into one generated file, and the frontend keeps a copy of that file. Until Phase 1 the copy is made by hand, backend first, in the same sitting as the change. From Phase 1 a GitHub Action in the backend repo opens a pull request in the frontend repo whenever the file changes. If the PRD, SRS or Build Plan change, they change in the backend repo first, then the frontend copy is updated.
 
 **High-level architecture:**
@@ -93,7 +95,7 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 - `POST /api/auth/password-reset` — request and complete password reset via email (Resend)
 
 **Waitlist (public)**
-- `POST /api/waitlist` — accepts email and source (launch or job_board). Same bot-check token and per-IP rate limit as guest upload. Returns the same success whether or not the email already exists.
+- `POST /api/waitlist` — accepts email and source (launch or job_board). Same bot-check token and per-IP rate limit as guest upload. The email is trimmed and lowercased before it is saved, so `Foo@x.com` and `foo@x.com` are the same person and the unique rule cannot be bypassed by letter case. Returns the same success whether or not the email already exists.
 
 **Scan submission (guest-accessible)**
 - `POST /api/scan/general` — accepts CV file, optional guest session token, career_level override; returns scan_session_id
@@ -168,7 +170,7 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 
 **Password storage:** hashed using bcrypt or an equivalent industry-standard algorithm. Never stored in plain text or reversible encryption.
 
-**Session management:** JWT-based sessions. The backend handles sign-up, login and Google OAuth and issues the JWT. The frontend keeps it in an httpOnly cookie and sends it with each API call. The mobile app later uses the same API. A library such as Auth.js may be used on the backend side if it fits; the rule is that auth lives in `backend/`.
+**Session management:** JWT-based sessions. The backend handles sign-up, login and Google OAuth and issues the JWT. The frontend keeps it in an httpOnly cookie and sends it with each API call. The mobile app later uses the same API. A library such as Auth.js may be used on the backend side if it fits; the rule is that auth lives in `gradea-backend`.
 
 **Guest sessions:** a guest who uploads a CV before signup is issued a temporary, unauthenticated session token tied to their in-progress scan, used to reattach that scan to their account immediately after signup (via the `claim` endpoint). Guest session tokens expire after **30 minutes** if signup is not completed, at which point the associated scan data (including any transiently stored file and extracted content) is discarded entirely.
 
@@ -271,7 +273,7 @@ Each function's internal provider routing (which provider, which model tier) is 
 - **Geolocation service** — a dedicated IP geolocation lookup (e.g., ipapi.co or equivalent), run early (on landing, not deferred to checkout), with a manual override available if detection is wrong (open item carried from PRD Section 16).
 - **Google OAuth** — authentication, handled by the backend (Auth.js or equivalent).
 - **Error tracking** — Sentry or equivalent.
-- **Usage analytics** — PostHog (PRD Section 19): page views, clicks, funnels, searches, and country and city, on the site and the app. It records actions and never CV or job description text. No recordings on upload, scan and results screens, no full IP stored, signed-in users identified by internal id only. It sets its own cookie, named on the Privacy page. One shared list of event names is used by `frontend/` and `backend/`. Signed-in product metrics (plans, scans, conversion) also come from the database.
+- **Usage analytics** — PostHog (PRD Section 19): page views, clicks, funnels, searches, and country and city, on the site and the app. It records actions and never CV or job description text. No recordings on upload, scan and results screens, no full IP stored, signed-in users identified by internal id only. It sets its own cookie, named on the Privacy page. One shared list of event names is used by `gradea-frontend` and `gradea-backend`. Signed-in product metrics (plans, scans, conversion) also come from the database.
 - **Email service** — Resend (or equivalent), for password reset and a welcome email sent at signup completion (links the X Community first, Reddit as secondary). Payment receipts may rely on the payment provider's own automatic receipts rather than a duplicate system.
 - **YouTube (privacy-enhanced embed)** — the how-to video loads only after the visitor taps play, so no cookies are set before that and no cookie banner is needed (FR-49).
 - **Search tools** — Google Search Console and Bing Webmaster Tools, set up at launch.
@@ -279,6 +281,8 @@ Each function's internal provider routing (which provider, which model tier) is 
 - **File processing libraries** — PDF and DOCX parsing (e.g., `pdf-parse`, `mammoth`, or equivalent in the Node/TypeScript ecosystem). Left as an implementation detail for the engineering team.
 
 ## 12. Error Handling & Logging Strategy
+
+**One error shape for the whole API.** Every error response, from any route, has the same body: `{ "code": "...", "message": "..." }`, where `code` is a short stable machine-readable word (for example `not_found`, `validation_failed`, `rate_limited`, `internal_error`) and `message` is plain text safe to show a user. This includes the cases Fastify handles by default: unknown routes (404), invalid input (400) and unexpected crashes (500) are all converted to this shape by one shared error handler. The 500 response never includes a stack trace, an internal message, or any request data. The shape is part of the shared API file, so the frontend reads the same `code` values.
 
 **AI pipeline errors** (extraction, scoring, AutoFix, Magic Write): handled per Section 6's retry-then-fail pattern. Every failure (initial and retry) is logged with which function failed, which provider, timing, and error type, feeding into Sentry/structured logging.
 
@@ -300,7 +304,7 @@ Each function's internal provider routing (which provider, which model tier) is 
 
 **Scheduled jobs required for:** 12-month data retention deletion, moving affiliate commissions from pending to payable 30 days after the payment, Day Pass/subscription expiry checks (if not handled via lazy check-on-request), monthly usage counter resets. Specific scheduling mechanism left as an implementation detail.
 
-**Domain & hosting:** usegradea.com (being registered). Two repositories, each with its own `staging` and `main` branch (`main` is production, `staging` is staging). Two deployments per environment: `gradea-frontend` (Vercel) and `gradea-backend` (any Node host that accepts the organization repo, chosen in Phase 0). Work happens on short-lived feature branches and reaches `staging`, then `main`, only by pull request, with type check, lint, the token audit (frontend) and tests passing first. The staging frontend calls the staging backend.
+**Domain & hosting:** usegradea.com (being registered). The backend host must run Node 26 (the project pins Node 26.13.0) and offer PostgreSQL 18 (or a matching version), because staging and production should match local development. Two repositories, each with its own `staging` and `main` branch (`main` is production, `staging` is staging). Two deployments per environment: `gradea-frontend` (Vercel) and `gradea-backend` (any Node host that accepts the organization repo, chosen in Phase 0). Work happens on short-lived feature branches and reaches `staging`, then `main`, only by pull request, with type check, lint, the token audit (frontend) and tests passing first. The staging frontend calls the staging backend.
 
 **Frontend deploy (free plan, build period):** Vercel's free plan will not deploy a private repo owned by an organization, and it is meant for non-commercial use. So a personal fork of `gradea-frontend` is the deploy copy. A GitHub Action in `gradea-frontend` runs the checks, then pushes `staging` and `main` into the fork, and Vercel deploys from the fork. Nobody works in the fork. When revenue allows, move to Vercel Pro (or another host), reconnect Vercel to the organization repo and delete the fork. The backend has no fork; its host reads `gradea-backend` directly.
 
@@ -328,4 +332,5 @@ Each function's internal provider routing (which provider, which model tier) is 
 | Admin dashboard | Section 26, FR-51 | SRS Section 3 (User role, AdminAuditLog), Section 4 (admin API) |
 | Search and AI-search visibility | Section 27, FR-52 | SRS Section 4 (public files) |
 | How-to video | FR-49 | SRS Section 11 (privacy-enhanced embed) |
+| Coming-soon page and waitlist | Section 24, FR-55, FR-56 | SRS Section 3 (Waitlist), Section 4 (`POST /api/waitlist`) |
 | Network status bar | FR-48 | Front end only; retry behaviour in SRS Section 12 |
