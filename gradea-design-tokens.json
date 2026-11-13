@@ -699,7 +699,7 @@
   },
   "social icons": {
     "where": "Footer only, never in the nav. The coming-soon page and the About founder card also use them.",
-    "set": "LinkedIn, X, TikTok, Instagram, YouTube. Show only profiles that are live.",
+    "set": "LinkedIn, X, Instagram, YouTube. Show only profiles that are live. TikTok is not used for now.",
     "styles": "Light round (tint circle) on light backgrounds, dark round on dark ones. 56px in the set, scaled to 40 or 44 where needed."
   }
 }
