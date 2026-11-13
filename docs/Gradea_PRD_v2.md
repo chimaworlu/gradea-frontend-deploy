@@ -505,7 +505,7 @@ The MVP is not launch-ready until the founder's business registration is complet
 6. **Free vs PRO.** Clean comparison table, PRO column visually emphasized. NGN/USD toggle at the top, auto-set by geolocation, user-switchable.
 7. **Social proof.** Left out at launch. Testimonials and usage counters are added only when they are real; no invented reviews, stats or user counts.
 8. **Final CTA.** Repeat the upload widget or a strong "Get Started Free" button, full-width, high contrast.
-9. **Footer.** Columns: Product (General Analysis, Smart Target, Pricing, How It Works), Company (About, Contact), Legal (Privacy, Terms), and Community ("Join our X Community" first, Reddit second). Social icons for LinkedIn, X, TikTok, Instagram and YouTube (icons only, each with an accessible text label, opening in a new tab). A social link appears only once that profile exists; there are no dead links. An "Earn with Gradea" link (affiliate landing page) sits under Company. A "Coming soon" column lists only features that are really planned, with no dates (CV builder with templates by role, support for scanned CVs). Pricing/currency note.
+9. **Footer.** Columns: Product (General Analysis, Smart Target, Pricing, How It Works), Company (About, Contact), Legal (Privacy, Terms), and Community ("Join our X Community" first, Reddit second). Social icons for LinkedIn, X, Instagram and YouTube (icons only, each with an accessible text label, opening in a new tab). A social link appears only once that profile exists; there are no dead links. An "Earn with Gradea" link (affiliate landing page) sits under Company. A "Coming soon" column lists only features that are really planned, with no dates (CV builder with templates by role, support for scanned CVs). Pricing/currency note.
 
 **Marketing pages (design Group G, locked):**
 - G1 Homepage (the sections above). G2 General Analysis page and G3 Smart Target page, each a landing page with its own upload box (G3 also has the job description box). G4 Pricing page: Free vs PRO table, the four plans, NGN/USD switch, the real launch-offer counter while spots remain, and a short FAQ that matches the rules (what renews and what does not, non-refundable, Day Pass, 24-hour grace). G4 and the in-app plan picker are one shared design; a logged-out visitor chooses a plan, signs up, then lands on the order summary. G5 Privacy policy. G6 Terms of use (including non-refundable). G7 Contact page (support email and short form; the billing-error link points here). G8 About page. G9 Not found (404) page.
@@ -561,6 +561,6 @@ Mostly build work, not design. The goal is to be eligible to appear in Google, B
 Not software requirements. Recorded here so they are not forgotten.
 
 - The founder posts build-in-public progress updates on X while building, to grow presence before launch.
-- Social profiles to create and link in the footer once they exist: LinkedIn, X, TikTok, Instagram and YouTube.
+- Social profiles to create and link in the footer once they exist: LinkedIn, X, Instagram and YouTube. TikTok is not used for now.
 - The how-to video (FR-49) is recorded once the product screens are final, and posted to YouTube.
 - The X Community and the Reddit community stay as described in the welcome email.
