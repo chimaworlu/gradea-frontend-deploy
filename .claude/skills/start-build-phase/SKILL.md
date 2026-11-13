@@ -5,7 +5,7 @@ description: Use when the founder says start, continue, finish, or check a phase
 
 # Start a build phase
 
-Takes one phase of the Build Plan from "not started" to "done when passes". Laws: AGENTS.md Sections 1 and 8, the Designs rule in the Build Plan Overview, `testing.md`, `git-conventions.md`.
+Takes one phase of the Build Plan from "not started" to "done when passes". Laws: AGENTS.md (Purpose & Scope, and When to Stop and Ask), the Designs rule in the Build Plan Overview, `testing.md`, `git-conventions.md`.
 
 The PRD, SRS and Build Plan in docs/ are read-only copies. If one needs a change, tell the founder; it is changed in gradea-backend first.
 
@@ -15,7 +15,7 @@ The PRD, SRS and Build Plan in docs/ are read-only copies. If one needs a change
 3. Read the PRD and SRS sections the phase names. Check its dependencies (for example, Phase 7 needs the business registration for Flutterwave).
 4. If a design, a note or a dependency is missing, stop and ask. List exactly what is missing. Do not guess a screen.
 5. Split the phase into tasks. Order them: database, then backend (endpoints, jobs, `lib/ai/`), then frontend screens, then emails. A feature that needs both is backend first.
-6. For each task, load its skill: `change-database`, `add-api-endpoint`, `change-ai-task`, `add-scheduled-job`, `build-screen`, `build-marketing-page`, `build-email`.
+6. For each task, load its skill: `build-screen`, `build-marketing-page`. Backend work (database, API, AI, jobs, emails) is done in gradea-backend with its own skills.
 7. Do one task at a time. After each, run type check, lint, the token audit and the task's tests.
 8. When every list item is done, run the flow described in "Done when" on staging or a preview.
 9. Report what is done, what is blocked, and which designs and notes you used.
@@ -34,7 +34,7 @@ The PRD, SRS and Build Plan in docs/ are read-only copies. If one needs a change
 - Doing the frontend first and calling an endpoint that does not exist yet.
 - Starting a phase whose dependency is not met.
 - Pulling work from a later phase because it looks easy.
-- Fixing an open PRD or SRS question quietly. Flag it (AGENTS.md Section 8).
+- Fixing an open PRD or SRS question quietly. Flag it (the 'When to Stop and Ask' section of AGENTS.md).
 - Reporting "done" without running the "Done when" flow.
 
 ## Verify before done

@@ -41,7 +41,7 @@
 
 Gradea is a web application that gives job seekers an instant, honest grade on their CV, and shows them exactly what's holding it back, both in general, and against a specific job description. Gradea is a grading and feedback tool, not a resume builder. At launch it does not offer templates or design styling (an in-app CV builder with templates by role is planned post-MVP, Section 21). It works only with the content already on a user's CV. It never invents experience, skills, or achievements the user hasn't stated.
 
-Gradea is built on Next.js, TypeScript, PostgreSQL, and Prisma, with AI functionality provided by DeepSeek (extraction) and GPT (analysis, scoring, and improvement) behind a provider-agnostic abstraction layer. Gradea's direct competitor and closest reference model is Resume Worded.
+Gradea is built as two apps: a Next.js front end and a standalone Fastify API server (back end), both in TypeScript, with PostgreSQL and Prisma, and AI functionality provided by DeepSeek (extraction) and GPT (analysis, scoring, and improvement) behind a provider-agnostic abstraction layer. Gradea's direct competitor and closest reference model is Resume Worded.
 
 ## 3. Problem Statement
 
@@ -211,6 +211,8 @@ Free user views locked results, selects one flagged line to unlock using their l
 | FR-51 | Admin dashboard, minimal at launch (Section 26): admin-only role, user and subscription lookup, support actions, launch-offer counter, billing-error handling, feedback and contact inbox, affiliate applications and payouts, abuse flags, and an audit log of every admin action. |
 | FR-52 | Search and AI-search visibility (Section 27): server-rendered marketing pages, sitemap, robots file, titles and descriptions, structured data, an llms.txt file, plain factual text on About, Pricing and FAQ, and Google and Bing webmaster tools set up at launch. |
 | FR-53 | Footer additions: a YouTube icon with the other social icons (shown only once the channel exists), an "Earn with Gradea" link, and a "Coming soon" column listing only features that are really planned, with no dates. At launch it lists only the Job board (the next feature, Section 21). Other planned features are added only when they are the next thing being built. |
+| FR-55 | Before launch the site shows a Coming-soon landing page (G12) with one email box to join the launch waitlist, a clear success state, a clear error state and the social icons (only for profiles that are live). It stays in place until the full marketing site is released. |
+| FR-56 | The system must let a visitor join the waitlist with an email address, from G12 (source: launch) or G11 (source: job_board). The email is trimmed and lowercased, and joining twice is harmless: the visitor always sees the same success message and a duplicate is never saved twice. The endpoint has the invisible bot check and a per-IP rate limit. A waitlist email is used only to tell that person about launch or the Job board, and it is deleted on request. |
 
 ## 11. AI System Requirements
 
@@ -347,7 +349,7 @@ Pricing above is a starting point and should be revisited once real AI cost-per-
 - **Scalability:** the architecture must support adding or swapping AI providers without a rewrite of core product logic, per Section 11.
 - **Cost control:** PRO is unlimited at launch with a quiet fair-use limit against abuse (FR-29). AI provider usage must be tracked per session so cost-per-user can be measured against subscription revenue. This is especially important given unlimited scans for PRO. A specific cost ceiling per session is not yet defined, and current pricing (Section 16) should be revisited once real cost data exists.
 - **Authentication security:** Google OAuth and email/password authentication must both follow standard secure practices for token handling and password storage (see Section 18).
-- **Maintainability:** the codebase must follow a modular structure (Next.js, TypeScript, Prisma, PostgreSQL) separating AI orchestration, business logic (auth, entitlements, payments, usage limits), and presentation.
+- **Maintainability:** the codebase must follow a modular structure across two apps (a Next.js front end; a Fastify, TypeScript, Prisma and PostgreSQL back end) separating AI orchestration, business logic (auth, entitlements, payments, usage limits), and presentation.
 
 ## 18. Security & Privacy
 
@@ -386,7 +388,7 @@ Pricing above is a starting point and should be revisited once real AI cost-per-
 - **Regions** come from the visitor's IP as country and city only. The full IP address is not stored.
 - **Signed-in users** are identified by their internal user id, never by email or name in event data.
 - **Cookies:** PostHog sets its own analytics cookie. The Privacy page says so, in plain words. No cookie banner at launch. Revisit if the audience outside Nigeria grows.
-- **One list of event names** is kept in the code (frontend and backend use the same names), so every event is named the same way everywhere. Rules live in `.agents/rules/analytics.md`.
+- **One list of event names** is kept in the code (frontend and backend use the same names), so every event is named the same way everywhere. Rules live in `.claude/rules/analytics.md`.
 Product metrics for signed-in users (plans, scans, conversion) also come from Gradea's own database. The following are tracked from launch:
 - Completion rate of the core flow (Upload, Analyze, and for guests, Signup, through to Download).
 - Free-to-PRO conversion rate. Target: 3 to 5 percent within 30 days of signup.
@@ -479,7 +481,7 @@ The following are explicitly out of MVP scope and may be considered afterward, s
 
 ## 23. Final MVP Definition
 
-Gradea is a web application, built on Next.js, TypeScript, PostgreSQL, and Prisma, that gives job seekers an instant, honest grade on their CV. Guests can upload a CV and submit it for General Analysis or Smart Target (job-specific) Analysis without an account. Signup, via email/password or Google, is required at the point results are shown, and captures the user's career level, used to calibrate scoring.
+Gradea is a web application, built as a Next.js front end and a standalone Fastify API server, in TypeScript with PostgreSQL and Prisma, that gives job seekers an instant, honest grade on their CV. Guests can upload a CV and submit it for General Analysis or Smart Target (job-specific) Analysis without an account. Signup, via email/password or Google, is required at the point results are shown, and captures the user's career level, used to calibrate scoring.
 
 Free users get 5 General scans and 1 Smart Target scan per month, full scores with summary feedback, a one-time lifetime trial of AutoFix on a single chosen line, and a lightweight score history log retained for 12 months. PRO users, subscribed as a 1-Day Pass, Weekly, Monthly, or 3-Month in NGN or USD based on geolocation, get unlimited scans, full line-by-line feedback, unrestricted AutoFix and Magic Write, and full Historical Review retained for 12 months. The 1-Day Pass gives urgency-driven users (e.g., an interview tomorrow) a low-cost way to access full PRO capability for 24 hours without a recurring commitment.
 
@@ -505,7 +507,7 @@ The MVP is not launch-ready until the founder's business registration is complet
 6. **Free vs PRO.** Clean comparison table, PRO column visually emphasized. NGN/USD toggle at the top, auto-set by geolocation, user-switchable.
 7. **Social proof.** Left out at launch. Testimonials and usage counters are added only when they are real; no invented reviews, stats or user counts.
 8. **Final CTA.** Repeat the upload widget or a strong "Get Started Free" button, full-width, high contrast.
-9. **Footer.** Columns: Product (General Analysis, Smart Target, Pricing, How It Works), Company (About, Contact), Legal (Privacy, Terms), and Community ("Join our X Community" first, Reddit second). Social icons for LinkedIn, X, TikTok, Instagram and YouTube (icons only, each with an accessible text label, opening in a new tab). A social link appears only once that profile exists; there are no dead links. An "Earn with Gradea" link (affiliate landing page) sits under Company. A "Coming soon" column lists only features that are really planned, with no dates (CV builder with templates by role, support for scanned CVs). Pricing/currency note.
+9. **Footer.** Columns: Product (General Analysis, Smart Target, Pricing, How It Works), Company (About, Contact), Legal (Privacy, Terms), and Community ("Join our X Community" first, Reddit second). Social icons for LinkedIn, X, Instagram and YouTube (icons only, each with an accessible text label, opening in a new tab). A social link appears only once that profile exists; there are no dead links. An "Earn with Gradea" link (affiliate landing page) sits under Company. A "Coming soon" column lists only features that are really planned, with no dates (CV builder with templates by role, support for scanned CVs). Pricing/currency note.
 
 **Marketing pages (design Group G, locked):**
 - G1 Homepage (the sections above). G2 General Analysis page and G3 Smart Target page, each a landing page with its own upload box (G3 also has the job description box). G4 Pricing page: Free vs PRO table, the four plans, NGN/USD switch, the real launch-offer counter while spots remain, and a short FAQ that matches the rules (what renews and what does not, non-refundable, Day Pass, 24-hour grace). G4 and the in-app plan picker are one shared design; a logged-out visitor chooses a plan, signs up, then lands on the order summary. G5 Privacy policy. G6 Terms of use (including non-refundable). G7 Contact page (support email and short form; the billing-error link points here). G8 About page. G9 Not found (404) page.
@@ -561,6 +563,6 @@ Mostly build work, not design. The goal is to be eligible to appear in Google, B
 Not software requirements. Recorded here so they are not forgotten.
 
 - The founder posts build-in-public progress updates on X while building, to grow presence before launch.
-- Social profiles to create and link in the footer once they exist: LinkedIn, X, TikTok, Instagram and YouTube.
+- Social profiles to create and link in the footer once they exist: LinkedIn, X, Instagram and YouTube. TikTok is not used for now.
 - The how-to video (FR-49) is recorded once the product screens are final, and posted to YouTube.
 - The X Community and the Reddit community stay as described in the welcome email.

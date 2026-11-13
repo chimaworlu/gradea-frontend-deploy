@@ -63,4 +63,4 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 - Record the how-to video. Add the real founder photo and edit the About story.
 - Check the AI providers' terms before keeping the "not used to train models" idea on the Privacy page.
 - Check Nigerian job coverage before promising anything on the Job board page.
-- TikTok icon is not in the coming-soon page yet.
+- Create the four social accounts (LinkedIn, X, Instagram, YouTube), then add their links to the shared content file. TikTok is not used for now. An icon shows only once its profile is live.
