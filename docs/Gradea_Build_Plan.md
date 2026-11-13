@@ -6,7 +6,7 @@
 
 ## Overview
 
-**Designs rule.** The Figma designs are exported as PNG, one image per screen state, into `docs/design/`, a little at a time, named by screen ID and state (for example `G12-coming-soon-empty.png`, `G12-coming-soon-error.png`). Each phase lists the screens it needs. Before a phase starts, those images must be in the folder. The agent builds a screen only from its design. If an image is missing, stop and ask. Do not guess a screen.
+**Designs rule.** The Figma designs are exported as PNG, one image per screen state, into `docs/design/`, a little at a time, named by screen ID, screen name and state, separated by " - " (for example `G12 - Coming-soon landing page - Error.png`). Each phase lists the screens it needs. Before a phase starts, those images must be in the folder. The agent builds a screen only from its design. If an image is missing, stop and ask. Do not guess a screen.
 
 This Build Plan sequences Gradea's MVP development into 10 phases (plus two small launch phases, 9B Affiliate programme and 9C Admin dashboard, and a post-MVP outline), ordered by dependency: foundational infrastructure first, then the core scan loop, then features that build on it (Smart Target, PRO capability, the dashboard, paywall UX), then billing, generation, the marketing site, and finally launch readiness. Each phase has a defined scope and a "done when" condition, so progress can be checked concretely rather than assumed.
 
@@ -44,7 +44,7 @@ This plan assumes the PRD and SRS as settled inputs. Where a phase depends on an
 - `lib/ai/` abstraction skeleton: module structure and function signatures (`extractContent`, `scoreOverview`, `scoreLineDetail`, `autoFixLine`, `magicWrite`, `validateOutput`) stubbed with placeholder/mock responses. The abstraction boundary is established from day one, real provider integration comes in Phase 2.
 - Deployment pipeline: staging and production environments, preview deployments per pull request, secrets management configured.
 - Error tracking: Sentry (or equivalent) wired in from the start.
-- Frontend fonts and tokens: set up `next/font` in the frontend app with Lora weight 700 and Inter weights 400, 500, 600 and 700, using `variable: "--font-lora"` and `variable: "--font-inter"`, and include Inter's `latin-ext` subset so the naira sign renders. Import `styles/tokens.css` once, globally. The token audit (`node frontend/scripts/build-design-tokens.mjs --audit`) must pass.
+- Frontend fonts and tokens: set up `next/font` in `gradea-frontend` with Lora weight 700 and Inter weights 400, 500, 600 and 700, using `variable: "--font-lora"` and `variable: "--font-inter"`, and include Inter's `latin-ext` subset so the naira sign renders. Import `styles/tokens.css` once, globally. The token audit (`node scripts/build-design-tokens.mjs --audit` in `gradea-frontend`) must pass.
 - Usage analytics: PostHog set up with the shared list of event names and one send function, with the privacy limits from PRD Section 19 (actions only, no content, no recordings on scan screens, no full IP). Events are then added screen by screen as each screen is built.
 - Content files: set up the `content/` folder (app, marketing, emails, shared) and a small loader with types generated from the JSON keys, so a missing or misspelled key fails at build time. Each screen's JSON is split into sections that mirror the parts of the screen, with states beside the text. Written during design (step 4), one file per screen.
 
