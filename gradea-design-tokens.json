@@ -1,0 +1,705 @@
+{
+  "shape": {
+    "corner radius scale": {
+      "sm": 6,
+      "md": 8,
+      "lg": 10,
+      "usage": {
+        "6": "Tags, chips, small badges",
+        "8": "Buttons, inputs, cards",
+        "10": "Popups, popovers, modals, the CV page",
+        "full circle": "Only naturally round things: the score ring, avatars"
+      },
+      "note": "Never 0px, never above 10px. No pill-shaped buttons or tags. The same radius for the same type of element everywhere."
+    },
+    "border discipline": {
+      "card and divider line": {
+        "color": "#E3E0D6",
+        "weight": "1px",
+        "note": "Soft warm line. White cards on paper. Dividers only between list rows, not around everything."
+      },
+      "input and outlined button line": {
+        "color": "#677B98",
+        "weight": "1px",
+        "note": "About 4.3:1 on white. The soft hairline (about 1.3:1) is too faint to show where a field is."
+      }
+    },
+    "color usage discipline": {
+      "note": "One accent color should visually dominate any given screen or moment — do not let green (success), amber (flagged), and navy (brand/authority) all compete for attention in the same view at equal visual weight. Pick the single most important signal per screen (e.g., the score ring is the one green moment on the results screen) and let everything else recede to muted/navy/ink."
+    },
+    "spacing discipline": {
+      "note": "Use a strict, consistent spacing scale (e.g., 4/8/12/16/24/32/48px) rather than arbitrary values. Elements of the same type must share identical padding/margin — inconsistency here is highly visible even when everything else is correct, and is a primary driver of a design feeling 'not premium.'"
+    },
+    "depth": {
+      "cards, panels, buttons": "No shadow. Flat, with the line only.",
+      "floating layers": "One soft shadow only for popovers, dropdowns, modals and toasts. Modals also dim the page behind them.",
+      "suggested shadow": "0 4px 16px rgba(15, 23, 42, 0.12)"
+    }
+  },
+  "gradient": {
+    "hero gradient": {
+      "description": "Subtle single-hue depth gradient for the hero section only. Not a decorative multi-hue gradient.",
+      "type": "custom-gradient",
+      "value": {
+        "gradientType": "linear",
+        "rotation": 180,
+        "stops": [
+          {
+            "position": 0,
+            "color": "#0f172aff"
+          },
+          {
+            "position": 1,
+            "color": "#182f4eff"
+          }
+        ]
+      }
+    },
+    "score reveal glow": {
+      "description": "Faint radial glow in the verified-green tone, used only behind the score circle on scan completion.",
+      "type": "custom-gradient",
+      "value": {
+        "gradientType": "radial",
+        "stops": [
+          {
+            "position": 0,
+            "color": "#39936f33"
+          },
+          {
+            "position": 1,
+            "color": "#39936f00"
+          }
+        ]
+      }
+    }
+  },
+  "font": {
+    "display": {
+      "large": {
+        "fontFamily": "Lora",
+        "fontSize": 60,
+        "fontWeight": 700,
+        "letterSpacing": -1.5,
+        "lineHeight": 66
+      },
+      "medium": {
+        "fontFamily": "Lora",
+        "fontSize": 48,
+        "fontWeight": 700,
+        "letterSpacing": -1,
+        "lineHeight": 55
+      },
+      "small": {
+        "fontFamily": "Lora",
+        "fontSize": 40,
+        "fontWeight": 700,
+        "letterSpacing": -0.5,
+        "lineHeight": 47
+      }
+    },
+    "headline": {
+      "large": {
+        "fontFamily": "Lora",
+        "fontSize": 36,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 44
+      },
+      "medium": {
+        "fontFamily": "Lora",
+        "fontSize": 32,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 40
+      },
+      "small": {
+        "fontFamily": "Lora",
+        "fontSize": 24,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 32
+      }
+    },
+    "title": {
+      "large": {
+        "fontFamily": "Inter",
+        "fontSize": 22,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 28
+      },
+      "medium": {
+        "fontFamily": "Inter",
+        "fontSize": 18,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 28
+      },
+      "small": {
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "fontWeight": 700,
+        "letterSpacing": 0,
+        "lineHeight": 24
+      }
+    },
+    "body": {
+      "large": {
+        "fontFamily": "Inter",
+        "fontSize": 18,
+        "fontWeight": 400,
+        "letterSpacing": 0,
+        "lineHeight": 30
+      },
+      "medium": {
+        "fontFamily": "Inter",
+        "fontSize": 15,
+        "fontWeight": 400,
+        "letterSpacing": 0,
+        "lineHeight": 24
+      },
+      "small": {
+        "fontFamily": "Inter",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "letterSpacing": 0,
+        "lineHeight": 22
+      }
+    },
+    "label": {
+      "large": {
+        "fontFamily": "Inter",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "letterSpacing": 0,
+        "lineHeight": 20
+      },
+      "medium": {
+        "fontFamily": "Inter",
+        "fontSize": 12,
+        "fontWeight": 600,
+        "letterSpacing": 0,
+        "lineHeight": 16
+      },
+      "small": {
+        "fontFamily": "Inter",
+        "fontSize": 12,
+        "fontWeight": 500,
+        "letterSpacing": 0,
+        "lineHeight": 16
+      }
+    },
+    "phone sizes": {
+      "note": "Apply below the tablet breakpoint (under 640). Title, body and label sizes do not change.",
+      "display": {
+        "large": {
+          "fontSize": 40,
+          "lineHeight": 46
+        },
+        "medium": {
+          "fontSize": 34,
+          "lineHeight": 40
+        },
+        "small": {
+          "fontSize": 30,
+          "lineHeight": 36
+        }
+      },
+      "headline": {
+        "large": {
+          "fontSize": 28,
+          "lineHeight": 36
+        },
+        "medium": {
+          "fontSize": 26,
+          "lineHeight": 34
+        },
+        "small": {
+          "fontSize": 22,
+          "lineHeight": 30
+        }
+      },
+      "text input": {
+        "fontFamily": "Inter",
+        "fontSize": 16,
+        "note": "16px minimum on phones so browsers do not zoom in when a field is tapped."
+      }
+    },
+    "usage rules": {
+      "lora": "Big moments only: hero headline, section titles, the score number, About page headings. Never in buttons, labels, tables, forms or prices.",
+      "inter": "Everything else: UI, body, labels, tables, forms.",
+      "currency": "Prices and currency are always Inter. Lora has no Naira sign. Load Inter's latin-ext subset so the Naira sign renders.",
+      "minimum size": "12px. The 11px size is removed.",
+      "numbers": "Use tabular (aligned) digits in Inter for prices, usage counts and tables.",
+      "loading": "Self-host fonts (e.g., next/font). Load only: Lora 700 (and 600 only if a screen needs it); Inter 400, 500, 600 and 700."
+    }
+  },
+  "primitive colors": {
+    "key colors": {
+      "primary key color": {
+        "value": "#1E3A5F",
+        "name": "Authority Navy"
+      },
+      "secondary key color": {
+        "value": "#2F7A5C",
+        "name": "Verified Green"
+      },
+      "tertiary key color": {
+        "value": "#C7742A",
+        "name": "Flagged Amber"
+      },
+      "neutral key color": {
+        "value": "#0F172A",
+        "name": "Ink Slate"
+      },
+      "neutral variant key color": {
+        "value": "#3E4A5B"
+      },
+      "error key color": {
+        "value": "#BC1010"
+      },
+      "success key color": {
+        "value": "#2F7A5C",
+        "name": "same as secondary — score-pass semantic color"
+      },
+      "warning key color": {
+        "value": "#C7742A",
+        "name": "same as tertiary — flagged semantic color"
+      },
+      "paper (page background)": {
+        "value": "#F7F7F4",
+        "name": "Warm Paper",
+        "note": "Page background. Cards sit on it in white (#FFFFFF). Pairs with the warm hairline #E3E0D6."
+      }
+    },
+    "primary color palette (navy)": {
+      "primary0": "#000000",
+      "primary10": "#131d2a",
+      "primary20": "#182f4e",
+      "primary30": "#254774",
+      "primary40": "#315f9b",
+      "primary50": "#3d76c2",
+      "primary60": "#6c97d0",
+      "primary70": "#92b2dd",
+      "primary80": "#b9cee9",
+      "primary90": "#d8e4f3",
+      "primary92": "#e3eaf2",
+      "primary94": "#eaeff5",
+      "primary95": "#eef2f7",
+      "primary96": "#f1f4f9",
+      "primary98": "#f8fafc",
+      "primary99": "#fcfcfd",
+      "primary100": "#ffffff"
+    },
+    "secondary color palette (green)": {
+      "secondary0": "#000000",
+      "secondary10": "#152821",
+      "secondary20": "#1c4a38",
+      "secondary30": "#2b6e53",
+      "secondary40": "#39936f",
+      "secondary50": "#47b88b",
+      "secondary60": "#73c9a7",
+      "secondary70": "#98d7be",
+      "secondary80": "#bde5d5",
+      "secondary90": "#daf1e8",
+      "secondary92": "#e4f1ec",
+      "secondary94": "#ebf4f1",
+      "secondary95": "#eef6f3",
+      "secondary96": "#f2f8f5",
+      "secondary98": "#f8fbfa",
+      "secondary99": "#fcfdfd",
+      "secondary100": "#ffffff"
+    },
+    "tertiary color palette (amber)": {
+      "tertiary0": "#000000",
+      "tertiary10": "#2d1e11",
+      "tertiary20": "#543112",
+      "tertiary30": "#7e4a1b",
+      "tertiary40": "#a86224",
+      "tertiary50": "#d37b2c",
+      "tertiary60": "#dd9a5f",
+      "tertiary70": "#e6b589",
+      "tertiary80": "#efcfb3",
+      "tertiary90": "#f6e5d5",
+      "tertiary92": "#f4eae1",
+      "tertiary94": "#f7efe9",
+      "tertiary95": "#f8f2ec",
+      "tertiary96": "#f9f5f0",
+      "tertiary98": "#fcfaf8",
+      "tertiary99": "#fefcfb",
+      "tertiary100": "#ffffff"
+    },
+    "neutral color palette (slate)": {
+      "neutral0": "#000000",
+      "neutral10": "#141a29",
+      "neutral20": "#1b294b",
+      "neutral30": "#283e71",
+      "neutral40": "#365296",
+      "neutral50": "#4367bc",
+      "neutral60": "#708bcc",
+      "neutral70": "#96aad9",
+      "neutral80": "#bbc8e7",
+      "neutral90": "#d9e1f2",
+      "neutral92": "#e4e8f1",
+      "neutral94": "#ebeef5",
+      "neutral95": "#eef1f6",
+      "neutral96": "#f1f3f8",
+      "neutral98": "#f8f9fc",
+      "neutral99": "#fcfcfd",
+      "neutral100": "#ffffff"
+    },
+    "neutral variant color palette": {
+      "neutral variant0": "#000000",
+      "neutral variant10": "#1b1e23",
+      "neutral variant20": "#29313d",
+      "neutral variant30": "#3e4a5b",
+      "neutral variant40": "#536379",
+      "neutral variant50": "#677b98",
+      "neutral variant60": "#8c9bb0",
+      "neutral variant70": "#aab5c5",
+      "neutral variant80": "#c8d0da",
+      "neutral variant90": "#e1e5ea",
+      "neutral variant92": "#e8eaed",
+      "neutral variant94": "#eeeff2",
+      "neutral variant95": "#f1f2f4",
+      "neutral variant96": "#f3f5f6",
+      "neutral variant98": "#f9fafb",
+      "neutral variant99": "#fcfcfd",
+      "neutral variant100": "#ffffff"
+    },
+    "error color palette": {
+      "error0": "#000000",
+      "error10": "#310d0d",
+      "error20": "#5e0808",
+      "error30": "#8d0c0c",
+      "error40": "#bc1010",
+      "error50": "#eb1414",
+      "error60": "#f04c4c",
+      "error70": "#f47b7b",
+      "error80": "#f8aaaa",
+      "error90": "#fbd0d0",
+      "error92": "#f7dfdf",
+      "error94": "#f9e7e7",
+      "error95": "#faebeb",
+      "error96": "#fbefef",
+      "error98": "#fdf7f7",
+      "error99": "#fefbfb",
+      "error100": "#ffffff"
+    },
+    "success color palette (= secondary/green)": {
+      "success0": "#000000",
+      "success10": "#152821",
+      "success20": "#1c4a38",
+      "success30": "#2b6e53",
+      "success40": "#39936f",
+      "success50": "#47b88b",
+      "success60": "#73c9a7",
+      "success70": "#98d7be",
+      "success80": "#bde5d5",
+      "success90": "#daf1e8",
+      "success94": "#ebf4f1",
+      "success95": "#eef6f3",
+      "success96": "#f2f8f5",
+      "success98": "#f8fbfa",
+      "success99": "#fcfdfd",
+      "success100": "#ffffff"
+    },
+    "warning color palette (= tertiary/amber)": {
+      "warning0": "#000000",
+      "warning10": "#2d1e11",
+      "warning20": "#543112",
+      "warning30": "#7e4a1b",
+      "warning40": "#a86224",
+      "warning50": "#d37b2c",
+      "warning60": "#dd9a5f",
+      "warning70": "#e6b589",
+      "warning80": "#efcfb3",
+      "warning90": "#f6e5d5",
+      "warning94": "#f7efe9",
+      "warning95": "#f8f2ec",
+      "warning96": "#f9f5f0",
+      "warning98": "#fcfaf8",
+      "warning99": "#fefcfb",
+      "warning100": "#ffffff"
+    }
+  },
+  "color roles": {
+    "primary color role": "{primitive colors.key colors.primary key color}",
+    "on primary color role": "{primitive colors.primary color palette (navy).primary100}",
+    "primary container": "{primitive colors.primary color palette (navy).primary90}",
+    "on primary container": "{primitive colors.primary color palette (navy).primary30}",
+    "primary soft": "{primitive colors.primary color palette (navy).primary95}",
+    "secondary color role": "{primitive colors.key colors.secondary key color}",
+    "on secondary color role": "{primitive colors.secondary color palette (green).secondary100}",
+    "secondary container": "{primitive colors.secondary color palette (green).secondary90}",
+    "on secondary container": "{primitive colors.secondary color palette (green).secondary30}",
+    "tertiary color role": "{primitive colors.key colors.tertiary key color}",
+    "on tertiary color role": "{primitive colors.tertiary color palette (amber).tertiary100}",
+    "tertiary container": "{primitive colors.tertiary color palette (amber).tertiary90}",
+    "on tertiary container": "{primitive colors.tertiary color palette (amber).tertiary30}",
+    "surface": "#F7F7F4",
+    "on surface": "{primitive colors.key colors.neutral key color}",
+    "surface variant": "{primitive colors.neutral variant color palette.neutral variant90}",
+    "on surface variant": "{primitive colors.neutral variant color palette.neutral variant30}",
+    "surface container highest": "{primitive colors.neutral variant color palette.neutral variant90}",
+    "surface container high": "{primitive colors.neutral variant color palette.neutral variant92}",
+    "surface container": "{primitive colors.neutral variant color palette.neutral variant94}",
+    "surface container low": "{primitive colors.neutral variant color palette.neutral variant96}",
+    "surface container lowest": "#FFFFFF",
+    "inverse surface": "{primitive colors.neutral color palette (slate).neutral20}",
+    "inverse on surface": "{primitive colors.neutral color palette (slate).neutral95}",
+    "error": "{primitive colors.key colors.error key color}",
+    "on error": "{primitive colors.error color palette.error100}",
+    "error container": "{primitive colors.error color palette.error98}",
+    "on error container": "{primitive colors.error color palette.error40}",
+    "success (score: passing)": "{primitive colors.key colors.success key color}",
+    "on success": "{primitive colors.success color palette (= secondary/green).success100}",
+    "success container": "{primitive colors.success color palette (= secondary/green).success96}",
+    "on success container": "{primitive colors.success color palette (= secondary/green).success30}",
+    "warning (score: flagged)": "{primitive colors.key colors.warning key color}",
+    "on warning": "{primitive colors.warning color palette (= tertiary/amber).warning100}",
+    "warning container": "#FEF1E4",
+    "on warning container": "{primitive colors.warning color palette (= tertiary/amber).warning30}"
+  },
+  "typography": "see 'font' block above — display/headline use Lora, title/body/label use Inter",
+  "notes": [
+    "Replaces the original indigo/violet/sky-blue key colors, which read as generic AI-SaaS default.",
+    "Secondary (green) and tertiary (amber) intentionally double as the 'passing score' and 'flagged issue' semantic colors, so the brand palette IS the product's grading language.",
+    "Two gradients only, both restrained and single-hue: a subtle hero background gradient, and a faint radial glow behind the score circle on scan completion. No multi-hue decorative gradients on cards or buttons.",
+    "Display typography (score numbers, hero headline, section titles) uses Lora, a serif with real character, to reinforce the 'official grading report' identity. All UI, body copy, and dense text uses Inter for legibility."
+  ],
+  "color meaning rules": {
+    "navy": "Brand and trust: headings, primary buttons (including Get PRO / upgrade), links.",
+    "green": "Only means strong, passed, success. Never decoration.",
+    "amber": "Only means flagged / needs attention. Never decoration.",
+    "red": "Only real errors (failed payment, unreadable file). Never used for a flagged line.",
+    "locked": "Locked or PRO-only items use a neutral grey-blue with a lock icon, never amber or green.",
+    "one star color per screen": "One accent dominates each screen (e.g., the green score ring on results). Everything else recedes to navy, ink and neutrals.",
+    "amber text rule": "Amber (#C7742A) scores only 3.3:1 on paper and white-on-amber 3.5:1, below the 4.5:1 needed for text. Use amber for icons, dots, underlines and light tints only. Text inside amber areas uses warning30 (#7E4A1B, about 5.9:1 on its tint). No white text on amber buttons.",
+    "green text rule": "Green text on tints uses success30 (#2B6E53), not success40, to stay above 4.5:1.",
+    "never": "No purple, indigo or violet anywhere."
+  },
+  "spacing": {
+    "scale": [
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64,
+      96
+    ],
+    "note": "Only these values. 4 is for tiny pairs only (icon and its label).",
+    "rules": [
+      "Related things sit close, unrelated things sit far apart.",
+      "The same type of element always has identical padding.",
+      "Card padding: 24 desktop, 16 phone.",
+      "Page side gutter: 24 desktop, 16 phone.",
+      "Section gap: marketing 96 desktop / 64 phone; app screens 32 desktop / 24 phone."
+    ]
+  },
+  "layout": {
+    "breakpoints": {
+      "phone": "under 640",
+      "tablet": "640 to 1023",
+      "desktop": "1024 and up"
+    },
+    "grid": {
+      "phone": "4 columns, 16 gutter",
+      "tablet": "8 columns",
+      "desktop": "12 columns, 24 gutter"
+    },
+    "max content width": {
+      "marketing": "1120 wide, centered, for every marketing page (nav side padding 160, footer inner 1120)",
+      "dashboard, billing, profile": 1120,
+      "text pages (About, Privacy, Terms)": 720,
+      "reading text": "about 70 characters per line"
+    },
+    "touch targets": "At least 44 x 44 on phones for every button and tappable icon.",
+    "results screen desktop": {
+      "left rail": 248,
+      "middle detail": 440,
+      "CV panel": "fills the rest; the CV page maxes at 760, centered"
+    },
+    "results screen phone": "Step by step: (1) score and the 4 categories as a list; (2) tap a category to open its detail as the next screen with a back arrow; (3) a 'View on CV' toggle at the top of the detail screen shows the highlighted CV.",
+    "results screen tablet": "Left rail collapses into a row of tabs; middle detail and CV panel sit side by side.",
+    "tablet": {
+      "design": "Not designed in Figma. Only desktop and phone are designed.",
+      "build": "The developer builds a proper tablet layout from the desktop and phone designs, using the same tokens (colors, fonts, spacing, components, states), so the whole app is fully responsive at every width. Tablet is tested like the other two sizes."
+    }
+  },
+  "icons": {
+    "set": "Lucide (one icon set only)",
+    "style": "Outline, 1.5px stroke",
+    "size": "20px default",
+    "color": "Ink or muted grey. Colored icons follow the color rules (green means strong, amber means flagged)."
+  },
+  "components": {
+    "buttons": {
+      "height": 44,
+      "radius": 8,
+      "primary": "Navy fill, white text. One per section. Full width on phones.",
+      "secondary": "White fill, #677B98 outline, navy text.",
+      "text": "Navy text only.",
+      "destructive": "Red, used only on the final Delete confirm.",
+      "loading": "Label changes (e.g., 'Creating your account...') and the button locks.",
+      "never": "No white text on amber.",
+      "small": {
+        "height": 36,
+        "radius": 8,
+        "use": "Top bar and inside cards, desktop only. Same styles as the 44px buttons."
+      }
+    },
+    "inputs": {
+      "height": 48,
+      "label": "Always above the field, never placeholder only.",
+      "error": "Under the field, red, with an icon.",
+      "password": "Show/hide toggle."
+    },
+    "upload box": {
+      "outline": "Dashed, 8px corners",
+      "states": [
+        "empty",
+        "dragging over (light navy tint)",
+        "file chosen (name, size, remove)",
+        "error (red message)"
+      ],
+      "phone": "Says 'Tap to upload', not 'drag'."
+    },
+    "tags and chips": {
+      "radius": 6,
+      "text": "12px, weight 600",
+      "flagged": "Amber tint, warning30 text, flag icon",
+      "strong": "Green tint, success30 text, check icon",
+      "locked": "Grey-blue tint, lock icon",
+      "pro plan chip": "Navy tint, navy text",
+      "rule": "Always an icon plus a word, never color alone."
+    },
+    "cards": {
+      "style": "White, 8px corners, padding 24 (16 on phone). App screens use the 1px soft line. Money, account and marketing screens use no outline (white card on the paper background). Inputs, selected states and dashed upload zones always keep their outline.",
+      "selected": "2px navy outline",
+      "locked category": "Blurred detail, lock tag, issue count still shown",
+      "recommended plan": "2px navy outline. A label such as 'Most popular' only if true. No fake badges."
+    },
+    "popups and menus": {
+      "radius": 10,
+      "shadow": "the one soft shadow",
+      "modal": "Dims the page behind; closes with Esc, the X, or tapping outside."
+    },
+    "banners": {
+      "style": "Full-width strip inside the app with an icon and one action",
+      "types": [
+        "info (navy tint)",
+        "warning (amber tint)",
+        "error (red tint)",
+        "success (green tint)"
+      ],
+      "used for": "24-hour grace banner, renewal cancelled, payment problems"
+    },
+    "toasts": {
+      "use": "Light confirmations only (e.g., Copied). Fade after 5 seconds. Errors never use a toast."
+    },
+    "loading and empty": {
+      "loading": "Grey placeholder shapes in the layout, not a spinner alone.",
+      "empty": "One line of text and one button."
+    },
+    "score ring": {
+      "arc color": "Green at 75 and above, amber below 75. Never red (red is for errors). 75 is a starting point to tune with real score data.",
+      "number": "Centered, Lora",
+      "glow": "The faint green radial glow only appears behind a green (75+) ring on completion."
+    }
+  },
+  "states": {
+    "hover": "Navy buttons go slightly darker (primary20). Text buttons underline. Cards get a slightly stronger line.",
+    "pressed": "A little darker than hover.",
+    "keyboard focus": "2px navy ring with a 2px gap; white ring on navy backgrounds. Always visible.",
+    "disabled": "40% faded, ignores taps, and a short note says why when not obvious.",
+    "selected": "2px navy outline on cards; light navy tint on menu rows.",
+    "loading": "Buttons keep their size and show a small spinner with the new label. Pages use grey placeholder shapes.",
+    "touch": "Nothing important works on hover only. Every hover feature has a tap equivalent."
+  },
+  "motion": {
+    "durations": {
+      "small color changes": "150ms",
+      "menus, popups, banners": "250ms",
+      "score count-up": "about 800ms"
+    },
+    "easing": "ease-out",
+    "properties": "Fade and slide only. No bouncing, wiggling or pulsing.",
+    "allowed in": [
+      "hero scan demo",
+      "How It Works reveal (once, not repeated)",
+      "score count-up",
+      "CV highlight when a category opens",
+      "green check when a fix is approved"
+    ],
+    "reduced motion": "When the user's device asks for reduced motion, all animation switches off and final values show immediately.",
+    "honest waiting": "The processing screen shows real stages (e.g., 'Reading your CV...', 'Scoring...'), never a fake percentage bar. After about 15 seconds a 'taking longer than usual' message appears."
+  },
+  "locked content": {
+    "blur": "The blur on a locked category is a picture of placeholder text, not real text hidden by CSS.",
+    "security": "Real content for locked parts is never sent to the browser. Locked categories return counts only (SRS)."
+  },
+  "voice and copy": {
+    "voice": "A sharp, honest friend who knows recruiting. Direct, kind, specific. Never a cheerleader, never harsh.",
+    "rules": [
+      "Plain words: 'Fix this line', not 'Optimise your bullet'.",
+      "Errors say what happened, why, and what to do next. Never 'Oops!'. Never blame the user.",
+      "Buttons are verb plus object: 'Scan my CV', 'Get PRO'. Not 'Submit' or 'Continue'.",
+      "Money is always plain: 'Renews on 1 Dec at ₦4,000. Cancel anytime.'",
+      "No fake urgency or scarcity. Offers and counters appear only when true.",
+      "No big promises ('Get hired fast'). Say what the product actually does.",
+      "AI text is a draft: 'We only use facts from your CV or what you tell us.' Never 'guaranteed'.",
+      "Sentence case everywhere except product names.",
+      "No emojis and no em dashes in product text. Short sentences."
+    ],
+    "terms": {
+      "scan": "one run",
+      "flag": "a problem found",
+      "strong / flagged": "never 'bad' or 'errors'",
+      "fixed names": [
+        "AutoFix",
+        "Magic Write",
+        "PRO",
+        "Free",
+        "Day Pass",
+        "Re-score",
+        "working copy"
+      ],
+      "ATS": "Explain once where it first appears: 'the software employers use to filter CVs'."
+    },
+    "formats": {
+      "dates": "22 Oct 2026",
+      "prices": "₦4,000 and $9.99"
+    },
+    "cv or resume": "Product text says 'CV'. Marketing page titles and search text also include 'resume' so US visitors can find the site.",
+    "spelling": "British English in all user-facing text (organise, colour)."
+  },
+  "marketing site": {
+    "note": "Rules learned while designing G1 to G9, the waitlist and the coming-soon page. Desktop is designed in Figma. Phones are built responsive in code from these rules.",
+    "frame": "1440 wide. Nav 64 tall. Content column 1120, centered.",
+    "section rhythm": "48 top and bottom padding per section (96 between sections). Section title Lora Bold 32/40, then 8 to subline, then 32 to content.",
+    "buttons and inputs": "Buttons 48 tall and inputs 48 tall on marketing pages (44 in the app).",
+    "cards": "No outline. Radius 10. Padding 24 to 32.",
+    "accent": "Navy only. Green only for strong or passed. Amber only for flagged or missing. Red only for delete and form errors. Ink is used for text only (not for buttons or backgrounds) until the post-MVP accent decision.",
+    "FAQ dropdown": "White card, rows split by 1px soft dividers. Question Inter Semi Bold 16, answer Inter 15 muted. Chevron (Lucide, 1.5px, navy) on the right: down when closed, up when open. First item open, the rest closed. Several can be open together.",
+    "plans": "Day Pass is the default selected plan on the homepage. The currency switch changes every price on the page. Prices are in Inter because Lora has no naira sign.",
+    "how it works": "One section: video poster on top (click to play, never autoplay), then equal-width step cards with centered text. No second separate video section.",
+    "legal pages": "Two columns: sticky \"On this page\" list 280 wide and a 720 text column, 120 apart. Section headings Inter Bold 22, body Inter 17 or 16 muted.",
+    "forms": "Label Inter Semi Bold 14 above the field. Error text red 13 below the field and a red outline on the field. A sent or joined state replaces the form with a green check and a short message.",
+    "waitlist and coming soon": "One waitlist table for both pages, with a source field."
+  },
+  "logo": {
+    "lockup": "Component \"Logo / Lockup\": navy mark 28px, lowercase \"gradea\" Inter Bold 21 navy, gap 10.",
+    "profile pictures": "Use the mark only.",
+    "favicon": "Use a simplified mark. A 16px version may need the notch removed.",
+    "admin": "The admin dashboard shows the logo with no extra word beside it."
+  },
+  "social icons": {
+    "where": "Footer only, never in the nav. The coming-soon page and the About founder card also use them.",
+    "set": "LinkedIn, X, TikTok, Instagram, YouTube. Show only profiles that are live.",
+    "styles": "Light round (tint circle) on light backgrounds, dark round on dark ones. 56px in the set, scaled to 40 or 44 where needed."
+  }
+}

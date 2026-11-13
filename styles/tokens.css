@@ -1,0 +1,598 @@
+/* ==========================================================================
+ * GRADEA DESIGN TOKENS
+ * AUTO-GENERATED. DO NOT EDIT BY HAND.
+ * Source:      ../gradea-design-tokens.json
+ * Generator:   ../scripts/build-design-tokens.mjs
+ * Regenerate:  node scripts/build-design-tokens.mjs
+ *
+ * HOW TO USE
+ *   Import once, globally (e.g. in app/layout.tsx: import "@/styles/tokens.css").
+ *
+ *   COLOUR: use --color-* (roles) only.
+ *     --primitive-* are the raw palette that roles are built from. They are
+ *     listed first because roles reference them, NOT because components
+ *     should use them. `--audit` flags any use outside this file.
+ *
+ *   Everything else: --font-*, --space-*, --radius-*, --shadow-*, --size-*,
+ *   --layout-*, --duration-*, --easing-*.
+ *
+ *   Responsive: phone overrides live in "@media (width < 640px)" at the
+ *   bottom, so tokens like --space-card-padding switch automatically.
+ * ========================================================================== */
+
+:root {
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: key colours
+   * Source: "primitive colors > key colors".
+   *
+   * DO NOT USE IN COMPONENTS. Primitives are raw ingredients with no meaning.
+   * Use the --color-* role variables further down instead. Run this build
+   * with --audit to find stray uses.
+   * ---------------------------------------------------------------------- */
+  --primitive-key-primary:         #1e3a5f; /* Authority Navy */
+  --primitive-key-secondary:       #2f7a5c; /* Verified Green */
+  --primitive-key-tertiary:        #c7742a; /* Flagged Amber */
+  --primitive-key-neutral:         #0f172a; /* Ink Slate */
+  --primitive-key-neutral-variant: #3e4a5b;
+  --primitive-key-error:           #bc1010;
+  --primitive-key-success:         #2f7a5c; /* same as secondary — score-pass semantic color */
+  --primitive-key-warning:         #c7742a; /* same as tertiary — flagged semantic color */
+  --primitive-key-paper:           #f7f7f4; /* Warm Paper */
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: primary color palette (navy)
+   * Source: "primitive colors > primary color palette (navy)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-primary-0:   #000000;
+  --primitive-primary-10:  #131d2a;
+  --primitive-primary-20:  #182f4e;
+  --primitive-primary-30:  #254774;
+  --primitive-primary-40:  #315f9b;
+  --primitive-primary-50:  #3d76c2;
+  --primitive-primary-60:  #6c97d0;
+  --primitive-primary-70:  #92b2dd;
+  --primitive-primary-80:  #b9cee9;
+  --primitive-primary-90:  #d8e4f3;
+  --primitive-primary-92:  #e3eaf2;
+  --primitive-primary-94:  #eaeff5;
+  --primitive-primary-95:  #eef2f7;
+  --primitive-primary-96:  #f1f4f9;
+  --primitive-primary-98:  #f8fafc;
+  --primitive-primary-99:  #fcfcfd;
+  --primitive-primary-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: secondary color palette (green)
+   * Source: "primitive colors > secondary color palette (green)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-secondary-0:   #000000;
+  --primitive-secondary-10:  #152821;
+  --primitive-secondary-20:  #1c4a38;
+  --primitive-secondary-30:  #2b6e53;
+  --primitive-secondary-40:  #39936f;
+  --primitive-secondary-50:  #47b88b;
+  --primitive-secondary-60:  #73c9a7;
+  --primitive-secondary-70:  #98d7be;
+  --primitive-secondary-80:  #bde5d5;
+  --primitive-secondary-90:  #daf1e8;
+  --primitive-secondary-92:  #e4f1ec;
+  --primitive-secondary-94:  #ebf4f1;
+  --primitive-secondary-95:  #eef6f3;
+  --primitive-secondary-96:  #f2f8f5;
+  --primitive-secondary-98:  #f8fbfa;
+  --primitive-secondary-99:  #fcfdfd;
+  --primitive-secondary-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: tertiary color palette (amber)
+   * Source: "primitive colors > tertiary color palette (amber)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-tertiary-0:   #000000;
+  --primitive-tertiary-10:  #2d1e11;
+  --primitive-tertiary-20:  #543112;
+  --primitive-tertiary-30:  #7e4a1b;
+  --primitive-tertiary-40:  #a86224;
+  --primitive-tertiary-50:  #d37b2c;
+  --primitive-tertiary-60:  #dd9a5f;
+  --primitive-tertiary-70:  #e6b589;
+  --primitive-tertiary-80:  #efcfb3;
+  --primitive-tertiary-90:  #f6e5d5;
+  --primitive-tertiary-92:  #f4eae1;
+  --primitive-tertiary-94:  #f7efe9;
+  --primitive-tertiary-95:  #f8f2ec;
+  --primitive-tertiary-96:  #f9f5f0;
+  --primitive-tertiary-98:  #fcfaf8;
+  --primitive-tertiary-99:  #fefcfb;
+  --primitive-tertiary-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: neutral color palette (slate)
+   * Source: "primitive colors > neutral color palette (slate)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-neutral-0:   #000000;
+  --primitive-neutral-10:  #141a29;
+  --primitive-neutral-20:  #1b294b;
+  --primitive-neutral-30:  #283e71;
+  --primitive-neutral-40:  #365296;
+  --primitive-neutral-50:  #4367bc;
+  --primitive-neutral-60:  #708bcc;
+  --primitive-neutral-70:  #96aad9;
+  --primitive-neutral-80:  #bbc8e7;
+  --primitive-neutral-90:  #d9e1f2;
+  --primitive-neutral-92:  #e4e8f1;
+  --primitive-neutral-94:  #ebeef5;
+  --primitive-neutral-95:  #eef1f6;
+  --primitive-neutral-96:  #f1f3f8;
+  --primitive-neutral-98:  #f8f9fc;
+  --primitive-neutral-99:  #fcfcfd;
+  --primitive-neutral-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: neutral variant color palette
+   * Source: "primitive colors > neutral variant color palette". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-neutral-variant-0:   #000000;
+  --primitive-neutral-variant-10:  #1b1e23;
+  --primitive-neutral-variant-20:  #29313d;
+  --primitive-neutral-variant-30:  #3e4a5b;
+  --primitive-neutral-variant-40:  #536379;
+  --primitive-neutral-variant-50:  #677b98;
+  --primitive-neutral-variant-60:  #8c9bb0;
+  --primitive-neutral-variant-70:  #aab5c5;
+  --primitive-neutral-variant-80:  #c8d0da;
+  --primitive-neutral-variant-90:  #e1e5ea;
+  --primitive-neutral-variant-92:  #e8eaed;
+  --primitive-neutral-variant-94:  #eeeff2;
+  --primitive-neutral-variant-95:  #f1f2f4;
+  --primitive-neutral-variant-96:  #f3f5f6;
+  --primitive-neutral-variant-98:  #f9fafb;
+  --primitive-neutral-variant-99:  #fcfcfd;
+  --primitive-neutral-variant-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: error color palette
+   * Source: "primitive colors > error color palette". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-error-0:   #000000;
+  --primitive-error-10:  #310d0d;
+  --primitive-error-20:  #5e0808;
+  --primitive-error-30:  #8d0c0c;
+  --primitive-error-40:  #bc1010;
+  --primitive-error-50:  #eb1414;
+  --primitive-error-60:  #f04c4c;
+  --primitive-error-70:  #f47b7b;
+  --primitive-error-80:  #f8aaaa;
+  --primitive-error-90:  #fbd0d0;
+  --primitive-error-92:  #f7dfdf;
+  --primitive-error-94:  #f9e7e7;
+  --primitive-error-95:  #faebeb;
+  --primitive-error-96:  #fbefef;
+  --primitive-error-98:  #fdf7f7;
+  --primitive-error-99:  #fefbfb;
+  --primitive-error-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: success color palette (= secondary/green)
+   * Source: "primitive colors > success color palette (= secondary/green)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-success-0:   #000000;
+  --primitive-success-10:  #152821;
+  --primitive-success-20:  #1c4a38;
+  --primitive-success-30:  #2b6e53;
+  --primitive-success-40:  #39936f;
+  --primitive-success-50:  #47b88b;
+  --primitive-success-60:  #73c9a7;
+  --primitive-success-70:  #98d7be;
+  --primitive-success-80:  #bde5d5;
+  --primitive-success-90:  #daf1e8;
+  --primitive-success-94:  #ebf4f1;
+  --primitive-success-95:  #eef6f3;
+  --primitive-success-96:  #f2f8f5;
+  --primitive-success-98:  #f8fbfa;
+  --primitive-success-99:  #fcfdfd;
+  --primitive-success-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 1 / PRIMITIVES: warning color palette (= tertiary/amber)
+   * Source: "primitive colors > warning color palette (= tertiary/amber)". Tone 0 is black, 100 is white.
+   * DO NOT USE IN COMPONENTS. Use --color-* roles.
+   * ---------------------------------------------------------------------- */
+  --primitive-warning-0:   #000000;
+  --primitive-warning-10:  #2d1e11;
+  --primitive-warning-20:  #543112;
+  --primitive-warning-30:  #7e4a1b;
+  --primitive-warning-40:  #a86224;
+  --primitive-warning-50:  #d37b2c;
+  --primitive-warning-60:  #dd9a5f;
+  --primitive-warning-70:  #e6b589;
+  --primitive-warning-80:  #efcfb3;
+  --primitive-warning-90:  #f6e5d5;
+  --primitive-warning-94:  #f7efe9;
+  --primitive-warning-95:  #f8f2ec;
+  --primitive-warning-96:  #f9f5f0;
+  --primitive-warning-98:  #fcfaf8;
+  --primitive-warning-99:  #fefcfb;
+  --primitive-warning-100: #ffffff;
+
+  /* ----------------------------------------------------------------------
+   * TIER 2 / COLOUR ROLES
+   * Source: "color roles". THESE are the colours to use in the UI.
+   *
+   * Pairing rule: put text on a fill with its "on-" partner, e.g.
+   *   background: var(--color-warning-container);
+   *   color:      var(--color-on-warning-container);
+   *
+   * Colour meaning rules (from "color meaning rules" in the JSON):
+   *   - navy: Brand and trust: headings, primary buttons (including Get PRO /
+   *     upgrade), links.
+   *   - green: Only means strong, passed, success. Never decoration.
+   *   - amber: Only means flagged / needs attention. Never decoration.
+   *   - red: Only real errors (failed payment, unreadable file). Never used
+   *     for a flagged line.
+   *   - locked: Locked or PRO-only items use a neutral grey-blue with a lock
+   *     icon, never amber or green.
+   *   - one star color per screen: One accent dominates each screen (e.g., the
+   *     green score ring on results). Everything else recedes to navy, ink and
+   *     neutrals.
+   *   - amber text rule: Amber (#C7742A) scores only 3.3:1 on paper and
+   *     white-on-amber 3.5:1, below the 4.5:1 needed for text. Use amber for
+   *     icons, dots, underlines and light tints only. Text inside amber areas
+   *     uses warning30 (#7E4A1B, about 5.9:1 on its tint). No white text on
+   *     amber buttons.
+   *   - green text rule: Green text on tints uses success30 (#2B6E53), not
+   *     success40, to stay above 4.5:1.
+   *   - never: No purple, indigo or violet anywhere.
+   * ---------------------------------------------------------------------- */
+  --color-primary:                   var(--primitive-key-primary); /* primary key color #1e3a5f */
+  --color-on-primary:                var(--primitive-primary-100); /* primary100 #ffffff */
+  --color-primary-container:         var(--primitive-primary-90); /* primary90 #d8e4f3 */
+  --color-on-primary-container:      var(--primitive-primary-30); /* primary30 #254774 */
+  --color-primary-soft:              var(--primitive-primary-95); /* primary95 #eef2f7 */
+  --color-secondary:                 var(--primitive-key-secondary); /* secondary key color #2f7a5c */
+  --color-on-secondary:              var(--primitive-secondary-100); /* secondary100 #ffffff */
+  --color-secondary-container:       var(--primitive-secondary-90); /* secondary90 #daf1e8 */
+  --color-on-secondary-container:    var(--primitive-secondary-30); /* secondary30 #2b6e53 */
+  --color-tertiary:                  var(--primitive-key-tertiary); /* tertiary key color #c7742a */
+  --color-on-tertiary:               var(--primitive-tertiary-100); /* tertiary100 #ffffff */
+  --color-tertiary-container:        var(--primitive-tertiary-90); /* tertiary90 #f6e5d5 */
+  --color-on-tertiary-container:     var(--primitive-tertiary-30); /* tertiary30 #7e4a1b */
+  --color-surface:                   var(--primitive-key-paper); /* paper (page background) #f7f7f4 (literal in JSON, matched to primitive) */
+  --color-on-surface:                var(--primitive-key-neutral); /* neutral key color #0f172a */
+  --color-surface-variant:           var(--primitive-neutral-variant-90); /* neutral variant90 #e1e5ea */
+  --color-on-surface-variant:        var(--primitive-neutral-variant-30); /* neutral variant30 #3e4a5b */
+  --color-surface-container-highest: var(--primitive-neutral-variant-90); /* neutral variant90 #e1e5ea */
+  --color-surface-container-high:    var(--primitive-neutral-variant-92); /* neutral variant92 #e8eaed */
+  --color-surface-container:         var(--primitive-neutral-variant-94); /* neutral variant94 #eeeff2 */
+  --color-surface-container-low:     var(--primitive-neutral-variant-96); /* neutral variant96 #f3f5f6 */
+  --color-surface-container-lowest:  #ffffff; /* literal #ffffff: pure white/black, exists in every palette */
+  --color-inverse-surface:           var(--primitive-neutral-20); /* neutral20 #1b294b */
+  --color-inverse-on-surface:        var(--primitive-neutral-95); /* neutral95 #eef1f6 */
+  --color-error:                     var(--primitive-key-error); /* error key color #bc1010 */
+  --color-on-error:                  var(--primitive-error-100); /* error100 #ffffff */
+  --color-error-container:           var(--primitive-error-98); /* error98 #fdf7f7 */
+  --color-on-error-container:        var(--primitive-error-40); /* error40 #bc1010 */
+  --color-success:                   var(--primitive-key-success); /* success key color #2f7a5c */
+  --color-on-success:                var(--primitive-success-100); /* success100 #ffffff */
+  --color-success-container:         var(--primitive-success-96); /* success96 #f2f8f5 */
+  --color-on-success-container:      var(--primitive-success-30); /* success30 #2b6e53 */
+  --color-warning:                   var(--primitive-key-warning); /* warning key color #c7742a */
+  --color-on-warning:                var(--primitive-warning-100); /* warning100 #ffffff */
+  --color-warning-container:         #fef1e4; /* literal #fef1e4: no matching primitive */
+  --color-on-warning-container:      var(--primitive-warning-30); /* warning30 #7e4a1b */
+
+  /* ----------------------------------------------------------------------
+   * TIER 2 / COLOUR ROLES: borders, interaction states
+   * Source: "shape > border discipline" and "states".
+   * --color-border-card: soft warm line for white cards and list dividers.
+   * --color-border-input: inputs and outlined buttons (about 4.3:1 on white).
+   * Primary hover/pressed: navy buttons darken on hover (primary20) and a
+   * little more when pressed (primary10, an interpretation of "a little
+   * darker than hover"). Focus ring: 2px navy with a 2px gap; white on navy.
+   * ---------------------------------------------------------------------- */
+  --color-border-card:        #e3e0d6; /* literal #e3e0d6: no matching primitive */
+  --color-border-input:       var(--primitive-neutral-variant-50); /* neutral variant50 #677b98 (literal in JSON, matched to primitive) */
+  --color-primary-hover:      var(--primitive-primary-20); /* primary20 */
+  --color-primary-pressed:    var(--primitive-primary-10); /* primary10 (interpretation) */
+  --color-focus-ring:         var(--color-primary); /* on light backgrounds */
+  --color-focus-ring-on-dark: var(--color-on-primary); /* white ring on navy backgrounds */
+
+  /* ----------------------------------------------------------------------
+   * GRADIENTS
+   * Source: "gradient". Only two exist, both single-hue and restrained.
+   * --gradient-hero: hero section background only.
+   * --gradient-score-glow: behind a GREEN (75+) score ring on scan completion
+   * only. Never on cards or buttons.
+   * ---------------------------------------------------------------------- */
+  --gradient-hero:       linear-gradient(180deg, var(--primitive-key-neutral) 0%, var(--primitive-primary-20) 100%);
+  --gradient-score-glow: radial-gradient(circle closest-side, #39936f33 0%, #39936f00 100%); /* #39936f33: secondary40 at 0.2 alpha; #39936f00: secondary40 at 0 alpha */
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: families and weights
+   * Source: "font" and "font > usage rules".
+   * Lora: big moments only (hero headline, section titles, the score number).
+   * Inter: everything else, and ALWAYS for prices (Lora has no Naira sign).
+   * Self-host with next/font using `variable: "--font-lora"` and
+   * `variable: "--font-inter"`; these variables pick them up automatically.
+   * Use `font-variant-numeric: tabular-nums` for prices, counts and tables.
+   * ---------------------------------------------------------------------- */
+  --font-family-lora:           var(--font-lora, "Lora"), Georgia, "Times New Roman", serif;
+  --font-family-inter:          var(--font-inter, "Inter"), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-weight-regular:        400;
+  --font-weight-medium:         500;
+  --font-weight-semibold:       600;
+  --font-weight-bold:           700;
+  --font-text-input-size-phone: 1rem; /* 16px minimum on phones, stops browser zoom on focus */
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: display
+   * Source: "font > display". Each size has its parts plus a `font` shorthand:
+   *   font: var(--font-display-large);
+   *   letter-spacing: var(--font-display-large-letter-spacing);
+   * (letter-spacing is not part of the CSS `font` shorthand, set it too.)
+   * ---------------------------------------------------------------------- */
+  --font-display-large-family:          var(--font-family-lora);
+  --font-display-large-size:            3.75rem; /* 60px */
+  --font-display-large-weight:          700;
+  --font-display-large-line-height:     4.125rem; /* 66px */
+  --font-display-large-letter-spacing:  -0.09375rem; /* -1.5px */
+  --font-display-large:                 var(--font-display-large-weight) var(--font-display-large-size)/var(--font-display-large-line-height) var(--font-display-large-family);
+  --font-display-medium-family:         var(--font-family-lora);
+  --font-display-medium-size:           3rem; /* 48px */
+  --font-display-medium-weight:         700;
+  --font-display-medium-line-height:    3.4375rem; /* 55px */
+  --font-display-medium-letter-spacing: -0.0625rem; /* -1px */
+  --font-display-medium:                var(--font-display-medium-weight) var(--font-display-medium-size)/var(--font-display-medium-line-height) var(--font-display-medium-family);
+  --font-display-small-family:          var(--font-family-lora);
+  --font-display-small-size:            2.5rem; /* 40px */
+  --font-display-small-weight:          700;
+  --font-display-small-line-height:     2.9375rem; /* 47px */
+  --font-display-small-letter-spacing:  -0.03125rem; /* -0.5px */
+  --font-display-small:                 var(--font-display-small-weight) var(--font-display-small-size)/var(--font-display-small-line-height) var(--font-display-small-family);
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: headline
+   * Source: "font > headline". Each size has its parts plus a `font` shorthand:
+   *   font: var(--font-headline-large);
+   *   letter-spacing: var(--font-headline-large-letter-spacing);
+   * (letter-spacing is not part of the CSS `font` shorthand, set it too.)
+   * ---------------------------------------------------------------------- */
+  --font-headline-large-family:          var(--font-family-lora);
+  --font-headline-large-size:            2.25rem; /* 36px */
+  --font-headline-large-weight:          700;
+  --font-headline-large-line-height:     2.75rem; /* 44px */
+  --font-headline-large-letter-spacing:  0; /* 0px */
+  --font-headline-large:                 var(--font-headline-large-weight) var(--font-headline-large-size)/var(--font-headline-large-line-height) var(--font-headline-large-family);
+  --font-headline-medium-family:         var(--font-family-lora);
+  --font-headline-medium-size:           2rem; /* 32px */
+  --font-headline-medium-weight:         700;
+  --font-headline-medium-line-height:    2.5rem; /* 40px */
+  --font-headline-medium-letter-spacing: 0; /* 0px */
+  --font-headline-medium:                var(--font-headline-medium-weight) var(--font-headline-medium-size)/var(--font-headline-medium-line-height) var(--font-headline-medium-family);
+  --font-headline-small-family:          var(--font-family-lora);
+  --font-headline-small-size:            1.5rem; /* 24px */
+  --font-headline-small-weight:          700;
+  --font-headline-small-line-height:     2rem; /* 32px */
+  --font-headline-small-letter-spacing:  0; /* 0px */
+  --font-headline-small:                 var(--font-headline-small-weight) var(--font-headline-small-size)/var(--font-headline-small-line-height) var(--font-headline-small-family);
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: title
+   * Source: "font > title". Each size has its parts plus a `font` shorthand:
+   *   font: var(--font-title-large);
+   *   letter-spacing: var(--font-title-large-letter-spacing);
+   * (letter-spacing is not part of the CSS `font` shorthand, set it too.)
+   * ---------------------------------------------------------------------- */
+  --font-title-large-family:          var(--font-family-inter);
+  --font-title-large-size:            1.375rem; /* 22px */
+  --font-title-large-weight:          700;
+  --font-title-large-line-height:     1.75rem; /* 28px */
+  --font-title-large-letter-spacing:  0; /* 0px */
+  --font-title-large:                 var(--font-title-large-weight) var(--font-title-large-size)/var(--font-title-large-line-height) var(--font-title-large-family);
+  --font-title-medium-family:         var(--font-family-inter);
+  --font-title-medium-size:           1.125rem; /* 18px */
+  --font-title-medium-weight:         700;
+  --font-title-medium-line-height:    1.75rem; /* 28px */
+  --font-title-medium-letter-spacing: 0; /* 0px */
+  --font-title-medium:                var(--font-title-medium-weight) var(--font-title-medium-size)/var(--font-title-medium-line-height) var(--font-title-medium-family);
+  --font-title-small-family:          var(--font-family-inter);
+  --font-title-small-size:            1rem; /* 16px */
+  --font-title-small-weight:          700;
+  --font-title-small-line-height:     1.5rem; /* 24px */
+  --font-title-small-letter-spacing:  0; /* 0px */
+  --font-title-small:                 var(--font-title-small-weight) var(--font-title-small-size)/var(--font-title-small-line-height) var(--font-title-small-family);
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: body
+   * Source: "font > body". Each size has its parts plus a `font` shorthand:
+   *   font: var(--font-body-large);
+   *   letter-spacing: var(--font-body-large-letter-spacing);
+   * (letter-spacing is not part of the CSS `font` shorthand, set it too.)
+   * ---------------------------------------------------------------------- */
+  --font-body-large-family:          var(--font-family-inter);
+  --font-body-large-size:            1.125rem; /* 18px */
+  --font-body-large-weight:          400;
+  --font-body-large-line-height:     1.875rem; /* 30px */
+  --font-body-large-letter-spacing:  0; /* 0px */
+  --font-body-large:                 var(--font-body-large-weight) var(--font-body-large-size)/var(--font-body-large-line-height) var(--font-body-large-family);
+  --font-body-medium-family:         var(--font-family-inter);
+  --font-body-medium-size:           0.9375rem; /* 15px */
+  --font-body-medium-weight:         400;
+  --font-body-medium-line-height:    1.5rem; /* 24px */
+  --font-body-medium-letter-spacing: 0; /* 0px */
+  --font-body-medium:                var(--font-body-medium-weight) var(--font-body-medium-size)/var(--font-body-medium-line-height) var(--font-body-medium-family);
+  --font-body-small-family:          var(--font-family-inter);
+  --font-body-small-size:            0.875rem; /* 14px */
+  --font-body-small-weight:          400;
+  --font-body-small-line-height:     1.375rem; /* 22px */
+  --font-body-small-letter-spacing:  0; /* 0px */
+  --font-body-small:                 var(--font-body-small-weight) var(--font-body-small-size)/var(--font-body-small-line-height) var(--font-body-small-family);
+
+  /* ----------------------------------------------------------------------
+   * TYPOGRAPHY: label
+   * Source: "font > label". Each size has its parts plus a `font` shorthand:
+   *   font: var(--font-label-large);
+   *   letter-spacing: var(--font-label-large-letter-spacing);
+   * (letter-spacing is not part of the CSS `font` shorthand, set it too.)
+   * ---------------------------------------------------------------------- */
+  --font-label-large-family:          var(--font-family-inter);
+  --font-label-large-size:            0.875rem; /* 14px */
+  --font-label-large-weight:          600;
+  --font-label-large-line-height:     1.25rem; /* 20px */
+  --font-label-large-letter-spacing:  0; /* 0px */
+  --font-label-large:                 var(--font-label-large-weight) var(--font-label-large-size)/var(--font-label-large-line-height) var(--font-label-large-family);
+  --font-label-medium-family:         var(--font-family-inter);
+  --font-label-medium-size:           0.75rem; /* 12px */
+  --font-label-medium-weight:         600;
+  --font-label-medium-line-height:    1rem; /* 16px */
+  --font-label-medium-letter-spacing: 0; /* 0px */
+  --font-label-medium:                var(--font-label-medium-weight) var(--font-label-medium-size)/var(--font-label-medium-line-height) var(--font-label-medium-family);
+  --font-label-small-family:          var(--font-family-inter);
+  --font-label-small-size:            0.75rem; /* 12px */
+  --font-label-small-weight:          500;
+  --font-label-small-line-height:     1rem; /* 16px */
+  --font-label-small-letter-spacing:  0; /* 0px */
+  --font-label-small:                 var(--font-label-small-weight) var(--font-label-small-size)/var(--font-label-small-line-height) var(--font-label-small-family);
+
+  /* ----------------------------------------------------------------------
+   * SPACING: scale
+   * Source: "spacing > scale". Named by their px value: --space-16 is 16px.
+   * ONLY these values. 4 is for tiny pairs only (an icon and its label).
+   * ---------------------------------------------------------------------- */
+  --space-4:  0.25rem; /* 4px */
+  --space-8:  0.5rem; /* 8px */
+  --space-12: 0.75rem; /* 12px */
+  --space-16: 1rem; /* 16px */
+  --space-24: 1.5rem; /* 24px */
+  --space-32: 2rem; /* 32px */
+  --space-48: 3rem; /* 48px */
+  --space-64: 4rem; /* 64px */
+  --space-96: 6rem; /* 96px */
+
+  /* ----------------------------------------------------------------------
+   * SPACING: semantic (responsive)
+   * Source: "spacing > rules". Desktop values here; phone values in the
+   * phone media query below. Prefer these over raw --space-* where they apply.
+   * ---------------------------------------------------------------------- */
+  --space-card-padding:      var(--space-24);
+  --space-page-gutter:       var(--space-24);
+  --space-section-marketing: var(--space-96);
+  --space-section-app:       var(--space-32);
+
+  /* ----------------------------------------------------------------------
+   * SHAPE: corner radius, borders, depth
+   * Source: "shape". Radii: sm 6 tags/chips/badges; md 8 buttons, inputs,
+   * cards; lg 10 popups, modals, the CV page; full only for naturally round
+   * things (score ring, avatars). Never 0, never above 10, no pill shapes.
+   * Shadow: ONLY for floating layers (popovers, dropdowns, modals, toasts).
+   * Cards, panels and buttons are flat with a 1px line.
+   * ---------------------------------------------------------------------- */
+  --radius-sm:             6px;
+  --radius-md:             8px;
+  --radius-lg:             10px;
+  --radius-full:           50%; /* score ring and avatars only */
+  --border-width:          1px;
+  --border-width-selected: 2px; /* selected cards, recommended plan */
+  --focus-ring-width:      2px;
+  --focus-ring-offset:     2px;
+  --shadow-floating:       0 4px 16px rgba(15, 23, 42, 0.12);
+  --opacity-disabled:      0.6; /* 40% faded */
+
+  /* ----------------------------------------------------------------------
+   * LAYOUT
+   * Source: "layout" and "marketing site > frame".
+   * Breakpoint variables are for JS only; CSS cannot use var() in @media.
+   * In CSS write: phone (width < 640px), tablet (640px <= width < 1024px),
+   * desktop (width >= 1024px).
+   * ---------------------------------------------------------------------- */
+  --breakpoint-tablet:          640px; /* tablet starts here */
+  --breakpoint-desktop:         1024px; /* desktop starts here */
+  --layout-max-width-marketing: 70rem; /* 1120px */
+  --layout-max-width-app:       70rem; /* 1120px: dashboard, billing, profile */
+  --layout-max-width-text:      45rem; /* 720px: About, Privacy, Terms */
+  --layout-max-width-reading:   70ch; /* about 70 characters per line */
+  --layout-results-rail:        15.5rem; /* 248px */
+  --layout-results-detail:      27.5rem; /* 440px */
+  --layout-results-cv-page:     47.5rem; /* 760px: CV page max width */
+  --layout-nav-height:          4rem; /* 64px: marketing nav */
+
+  /* ----------------------------------------------------------------------
+   * COMPONENT SIZES
+   * Source: "components", "layout > touch targets", "icons", "marketing site".
+   * App buttons 44 tall (36 small, desktop only, top bar and inside cards).
+   * Marketing pages use 48 for buttons and inputs.
+   * On phones every button and tappable icon is at least 44 x 44.
+   * ---------------------------------------------------------------------- */
+  --size-button:           2.75rem; /* 44px */
+  --size-button-small:     2.25rem; /* 36px: desktop only */
+  --size-button-marketing: 3rem; /* 48px */
+  --size-input:            3rem; /* 48px */
+  --size-input-marketing:  3rem; /* 48px */
+  --size-touch-target:     2.75rem; /* 44px: minimum on phones */
+  --size-icon:             1.25rem; /* 20px: Lucide default */
+  --icon-stroke-width:     1.5px; /* Lucide outline stroke */
+
+  /* ----------------------------------------------------------------------
+   * MOTION
+   * Source: "motion". Fade and slide only. No bouncing, wiggling or pulsing.
+   * Allowed only in: hero scan demo, How It Works reveal (once), score
+   * count-up, CV highlight when a category opens, green check on approve.
+   * Reduced motion sets every duration to 0ms (see the media block below).
+   * ---------------------------------------------------------------------- */
+  --duration-fast:   150ms; /* small colour changes */
+  --duration-medium: 250ms; /* menus, popups, banners */
+  --duration-score:  800ms; /* score count-up */
+  --easing-standard: ease-out;
+}
+
+@media (width < 640px) {
+  :root {
+    /* ----------------------------------------------------------------------
+     * TYPOGRAPHY: phone sizes
+     * Source: "font > phone sizes". Display and headline shrink on phones.
+     * Title, body and label sizes do not change. The `font` shorthands above
+     * pick these up automatically.
+     * ---------------------------------------------------------------------- */
+    --font-display-large-size:          2.5rem; /* 40px */
+    --font-display-large-line-height:   2.875rem; /* 46px */
+    --font-display-medium-size:         2.125rem; /* 34px */
+    --font-display-medium-line-height:  2.5rem; /* 40px */
+    --font-display-small-size:          1.875rem; /* 30px */
+    --font-display-small-line-height:   2.25rem; /* 36px */
+    --font-headline-large-size:         1.75rem; /* 28px */
+    --font-headline-large-line-height:  2.25rem; /* 36px */
+    --font-headline-medium-size:        1.625rem; /* 26px */
+    --font-headline-medium-line-height: 2.125rem; /* 34px */
+    --font-headline-small-size:         1.375rem; /* 22px */
+    --font-headline-small-line-height:  1.875rem; /* 30px */
+
+    /* ----------------------------------------------------------------------
+     * SPACING: semantic, phone
+     * Source: "spacing > rules".
+     * ---------------------------------------------------------------------- */
+    --space-card-padding:      var(--space-16);
+    --space-page-gutter:       var(--space-16);
+    --space-section-marketing: var(--space-64);
+    --space-section-app:       var(--space-24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* ----------------------------------------------------------------------
+     * MOTION: reduced
+     * Source: "motion > reduced motion". All animation off; final values show
+     * immediately. JS animations must also check
+     * matchMedia("(prefers-reduced-motion: reduce)").
+     * ---------------------------------------------------------------------- */
+    --duration-fast:   0ms;
+    --duration-medium: 0ms;
+    --duration-score:  0ms;
+  }
+}
