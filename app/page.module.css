@@ -1,0 +1,25 @@
+.page {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--space-section-marketing) var(--space-page-gutter);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  width: 100%;
+  max-width: var(--layout-max-width-text);
+  margin: 0 auto;
+}
+
+.heading {
+  overflow-wrap: anywhere;
+}
+
+.body {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+}
