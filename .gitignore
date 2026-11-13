@@ -8,3 +8,7 @@ build/
 *.log
 .DS_Store
 Thumbs.db
+coverage/
+out/
+next-env.d.ts
+*.tsbuildinfo
