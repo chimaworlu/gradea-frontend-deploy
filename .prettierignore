@@ -1,0 +1,20 @@
+# Generated or installed
+.next/
+out/
+build/
+coverage/
+node_modules/
+package-lock.json
+next-env.d.ts
+
+# Generated from gradea-design-tokens.json; never hand-edited
+styles/tokens.css
+
+# Existing files kept as they are (docs copies, design source, agent instructions)
+docs/
+gradea-design-tokens.json
+scripts/build-design-tokens.mjs
+styles/README.md
+.claude/
+AGENTS.md
+CLAUDE.md
