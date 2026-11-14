@@ -184,11 +184,11 @@ This plan assumes the PRD and SRS as settled inputs. Where a phase depends on an
 - Hero scan animation and "How It Works" scroll-reveal animations.
 - NGN/USD toggle on the Pricing section, wired to the same geolocation service from Phase 7.
 - Frontend-design skill guidance pulled in during this phase for actual typography, spacing, and color execution.
-- Pages per PRD Section 24: Homepage, General Analysis page, Smart Target page, Pricing page (shared design with the in-app plan picker, with FAQ), Privacy, Terms, Contact (with `POST /api/contact`), About (founder and future team photos), and a 404 page. Social proof section omitted until real. Footer with Product, Company, Legal and Community columns plus LinkedIn, X, Instagram and YouTube icons (each shown only once the profile exists).
+- Pages per PRD Section 24: Homepage, General Analysis page, Smart Target page, Pricing page (shared design with the in-app plan picker, with FAQ), Privacy, Terms, Contact (with `POST /api/contact`), About (founder and future team photos), and a 404 page. Social proof section omitted until real. Footer with Product, Company, Legal and Community columns plus the social icon row in the order LinkedIn, TikTok, Facebook, YouTube, X, Instagram (each icon shown only when its link is filled; first wave LinkedIn, TikTok, YouTube, X).
 - Hero sample CV is fictional and labelled. One shared upload component across Homepage, G2, G3 and the in-app Upload screen. Mobile first, collapsing nav. Page titles, descriptions and one share image for G2 and G3.
 - Usage analytics (PostHog, Phase 1) running on the marketing pages, with the Privacy page naming its cookie. No cookie banner at launch. Privacy and Terms wording supplied (template or lawyer) before launch.
 - "See how it works" video section under the hero: a click-to-play poster with a privacy-enhanced YouTube embed that loads only after the visitor taps play, never autoplay (PRD FR-49). A placeholder poster until the video is recorded. Also linked from the pricing FAQ.
-- Footer additions: a YouTube icon (only once the channel exists), an "Earn with Gradea" link, and a "Coming soon" column (CV builder with templates by role, support for scanned CVs; no dates), per FR-53.
+- Footer additions: a social icon row (see above), an "Earn with Gradea" link, and a "Coming soon" column (CV builder with templates by role, support for scanned CVs; no dates), per FR-53.
 - Search and AI-search basics per PRD Section 27: server-rendered pages, titles and descriptions, sitemap.xml, robots.txt, llms.txt, structured data (Organization, SoftwareApplication, FAQ), plain factual About, Pricing and FAQ text. Google Search Console and Bing Webmaster Tools set up at go-live.
 - Affiliate landing page (G10) and apply form (G11), once Phase 9B is ready.
 
@@ -213,13 +213,14 @@ This plan assumes the PRD and SRS as settled inputs. Where a phase depends on an
 
 ## Phase 9C — Admin Dashboard (minimal)
 
-**Designs needed in `docs/design/` before this phase starts:** J1 Overview, J2 Users and user detail, J3 Subscriptions and billing errors, J4 Inbox, J5 Affiliates and payouts, J6 Abuse and audit log.
+**Designs needed in `docs/design/` before this phase starts:** J1 Overview, J2 Users and user detail, J3 Subscriptions and billing errors, J4 Inbox, J5 Affiliates and payouts, J6 Abuse and audit log, J7 Metrics (with the region-picked and no-data states).
 
 - `role` on User; admin routes checked on the server; sensitive actions need re-sign-in; the area carries noindex and is not in the sitemap.
 - Screens and endpoints per SRS Section 4 and PRD Section 26: users and user detail (no CV content), grant or extend PRO by hand with a required reason, launch-offer counter, billing-error log, feedback and contact inbox, affiliate approvals and payouts, abuse view, audit log.
+- Metrics screen (J7): `GET /api/admin/metrics` asks PostHog for the usage numbers with a read-only key and caches the answer for a few minutes (PRD Section 26, SRS Section 4). Date filter, country then city filter, regions under 5 searches grouped into Other, real numbers only ("No data yet" when empty). It needs PostHog and the shared event list from Phase 0 and the events added since, and the read-only PostHog key in the secrets. Search numbers stay empty until the Job board ships.
 - Every admin action writes an AdminAuditLog row.
 
-**Done when:** an admin can look up a user, fix a billing error, approve an affiliate and mark a payout paid, and every action appears in the audit log.
+**Done when:** an admin can look up a user, fix a billing error, approve an affiliate and mark a payout paid, and every action appears in the audit log. The Metrics screen shows real PostHog numbers for the chosen period and region, and "No data yet" where there are none.
 
 ---
 
@@ -240,6 +241,10 @@ This plan assumes the PRD and SRS as settled inputs. Where a phase depends on an
 
 ## Post-MVP outline (not scheduled)
 
+The order below follows PRD Section 21. Nothing here is built before launch.
+
+- **Job board (the next feature after launch, direction decided 11 Nov 2026).** Order: (1) sources and the board, (2) filters and saved jobs, (3) tailor-then-apply (Apply runs the Job-specific scan, then sends the user to the company's own apply page), (4) application tracking (saved, applied, interview), (5) auto-apply last, and only if it is still wanted. Jobs come only from sources that permit it (robots.txt, terms, preferably public feeds), every job shows its source and links to the original, and there is a Report button and a removal request path. Before promising it: check how many Nigerian and African jobs exist on the sources. The G11 waitlist page and the `job_board` waitlist source already exist from Phase 0. When the board ships, the homepage gets the search-led hero and the four-step strip described in PRD Section 21, and the admin Metrics screen starts showing search numbers.
+- **Mobile app (direction decided 12 Nov 2026).** After the MVP, the main product becomes a real mobile app, with the web version staying. The Job board is designed app first. Before promising prices in the app: check store billing rules for Nigeria and the Flutterwave plans. The build approach (separate app or one codebase) is not decided.
 - **In-app CV builder with templates by role** (PRD Section 21): a structured two-pane editor with live preview, ATS-safe templates by role and career level, import from an uploaded CV, export to PDF and Word, AutoFix and Magic Write inside the editor, and the live Gradea grade beside it. Phase A: editor, 3 to 5 role templates, import, export, live grade. Phase B: more roles, AI helpers. Before building: decide the free versus PRO split, update the Privacy page and Terms (the builder stores what the user writes, until they delete it, and it is erased with the account), and tell existing users before it goes live.
 - OCR for scanned or photographed CVs (priority raised), non-English CVs.
 - Public affiliate leaderboard. Remaining PRD Section 21 items.

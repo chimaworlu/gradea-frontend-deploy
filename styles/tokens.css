@@ -516,6 +516,7 @@
   --layout-max-width-marketing: 70rem; /* 1120px */
   --layout-max-width-app:       70rem; /* 1120px: dashboard, billing, profile */
   --layout-max-width-text:      45rem; /* 720px: About, Privacy, Terms */
+  --layout-max-width-form:      40rem; /* 640px: form and waitlist column */
   --layout-max-width-reading:   70ch; /* about 70 characters per line */
   --layout-results-rail:        15.5rem; /* 248px */
   --layout-results-detail:      27.5rem; /* 440px */

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [staging, main]
+
+# Read-only: this workflow only checks the code. No secrets and no deploy step.
+permissions:
+  contents: read
+
+# SRS Section 2: Next.js anonymous telemetry stays off everywhere. The npm scripts also
+# set this through scripts/next.mjs; it is repeated here so any direct `next` call in CI is covered.
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Type check, lint, token audit and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 26.13.0
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.13.0
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Run npm run check
+        run: npm run check

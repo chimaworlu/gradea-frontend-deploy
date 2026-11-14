@@ -515,6 +515,7 @@
       "marketing": "1120 wide, centered, for every marketing page (nav side padding 160, footer inner 1120)",
       "dashboard, billing, profile": 1120,
       "text pages (About, Privacy, Terms)": 720,
+      "form and waitlist column (Coming soon, Job board waitlist)": 640,
       "reading text": "about 70 characters per line"
     },
     "touch targets": "At least 44 x 44 on phones for every button and tappable icon.",
@@ -699,7 +700,7 @@
   },
   "social icons": {
     "where": "Footer only, never in the nav. The coming-soon page and the About founder card also use them.",
-    "set": "LinkedIn, X, Instagram, YouTube. Show only profiles that are live. TikTok is not used for now.",
-    "styles": "Light round (tint circle) on light backgrounds, dark round on dark ones. 56px in the set, scaled to 40 or 44 where needed."
+    "set": "LinkedIn, TikTok, Facebook, YouTube, X, Instagram (this order). First wave live: LinkedIn, TikTok, YouTube, X. Show an icon only when its link is filled.",
+    "styles": "Light rounded squares (tint fill) on light backgrounds, dark rounded squares on dark ones. 56px in the set, scaled to 40 or 44 where needed."
   }
 }
