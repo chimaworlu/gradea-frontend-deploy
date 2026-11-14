@@ -99,7 +99,7 @@
   gap: var(--space-16);
   padding: var(--space-24);
   border-radius: var(--radius-lg);
-  /* The design's green tint (#E5F2EB) has no exact role; secondary-container is the closest. */
+  /* The design's green tint has no exact role; secondary-container is the closest (see report). */
   background: var(--color-secondary-container);
   text-align: start;
 }
