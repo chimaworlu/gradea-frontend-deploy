@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { SocialLinks, toSocialItems } from "../components/SocialLinks";
+import { SocialLinks } from "../components/SocialLinks";
 import { WaitlistForm } from "../components/WaitlistForm";
 import { fillPlaceholders, getContent } from "../lib/content";
+import { selectShownSocials, toSocialItems } from "../lib/socials";
 import styles from "./page.module.css";
 
 // G12 Coming-soon landing page (FR-55). It stays at / until the full marketing site launches.
 const content = getContent("marketing/coming-soon");
-const socials = toSocialItems(content.socials.items);
+const socials = selectShownSocials(toSocialItems(content.socials.items));
 
 // Indexable on purpose (Marketing dev notes, "Coming soon page: keep indexable").
 export const metadata: Metadata = {
