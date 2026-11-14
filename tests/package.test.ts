@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 type PackageJson = {
   engines?: Record<string, string>;
+  scripts?: Record<string, string>;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
 };
@@ -31,5 +32,16 @@ describe("package.json", () => {
     for (const [name, version] of Object.entries(all)) {
       expect(version, name).toMatch(/^\d+\.\d+\.\d+$/);
     }
+  });
+
+  // SRS Section 2: Next.js telemetry is off. scripts/next.mjs sets NEXT_TELEMETRY_DISABLED=1.
+  it("runs every Next.js command through the telemetry-off wrapper", () => {
+    const scripts = Object.entries(pkg.scripts ?? {});
+    expect(scripts.length).toBeGreaterThan(0);
+    for (const [name, command] of scripts) {
+      expect(command, name).not.toMatch(/(^|&&\s*|\s)next\s/);
+    }
+    expect(pkg.scripts?.dev).toContain("node scripts/next.mjs dev");
+    expect(pkg.scripts?.build).toContain("node scripts/next.mjs build");
   });
 });

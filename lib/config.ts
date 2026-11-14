@@ -14,6 +14,10 @@ export type ConfigEnv = {
   NEXT_PUBLIC_API_URL?: string | undefined;
 };
 
+export type TurnstileEnv = {
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string | undefined;
+};
+
 export class ConfigError extends Error {
   constructor(message: string) {
     super(message);
@@ -43,8 +47,28 @@ export function readConfig(env: ConfigEnv): AppConfig {
   return { apiUrl: raw.replace(/\/+$/, "") };
 }
 
-/** Reads the config from this environment. Throws a ConfigError with a plain message if invalid. */
+/**
+ * The Cloudflare Turnstile site key (public by design). An empty or missing key means
+ * "no bot check" for local development: the form then sends no bot_token. Never throws.
+ */
+export function readTurnstileSiteKey(env: TurnstileEnv): string {
+  const raw = env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+  if (/\s/.test(raw)) {
+    throw new ConfigError("NEXT_PUBLIC_TURNSTILE_SITE_KEY must not contain spaces.");
+  }
+  return raw;
+}
+
+// Next.js inlines NEXT_PUBLIC_ values only when they are read by their full literal name.
+
+/** Reads the API config from this environment. Throws a ConfigError with a plain message if invalid. */
 export function getConfig(): AppConfig {
-  // Next.js inlines NEXT_PUBLIC_ values only when they are read by their full literal name.
   return readConfig({ NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL });
+}
+
+/** Reads the Turnstile site key from this environment ("" when the bot check is off). */
+export function getTurnstileSiteKey(): string {
+  return readTurnstileSiteKey({
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  });
 }

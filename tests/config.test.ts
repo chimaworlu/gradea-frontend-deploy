@@ -1,5 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { ConfigError, readConfig } from "../lib/config";
+import { ConfigError, readConfig, readTurnstileSiteKey } from "../lib/config";
+
+describe("readTurnstileSiteKey", () => {
+  it("is empty when the key is missing, so the bot check is skipped locally", () => {
+    expect(readTurnstileSiteKey({})).toBe("");
+  });
+
+  it("is empty when the key is blank", () => {
+    expect(readTurnstileSiteKey({ NEXT_PUBLIC_TURNSTILE_SITE_KEY: "   " })).toBe("");
+  });
+
+  it("returns a set key without surrounding spaces", () => {
+    expect(readTurnstileSiteKey({ NEXT_PUBLIC_TURNSTILE_SITE_KEY: " site-key-1 " })).toBe(
+      "site-key-1",
+    );
+  });
+
+  it("rejects a key with spaces inside, without printing it", () => {
+    const value = "site key";
+    expect(() => readTurnstileSiteKey({ NEXT_PUBLIC_TURNSTILE_SITE_KEY: value })).toThrow(
+      "NEXT_PUBLIC_TURNSTILE_SITE_KEY must not contain spaces.",
+    );
+  });
+});
 
 describe("readConfig", () => {
   it("returns the API address without a trailing slash", () => {

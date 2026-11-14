@@ -1,0 +1,143 @@
+/* G12 waitlist form. Mobile first: the button sits under the field and is full width on phones. */
+
+.form {
+  width: 100%;
+  text-align: start;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.input {
+  min-width: 0;
+  height: var(--size-input-marketing);
+  padding: 0 var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  /* 16px minimum on phones so the browser does not zoom on focus. */
+  font-size: var(--font-text-input-size-phone);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.input::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 1;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.button {
+  height: var(--size-button-marketing);
+  padding: 0 var(--space-24);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.button:hover {
+  background: var(--color-primary-hover);
+}
+
+.button:active {
+  background: var(--color-primary-pressed);
+}
+
+.button:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.button:disabled:hover {
+  background: var(--color-primary);
+}
+
+.error {
+  margin-top: var(--space-8);
+  color: var(--color-error);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+/* Kept in the page (for the live region) but takes no space when there is no message. */
+.error:empty {
+  margin-top: 0;
+}
+
+/* Turnstile only draws here if Cloudflare asks the visitor to interact. */
+.turnstile:not(:empty) {
+  margin-top: var(--space-12);
+}
+
+.joined {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  /* The design's green tint has no exact role; secondary-container is the closest (see report). */
+  background: var(--color-secondary-container);
+  text-align: start;
+}
+
+/* Focus moves here for screen readers when the form is replaced. It is not a control, so no ring. */
+.joined:focus {
+  outline: none;
+}
+
+.joinedIcon {
+  color: var(--color-success);
+}
+
+.joinedText {
+  display: flex;
+  flex-direction: column;
+}
+
+.joinedTitle {
+  color: var(--color-on-surface);
+  font: var(--font-title-medium);
+  letter-spacing: var(--font-title-medium-letter-spacing);
+}
+
+.joinedBody {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+@media (width >= 640px) {
+  .row {
+    flex-direction: row;
+  }
+
+  /* Only in the side-by-side row: in the phone column, flex would override the 48 height. */
+  .input {
+    flex: 1;
+    font-size: var(--font-body-medium-size);
+  }
+}

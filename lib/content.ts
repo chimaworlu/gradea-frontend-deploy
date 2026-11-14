@@ -1,4 +1,4 @@
-import placeholder from "../content/marketing/placeholder.json";
+import comingSoon from "../content/marketing/coming-soon.json";
 
 /** Every content file starts with an id and a title that match the screen list. */
 export type ContentFileHeader = { id: string; title: string };
@@ -6,13 +6,13 @@ export type ContentFileHeader = { id: string; title: string };
 // Every content file is registered here. Its type is inferred from the JSON itself, so a
 // missing or misspelled key is a type error at build time (content-and-copy rule, Section 1).
 const contentFiles = {
-  "marketing/placeholder": placeholder,
+  "marketing/coming-soon": comingSoon,
 } satisfies Record<string, ContentFileHeader>;
 
 export type ContentFileKey = keyof typeof contentFiles;
 export type ContentFile<K extends ContentFileKey> = (typeof contentFiles)[K];
 
-/** Returns the typed text for one screen, for example getContent("marketing/placeholder"). */
+/** Returns the typed text for one screen, for example getContent("marketing/coming-soon"). */
 export function getContent<K extends ContentFileKey>(key: K): ContentFile<K> {
   return contentFiles[key];
 }
