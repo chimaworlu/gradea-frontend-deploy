@@ -9,7 +9,7 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 - FAQ lists are dropdowns. First item open, the rest closed. Chevron flips when open. Several can be open at once. Answer expands with a short height animation.
 - "How it works" is one section: video on top, then the step cards. The video never autoplays, plays on click. The caption under the poster is a placeholder until the video is recorded.
 - Every page needs its own title and description. Share image: use the sample result card.
-- Social icons appear in the footer only, and only for profiles that are live.
+- Social icons appear in the footer and on the coming-soon page, and only when their link is filled.
 
 ## S1 Nav and footer
 - Nav: logo (component "Logo / Lockup"), Product dropdown, Pricing, Earn with Gradea, Log in, primary button. Product opens on hover and click; chevron rotates 180 degrees when open (the design shows the open state with the chevron unrotated). Phone menu is built in code.
@@ -63,4 +63,4 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 - Record the how-to video. Add the real founder photo and edit the About story.
 - Check the AI providers' terms before keeping the "not used to train models" idea on the Privacy page.
 - Check Nigerian job coverage before promising anything on the Job board page.
-- Create the four social accounts (LinkedIn, X, Instagram, YouTube), then add their links to the shared content file. TikTok is not used for now. An icon shows only once its profile is live.
+- Create the first four social accounts (LinkedIn, TikTok, YouTube, X), then add their links to the shared content file. Facebook and Instagram come later. The set is six icons in this order: LinkedIn, TikTok, Facebook, YouTube, X, Instagram. An icon shows only when its link is filled.
