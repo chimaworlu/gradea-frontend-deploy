@@ -79,8 +79,11 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 **Payout**
 - `id`, `affiliate_id`, `amount`, `currency`, `status` (enum: requested, paid, rejected), `requested_at`, `paid_at` (nullable), `paid_by_admin_id` (nullable). Minimum balance 1,000 NGN. Payouts are in NGN only; the programme is open to Nigerian affiliates only for now.
 
-**Waitlist** (G11 Job board waitlist, G12 Coming-soon page)
-- `id`, `email` (unique, one row per email), `source` (enum: launch, job_board), `created_at`. Email only, no other personal data. Joining twice returns the same success message and adds no second row. Used only to tell people when the product or job board is live.
+**Waitlist** (G12 Coming-soon page, and the optional email box on G13 Coming soon features)
+- `id`, `email` (unique, one row per email), `source` (enum: launch, job_board, cv_builder, scanned_cv, mobile_app), `created_at`. Email only, no other personal data. Joining twice returns the same success message and adds no second row. Used only to tell people when the product or job board is live.
+
+**FeatureVote** (G13 Coming soon features)
+- `id`, `feature` (enum: job_board, cv_builder, scanned_cv, mobile_app), `created_at`. One row per tap. No email, no IP address and no other personal data is stored. The counts are read by the admin Metrics screen. A visitor can vote once per feature, checked in the browser, so the counts are a signal and not an exact figure.
 
 **AdminAuditLog**
 - `id`, `admin_user_id`, `action`, `target_type`, `target_id`, `reason` (nullable), `created_at`. Every admin action writes one row.
@@ -95,7 +98,8 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 - `POST /api/auth/password-reset` — request and complete password reset via email (Resend)
 
 **Waitlist (public)**
-- `POST /api/waitlist` — accepts email and source (launch or job_board). Body: `email`, `source` and `bot_token`. Same invisible bot check (Cloudflare Turnstile) and per-IP rate limit as guest upload: 5 requests per minute per IP on this route, and over the limit the API answers 429 with code `rate_limited`. Success is `200` with `{ "ok": true }`, the same for a new and a repeat email. Error codes for this endpoint: `validation_failed` (400), `bot_check_failed` (400), `rate_limited` (429), `internal_error` (500). The bot check is controlled by `BOT_CHECK_ENABLED` (off in local development, must be on in production). The rate-limit counter lives in the server's memory, so with more than one server running each counts on its own and the real limit multiplies; a shared store is needed before scaling out. There is one row per email: someone on the launch list who later joins the Job board keeps their first source (to be decided with G11). Deleting a waitlist email on request (PRD FR-56) is not built yet and needs an admin action or a manual step before launch. The email is trimmed and lowercased before it is saved, so `Foo@x.com` and `foo@x.com` are the same person and the unique rule cannot be bypassed by letter case. Returns the same success whether or not the email already exists.
+- `POST /api/waitlist` — accepts email and source (launch, job_board, cv_builder, scanned_cv or mobile_app). Body: `email`, `source` and `bot_token`. Same invisible bot check (Cloudflare Turnstile) and per-IP rate limit as guest upload: 5 requests per minute per IP on this route, and over the limit the API answers 429 with code `rate_limited`. Success is `200` with `{ "ok": true }`, the same for a new and a repeat email. Error codes for this endpoint: `validation_failed` (400), `bot_check_failed` (400), `rate_limited` (429), `internal_error` (500). The bot check is controlled by `BOT_CHECK_ENABLED` (off in local development, must be on in production). The rate-limit counter lives in the server's memory, so with more than one server running each counts on its own and the real limit multiplies; a shared store is needed before scaling out. There is one row per email: someone on the launch list who later joins the Job board keeps their first source (to be decided at the G13 build: the vote counts are kept separately in FeatureVote, so no vote is lost). Deleting a waitlist email on request (PRD FR-56) is not built yet and needs an admin action or a manual step before launch. The email is trimmed and lowercased before it is saved, so `Foo@x.com` and `foo@x.com` are the same person and the unique rule cannot be bypassed by letter case. Returns the same success whether or not the email already exists.
+- `POST /api/feature-vote` — public, one tap on G13. Body: `feature` (job_board, cv_builder, scanned_cv or mobile_app) and `bot_token`. Same invisible bot check and the same per-IP rate limit as the waitlist (5 per minute per IP). Success is `200` with `{ "ok": true }`. Error codes: `validation_failed` (400), `bot_check_failed` (400), `rate_limited` (429), `internal_error` (500). Saves one FeatureVote row and returns no counts.
 
 **Scan submission (guest-accessible)**
 - `POST /api/scan/general` — accepts CV file, optional guest session token, career_level override; returns scan_session_id
@@ -337,4 +341,5 @@ Each function's internal provider routing (which provider, which model tier) is 
 | Search and AI-search visibility | Section 27, FR-52 | SRS Section 4 (public files) |
 | How-to video | FR-49 | SRS Section 11 (privacy-enhanced embed) |
 | Coming-soon page and waitlist | Section 24, FR-55, FR-56 | SRS Section 3 (Waitlist), Section 4 (`POST /api/waitlist`) |
+| Coming soon features and votes | Section 24, FR-57 | SRS Section 3 (FeatureVote), Section 4 (`POST /api/feature-vote`) |
 | Network status bar | FR-48 | Front end only; retry behaviour in SRS Section 12 |
