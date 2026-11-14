@@ -1,25 +1,79 @@
+/* G12 Coming-soon landing page. Mobile first; token variables only. */
+
 .page {
   display: flex;
+  flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: var(--space-section-marketing) var(--space-page-gutter);
+  min-height: 100dvh;
+  padding: var(--space-48) var(--space-page-gutter);
 }
 
-.inner {
+.header {
   display: flex;
+  justify-content: center;
+}
+
+/* The hero sits centred in the space between the logo and the socials, as in all four designs. */
+.main {
+  display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: var(--space-16);
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: var(--layout-max-width-text);
-  margin: 0 auto;
+  max-width: var(--layout-max-width-form);
+  padding: var(--space-64) 0;
+  text-align: center;
 }
 
-.heading {
-  overflow-wrap: anywhere;
+.tag {
+  margin-bottom: var(--space-24);
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font: var(--font-label-medium);
+  letter-spacing: var(--font-label-medium-letter-spacing);
 }
 
-.body {
+/* The design sets the headline in ink, not navy, and with no tracking: the G12 frame measures
+   48px Lora at normal letter-spacing (the token's -1px makes it wrap "holding your / CV back"
+   instead of the designed "holding / your CV back"). Listed as a token conflict in the report. */
+.headline {
+  color: var(--color-on-surface);
+  font: var(--font-display-medium);
+  letter-spacing: normal;
+}
+
+.subline {
+  margin-top: var(--space-16);
   color: var(--color-on-surface-variant);
   font: var(--font-body-large);
   letter-spacing: var(--font-body-large-letter-spacing);
+}
+
+.formSlot {
+  width: 100%;
+  margin-top: var(--space-48);
+}
+
+.helper {
+  margin-top: var(--space-24);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-64);
+}
+
+.copyright {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
 }
