@@ -23,13 +23,29 @@ describe("G12 coming-soon content", () => {
     expect(fillPlaceholders(content.footer.copyright, { year: 2026 })).toBe("© 2026 Gradea");
   });
 
-  it("lists the four social profiles in the design order", () => {
+  it("lists the six social profiles in the agreed order", () => {
     expect(content.socials.items.map((item) => item.network)).toEqual([
       "linkedin",
+      "tiktok",
+      "facebook",
+      "youtube",
       "x",
       "instagram",
-      "youtube",
     ]);
+  });
+
+  it("marks LinkedIn, TikTok, YouTube and X visible, Facebook and Instagram hidden", () => {
+    const visible = Object.fromEntries(
+      content.socials.items.map((item) => [item.network, item.visible]),
+    );
+    expect(visible).toEqual({
+      linkedin: true,
+      tiktok: true,
+      facebook: false,
+      youtube: true,
+      x: true,
+      instagram: false,
+    });
   });
 
   it("uses only https links for socials that have a url", () => {
@@ -43,8 +59,8 @@ describe("G12 coming-soon content", () => {
 
 // Reports, without failing CI, every social profile that still has no link. The icon shows
 // without a link until the founder sends the real profile url (it is never invented).
-describe("G12 social profiles still without a url", () => {
-  const missing = content.socials.items.filter((item) => item.url === "");
+describe("G12 visible social profiles still without a url", () => {
+  const missing = content.socials.items.filter((item) => item.visible && item.url === "");
   for (const item of missing) {
     it.todo(`add the ${item.name} profile url to content/marketing/coming-soon.json`);
   }

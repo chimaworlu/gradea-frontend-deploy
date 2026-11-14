@@ -1,39 +1,24 @@
 import { fillPlaceholders } from "../lib/content";
-import { SocialIcon, type SocialNetwork } from "./icons/SocialIcon";
+import type { SocialItem } from "../lib/socials";
+import { SocialIcon } from "./icons/SocialIcon";
 import styles from "./SocialLinks.module.css";
-
-export type SocialItem = { network: SocialNetwork; name: string; url: string };
-
-const NETWORKS: readonly SocialNetwork[] = ["linkedin", "x", "instagram", "youtube"];
-
-function isSocialNetwork(value: string): value is SocialNetwork {
-  return NETWORKS.some((network) => network === value);
-}
-
-/** Checks the socials list from the content file. An unknown network fails the build. */
-export function toSocialItems(
-  items: readonly { network: string; name: string; url: string }[],
-): SocialItem[] {
-  return items.map(({ network, name, url }) => {
-    if (!isSocialNetwork(network)) {
-      throw new Error(`Unknown social network in content: ${network}`);
-    }
-    return { network, name, url };
-  });
-}
 
 type Props = {
   listLabel: string;
   linkLabel: string;
+  /** Already filtered with selectShownSocials (lib/socials.ts). */
   items: readonly SocialItem[];
 };
 
 /**
  * The social icons shown on G12. An icon is a link only when its profile url is filled in the
- * content file. Until then it shows as in the design but is not a link (founder decision:
+ * content file. Until then it shows as a plain icon, never a dead link (founder decision:
  * profiles are not created yet, and links are never invented).
  */
 export function SocialLinks({ listLabel, linkLabel, items }: Props) {
+  if (items.length === 0) {
+    return null;
+  }
   return (
     <ul className={styles.list} aria-label={listLabel}>
       {items.map((item) => (

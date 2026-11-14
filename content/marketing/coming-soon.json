@@ -37,10 +37,12 @@
     "listLabel": "Gradea on social media",
     "linkLabel": "Gradea on {network}",
     "items": [
-      { "network": "linkedin", "name": "LinkedIn", "url": "" },
-      { "network": "x", "name": "X", "url": "" },
-      { "network": "instagram", "name": "Instagram", "url": "" },
-      { "network": "youtube", "name": "YouTube", "url": "" }
+      { "network": "linkedin", "name": "LinkedIn", "url": "", "visible": true },
+      { "network": "tiktok", "name": "TikTok", "url": "", "visible": true },
+      { "network": "facebook", "name": "Facebook", "url": "", "visible": false },
+      { "network": "youtube", "name": "YouTube", "url": "", "visible": true },
+      { "network": "x", "name": "X", "url": "", "visible": true },
+      { "network": "instagram", "name": "Instagram", "url": "", "visible": false }
     ]
   },
   "footer": {
