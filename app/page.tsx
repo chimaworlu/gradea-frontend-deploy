@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SocialLinks, toSocialItems } from "../components/SocialLinks";
+import { WaitlistForm } from "../components/WaitlistForm";
 import { fillPlaceholders, getContent } from "../lib/content";
 import styles from "./page.module.css";
 
@@ -33,6 +34,7 @@ export default function ComingSoonPage() {
         <h1 className={styles.headline}>{content.hero.headline}</h1>
         <p className={styles.subline}>{content.hero.subline}</p>
         <div className={styles.formSlot}>
+          <WaitlistForm text={content.waitlistForm} />
           <p className={styles.helper}>{content.waitlistForm.helper}</p>
         </div>
       </main>
