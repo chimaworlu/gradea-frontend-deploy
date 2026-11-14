@@ -515,6 +515,7 @@
       "marketing": "1120 wide, centered, for every marketing page (nav side padding 160, footer inner 1120)",
       "dashboard, billing, profile": 1120,
       "text pages (About, Privacy, Terms)": 720,
+      "form and waitlist column (Coming soon, Job board waitlist)": 640,
       "reading text": "about 70 characters per line"
     },
     "touch targets": "At least 44 x 44 on phones for every button and tappable icon.",
