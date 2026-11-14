@@ -23,7 +23,6 @@
 }
 
 .input {
-  flex: 1;
   min-width: 0;
   height: var(--size-input-marketing);
   padding: 0 var(--space-16);
@@ -100,8 +99,14 @@
   gap: var(--space-16);
   padding: var(--space-24);
   border-radius: var(--radius-lg);
-  background: var(--color-success-container);
+  /* The design's green tint (#E5F2EB) has no exact role; secondary-container is the closest. */
+  background: var(--color-secondary-container);
   text-align: start;
+}
+
+/* Focus moves here for screen readers when the form is replaced. It is not a control, so no ring. */
+.joined:focus {
+  outline: none;
 }
 
 .joinedIcon {
@@ -111,7 +116,6 @@
 .joinedText {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
 }
 
 .joinedTitle {
@@ -131,7 +135,9 @@
     flex-direction: row;
   }
 
+  /* Only in the side-by-side row: in the phone column, flex would override the 48 height. */
   .input {
+    flex: 1;
     font-size: var(--font-body-medium-size);
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useId, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { getConfig, getTurnstileSiteKey } from "../lib/config";
 import { TURNSTILE_SCRIPT_URL, createTurnstileTokenGetter } from "../lib/turnstile";
 import { createSingleFlight, submitWaitlist, type WaitlistOutcome } from "../lib/waitlist";
@@ -51,6 +51,13 @@ export function WaitlistForm({ text }: { text: WaitlistFormText }) {
   // A second tap or Enter while a request is running does nothing.
   const singleFlight = useMemo(() => createSingleFlight<WaitlistOutcome>(), []);
 
+  // The form is replaced by the joined message, so focus moves to it once it is on the page.
+  useEffect(() => {
+    if (joined) {
+      joinedRef.current?.focus();
+    }
+  }, [joined]);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const outcome = await singleFlight(async () => {
@@ -79,8 +86,6 @@ export function WaitlistForm({ text }: { text: WaitlistFormText }) {
     if (outcome === "joined") {
       setError(null);
       setJoined(true);
-      // The form is replaced, so move focus to the message that replaced it.
-      requestAnimationFrame(() => joinedRef.current?.focus());
       return;
     }
     setError(outcome);
