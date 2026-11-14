@@ -3,16 +3,17 @@ import { fillPlaceholders, getContent, listContentFiles } from "../lib/content";
 
 describe("content loader", () => {
   it("returns the typed text for a registered file", () => {
-    const content = getContent("marketing/placeholder");
-    expect(content.id).toBe("placeholder");
-    expect(content.hero.heading.length).toBeGreaterThan(0);
-    expect(content.hero.body.length).toBeGreaterThan(0);
+    const content = getContent("marketing/coming-soon");
+    expect(content.id).toBe("G12");
+    expect(content.title).toBe("Coming-soon landing page");
+    expect(content.hero.headline.length).toBeGreaterThan(0);
+    expect(content.hero.subline.length).toBeGreaterThan(0);
   });
 
   it("rejects a misspelled key or file at type-check time", () => {
-    const content = getContent("marketing/placeholder");
+    const content = getContent("marketing/coming-soon");
     // @ts-expect-error: proves a misspelled key fails npm run typecheck.
-    const misspelled: unknown = content.hero.headng;
+    const misspelled: unknown = content.hero.headlne;
     expect(misspelled).toBeUndefined();
     // @ts-expect-error: proves an unregistered content file fails npm run typecheck.
     expect(() => getContent("marketing/missing").id).toThrow();
