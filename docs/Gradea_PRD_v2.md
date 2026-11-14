@@ -208,7 +208,7 @@ Free user views locked results, selects one flagged line to unlock using their l
 | FR-48 | Network status bar: a slim bar under the app top bar appears when the browser goes offline ("You're offline. We'll reconnect when you're back online.") or when requests are slow ("Slow connection. This may take longer."), and disappears when the connection recovers. Typed text and chosen files are never lost. Uploads or scans interrupted by a lost connection show a clear message with a retry (design screen D3). |
 | FR-49 | How-to video: a short video on how to use Gradea sits in a "See how it works" section directly under the homepage hero, and is linked from the pricing FAQ. It is a click-to-play poster image (a privacy-enhanced YouTube embed that loads only after the visitor taps play), never autoplay, so no cookie banner is needed. |
 | FR-50 | Affiliate programme at launch, small version (Section 25): application and manual approval, a personal referral link, a 30-day attribution window, a one-time 20 percent commission on the referred user's first payment, a 30-day hold before a commission is payable, open to people in Nigeria only for now, a minimum payout of 1,000 naira, manual monthly payouts by Flutterwave transfer, an affiliate dashboard, and our own tracking with no paid third-party tool. No signup bonus. No commission on renewals. |
-| FR-51 | Admin dashboard, minimal at launch (Section 26): admin-only role, user and subscription lookup, support actions, launch-offer counter, billing-error handling, feedback and contact inbox, affiliate applications and payouts, abuse flags, and an audit log of every admin action. |
+| FR-51 | Admin dashboard, minimal at launch (Section 26): admin-only role, user and subscription lookup, support actions, launch-offer counter, billing-error handling, feedback and contact inbox, affiliate applications and payouts, abuse flags, a Metrics screen for usage numbers (Section 26), and an audit log of every admin action. |
 | FR-52 | Search and AI-search visibility (Section 27): server-rendered marketing pages, sitemap, robots file, titles and descriptions, structured data, an llms.txt file, plain factual text on About, Pricing and FAQ, and Google and Bing webmaster tools set up at launch. |
 | FR-53 | Footer additions: a YouTube icon with the other social icons (shown only once the channel exists), an "Earn with Gradea" link, and a "Coming soon" column listing only features that are really planned, with no dates. At launch it lists only the Job board (the next feature, Section 21). Other planned features are added only when they are the next thing being built. |
 | FR-55 | Before launch the site shows a Coming-soon landing page (G12) with one email box to join the launch waitlist, a clear success state, a clear error state and the social icons (only for profiles that are live). It stays in place until the full marketing site is released. |
@@ -384,7 +384,7 @@ Pricing above is a starting point and should be revisited once real AI cost-per-
 
 **Usage tracking (decided 12 Nov 2026).** Gradea uses PostHog (free to start) to see how people use the site and the app: page views, clicks, screens reached, features used, funnels, searches, and where visitors come from by country and city. Rules:
 - **Actions, never content.** Events carry the action and a few safe details (screen, plan, score band, search words). They never carry CV text, job description text, or anything typed into a scan. No screen recording on the upload, scan and results screens; masked or off everywhere else.
-- **Searches are tracked** (for example Job board searches once it ships), so the founder can see what people look for.
+- **Searches are tracked** (for example Job board searches once it ships), so the founder can see what people look for. Only the plain search words are kept: a search that is very long, or that looks like an email address or phone number, is dropped before it is sent. Searches carry the visitor's country and city, so the founder can see which regions search for what. A region with fewer than 5 searches is grouped into "Other".
 - **Regions** come from the visitor's IP as country and city only. The full IP address is not stored.
 - **Signed-in users** are identified by their internal user id, never by email or name in event data.
 - **Cookies:** PostHog sets its own analytics cookie. The Privacy page says so, in plain words. No cookie banner at launch. Revisit if the audience outside Nigeria grows.
@@ -545,7 +545,17 @@ Internal, for the founder and later support staff. Minimal at launch, built from
 - Affiliates: applications to approve or reject, commissions, and the monthly payout list to mark as paid.
 - Abuse: blocked signups, rate-limit hits and flagged accounts.
 - Audit log: every admin action is recorded with who, what and when.
-- **Design screens (new Group J):** J1 Overview, J2 Users and user detail, J3 Subscriptions and billing errors, J4 Inbox, J5 Affiliates and payouts, J6 Abuse and audit log. Designed after the product screens.
+- **Metrics (usage numbers from PostHog):** one screen, with a date filter (Today, 7 days, 30 days, All time) and a region filter (country first, then city; Nigeria listed first; the default is All regions). Regions with fewer than 5 searches are grouped into "Other". It shows:
+  - Key numbers: visitors, searches, signups, checkout starts, each compared with the period before.
+  - A per-day chart of visitors and searches.
+  - Searches: total searches, top search words with counts, searches with no results (count, percentage and top words), searches by country and by city, and the search-to-click rate. Searches start when the Job board ships; until then the block shows "No data yet".
+  - Where visitors come from: sources (Google, direct, social, affiliate links) and devices (phone, desktop, tablet).
+  - Funnel: homepage, upload started, signed up, saw results, viewed pricing, started checkout, with the share of visitors at each step.
+  - What people do: scans started, Job-specific switch, AutoFix, Magic Write, Re-score and downloads, plus marketing actions (main button clicks, pricing page views, waitlist signups by launch and Job board, how-to video plays, social icon clicks).
+  - Friction: failed uploads, offline or slow-connection screens, error screens shown.
+  - A link out to PostHog for anything deeper. The screen shows real numbers only; where there is no data it says "No data yet", with no sample or invented figures. It never shows CV or job description text, and never an email address or full IP.
+  - The operational numbers (today's scans, new users, revenue, errors, the "Needs you" list) stay on the Overview.
+- **Design screens (new Group J):** J1 Overview, J2 Users and user detail, J3 Subscriptions and billing errors, J4 Inbox, J5 Affiliates and payouts, J6 Abuse and audit log, J7 Metrics (with a region-picked state and a no-data state). Designed after the product screens.
 
 ## 27. Search and AI-Search Visibility
 
