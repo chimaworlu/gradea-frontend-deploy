@@ -3,7 +3,7 @@
   "title": "Coming-soon landing page",
   "meta": {
     "title": "Gradea, coming soon",
-    "description": "Gradea grades your CV or resume, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens."
+    "description": "Gradea grades your CV or resume, shows the exact lines to fix, and helps you fix them."
   },
   "header": {
     "logoAlt": "Gradea"
@@ -11,36 +11,19 @@
   "hero": {
     "tag": "Coming soon",
     "headline": "Find out what's holding your CV back",
-    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens."
-  },
-  "waitlistForm": {
-    "default": {
-      "label": "Your email",
-      "placeholder": "Your email",
-      "button": "Notify me"
-    },
-    "sending": {
-      "button": "Joining..."
-    },
-    "joined": {
-      "title": "You're on the list",
-      "body": "We will email you when Gradea opens."
-    },
-    "error": {
-      "invalidEmail": "Enter a valid email, like name@example.com.",
-      "rateLimited": "Too many tries. Please wait a minute and try again.",
-      "generic": "Something went wrong. Please try again."
-    },
-    "helper": "One email, when we launch. No spam."
+    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them.",
+    "follow": "Follow us for updates."
   },
   "socials": {
     "listLabel": "Gradea on social media",
     "linkLabel": "Gradea on {network}",
     "items": [
-      { "network": "linkedin", "name": "LinkedIn", "url": "" },
-      { "network": "x", "name": "X", "url": "" },
-      { "network": "instagram", "name": "Instagram", "url": "" },
-      { "network": "youtube", "name": "YouTube", "url": "" }
+      { "network": "linkedin", "name": "LinkedIn", "url": "", "visible": true },
+      { "network": "tiktok", "name": "TikTok", "url": "", "visible": true },
+      { "network": "facebook", "name": "Facebook", "url": "", "visible": false },
+      { "network": "youtube", "name": "YouTube", "url": "", "visible": true },
+      { "network": "x", "name": "X", "url": "", "visible": true },
+      { "network": "instagram", "name": "Instagram", "url": "", "visible": false }
     ]
   },
   "footer": {

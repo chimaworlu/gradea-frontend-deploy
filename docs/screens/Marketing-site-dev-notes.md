@@ -1,7 +1,7 @@
 # Marketing site: build notes
 
 Figma page "Affiliate & Admin & Marketing web", under the label MARKETING WEB. Desktop only (1440). Phones are built responsive in code. Content column is 1120 wide, centered. Nav padding 160, footer inner 1120.
-Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General Analysis, G3 Smart Target, G4 Pricing, G5 Privacy, G6 Terms, G7 Contact (empty, filled, sent, error), G8 About, G9 404, Job board waitlist (empty, filled, joined, error), Coming soon (empty, filled, joined, error). G10 Affiliate landing is in screens/Affiliate/Affiliate-programme-dev-notes.md.
+Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General Analysis, G3 Smart Target, G4 Pricing, G5 Privacy, G6 Terms, G7 Contact (empty, filled, sent, error), G8 About, G9 404, Coming soon G12 (one state, no email box), Coming soon features G13 (default, voted). G10 Affiliate landing is in screens/Affiliate/Affiliate-programme-dev-notes.md.
 
 ## Shared rules
 - Currency switch (Naira / Dollars) changes every price on the page. Default follows location. Prices use Inter (Lora has no naira sign).
@@ -13,7 +13,7 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 
 ## S1 Nav and footer
 - Nav: logo (component "Logo / Lockup"), Product dropdown, Pricing, Earn with Gradea, Log in, primary button. Product opens on hover and click; chevron rotates 180 degrees when open (the design shows the open state with the chevron unrotated). Phone menu is built in code.
-- Footer: columns incl. "Coming soon" with only "Job board", which opens the waitlist page. Social icons shown only when profiles exist.
+- Footer: columns incl. "Coming soon" with one link, "Vote for what's next", which opens the Coming soon features page (G13). Social icons shown only when profiles exist.
 
 ## G1 Homepage
 - Hero: upload box with mode switch, sample card with fictional CV. Animations: score count-up, tag pop-in, scroll reveals, hover on category cards.
@@ -49,11 +49,10 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 ## G9 404
 - Return a real 404 status. Signed-in users see "Go to your dashboard" instead of "Go to homepage". The layout is reused for a general error ("Something went wrong", with Try again).
 
-## Job board waitlist and Coming soon
-- Both save to one waitlist table: email, date, source ("job board" or "launch"). One row per email; a repeat sign-up shows the joined state with no duplicate.
-- One email only, when it opens, with an unsubscribe link. Privacy section 8 covers it.
-- The preview jobs are fictional and labeled. No launch date and no country claim until Nigerian job coverage is checked.
-- Coming soon page: keep indexable with a title like "Gradea, coming soon". The full homepage replaces it at launch.
+## Coming soon (G12) and Coming soon features (G13)
+- G12 has no form and no email box. It shows the logo, one line and the social icons. Gradea collects no emails and the page makes no API call.
+- G13 has four vote cards (Job board, CV builder with templates by role, Support for scanned CVs, Mobile app). One tap saves one vote, once per browser per feature, with no email and no counts shown. Built in Phase 9 (PRD FR-57).
+- Coming soon page G12: keep indexable with a title like "Gradea, coming soon". The full homepage replaces it at launch.
 
 ## Logo
 - Component "Logo / Lockup": navy mark 28px, lowercase "gradea" Inter Bold 21 navy, gap 10. Social profile pictures use the mark only. Favicon: use a simplified mark (a 16px version may need the notch removed).
