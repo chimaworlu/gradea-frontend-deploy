@@ -42,7 +42,7 @@ No task, deadline or refactor justifies breaking these. If a task seems to requi
 - **Analytics send actions, never content.** Use the one send function and the shared event list only. No recordings on the upload, scan and results screens. Country and city only, no full IP, signed-in users identified by internal id only.
 - **The how-to video is a click-to-play poster.** The privacy-enhanced YouTube embed loads only after the visitor taps play.
 - **The API lives on our own domain.** Production `api.usegradea.com`, staging `api.staging.usegradea.com`. The login cookie is set by the backend for `.usegradea.com` (httpOnly, Secure, SameSite=Lax).
-- **Waitlist forms** (Job board waitlist and coming-soon page) call the one waitlist endpoint with a `source` field. Joining twice shows the joined state.
+- **No email waitlist.** The coming-soon page collects no emails and makes no API call.
 - **Admin pages** carry noindex and stay out of the sitemap. The server checks the admin role; the frontend never relies on hiding a link.
 - **Affiliate programme is Nigeria only and naira only** (PRD Section 25). Show no dollar payout.
 
