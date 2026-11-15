@@ -5,7 +5,8 @@ on:
   push:
     branches: [staging, main]
 
-# Read-only: this workflow only checks the code. No secrets and no deploy step.
+# Least privilege: the workflow token can only read this repo. The deploy sync job pushes with
+# its own token (DEPLOY_FORK_TOKEN), which can only write to the deploy repo. No deploy step here.
 permissions:
   contents: read
 
@@ -40,3 +41,66 @@ jobs:
 
       - name: Run npm run check
         run: npm run check
+
+  # SRS Section 13, Build Plan Phase 0: Vercel's free plan cannot deploy a private organisation
+  # repo, so staging and main are copied into a personal deploy repo that Vercel deploys from.
+  # Runs only on a push to staging or main in this repo, and only after the checks pass, which
+  # is how a failing check stops a release. Never force pushes: if the deploy repo has drifted,
+  # the push fails and nothing is overwritten.
+  sync-deploy-repo:
+    name: Push to the deploy repo
+    needs: check
+    if: >-
+      github.event_name == 'push' &&
+      github.repository == 'usegradea/gradea-frontend' &&
+      (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push the branch to the deploy repo
+        env:
+          DEPLOY_FORK_TOKEN: ${{ secrets.DEPLOY_FORK_TOKEN }}
+          DEPLOY_FORK_REPO: ${{ vars.DEPLOY_FORK_REPO }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_FORK_TOKEN}" ]; then
+            echo "::error::The repository secret DEPLOY_FORK_TOKEN is missing. Add it under Settings > Secrets and variables > Actions > Secrets."
+            exit 1
+          fi
+          if [ -z "${DEPLOY_FORK_REPO}" ]; then
+            echo "::error::The repository variable DEPLOY_FORK_REPO is missing. Add it under Settings > Secrets and variables > Actions > Variables, as owner/name."
+            exit 1
+          fi
+          if ! printf '%s' "${DEPLOY_FORK_REPO}" | grep -Eq '^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$'; then
+            echo "::error::The repository variable DEPLOY_FORK_REPO must look like owner/name."
+            exit 1
+          fi
+
+          # Hide the deploy repo name and the auth header from every later log line.
+          echo "::add-mask::${DEPLOY_FORK_REPO}"
+          auth="$(printf 'x-access-token:%s' "${DEPLOY_FORK_TOKEN}" | base64 -w0)"
+          echo "::add-mask::${auth}"
+
+          # The token goes in through git's environment config, never in the address or the
+          # command line, so it is not in the remote list or the process list.
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic ${auth}"
+          export GIT_TERMINAL_PROMPT=0
+
+          # Same branch name in the deploy repo: staging to staging, main to main. No --force.
+          if git push --quiet "https://github.com/${DEPLOY_FORK_REPO}.git" "${GITHUB_SHA}:refs/heads/${BRANCH}" > /dev/null 2>&1; then
+            echo "Pushed ${BRANCH} (${GITHUB_SHA}) to the deploy repo."
+          else
+            echo "::error::Could not push ${BRANCH} to the deploy repo. Check that DEPLOY_FORK_TOKEN is valid, has Contents and Workflows read and write on the deploy repo, and that the deploy repo branch has not been changed by hand (this job never force pushes)."
+            exit 1
+          fi
