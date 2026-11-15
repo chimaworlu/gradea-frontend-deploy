@@ -3,7 +3,7 @@
   "title": "Coming-soon landing page",
   "meta": {
     "title": "Gradea, coming soon",
-    "description": "Gradea grades your CV or resume, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens."
+    "description": "Gradea grades your CV or resume, shows the exact lines to fix, and helps you fix them."
   },
   "header": {
     "logoAlt": "Gradea"
@@ -11,7 +11,7 @@
   "hero": {
     "tag": "Coming soon",
     "headline": "Find out what's holding your CV back",
-    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens.",
+    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them.",
     "follow": "Follow us for updates."
   },
   "socials": {
