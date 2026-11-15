@@ -515,7 +515,7 @@
       "marketing": "1120 wide, centered, for every marketing page (nav side padding 160, footer inner 1120)",
       "dashboard, billing, profile": 1120,
       "text pages (About, Privacy, Terms)": 720,
-      "form and waitlist column (Coming soon, Job board waitlist)": 640,
+      "coming-soon page column (G12)": 640,
       "reading text": "about 70 characters per line"
     },
     "touch targets": "At least 44 x 44 on phones for every button and tappable icon.",
@@ -679,7 +679,7 @@
     "spelling": "British English in all user-facing text (organise, colour)."
   },
   "marketing site": {
-    "note": "Rules learned while designing G1 to G9, the waitlist and the coming-soon page. Desktop is designed in Figma. Phones are built responsive in code from these rules.",
+    "note": "Rules learned while designing G1 to G9 and the coming-soon pages. Desktop is designed in Figma. Phones are built responsive in code from these rules.",
     "frame": "1440 wide. Nav 64 tall. Content column 1120, centered.",
     "section rhythm": "48 top and bottom padding per section (96 between sections). Section title Lora Bold 32/40, then 8 to subline, then 32 to content.",
     "buttons and inputs": "Buttons 48 tall and inputs 48 tall on marketing pages (44 in the app).",
@@ -690,7 +690,7 @@
     "how it works": "One section: video poster on top (click to play, never autoplay), then equal-width step cards with centered text. No second separate video section.",
     "legal pages": "Two columns: sticky \"On this page\" list 280 wide and a 720 text column, 120 apart. Section headings Inter Bold 22, body Inter 17 or 16 muted.",
     "forms": "Label Inter Semi Bold 14 above the field. Error text red 13 below the field and a red outline on the field. A sent or joined state replaces the form with a green check and a short message.",
-    "waitlist and coming soon": "One waitlist table for both pages, with a source field."
+    "coming soon": "G12 has no form: logo, one line and the social icons. G13 has four vote cards, no counts shown."
   },
   "logo": {
     "lockup": "Component \"Logo / Lockup\": navy mark 28px, lowercase \"gradea\" Inter Bold 21 navy, gap 10.",
