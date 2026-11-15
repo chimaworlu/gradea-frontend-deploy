@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SocialLinks } from "../components/SocialLinks";
-import { WaitlistForm } from "../components/WaitlistForm";
 import { fillPlaceholders, getContent } from "../lib/content";
 import { selectShownSocials, toSocialItems } from "../lib/socials";
 import styles from "./page.module.css";
 
 // G12 Coming-soon landing page (FR-55). It stays at / until the full marketing site launches.
+// No form: Gradea collects no emails here and the page makes no API call (PRD FR-55).
 const content = getContent("marketing/coming-soon");
 const socials = selectShownSocials(toSocialItems(content.socials.items));
 
@@ -34,10 +34,7 @@ export default function ComingSoonPage() {
         <p className={styles.tag}>{content.hero.tag}</p>
         <h1 className={styles.headline}>{content.hero.headline}</h1>
         <p className={styles.subline}>{content.hero.subline}</p>
-        <div className={styles.formSlot}>
-          <WaitlistForm text={content.waitlistForm} />
-          <p className={styles.helper}>{content.waitlistForm.helper}</p>
-        </div>
+        <p className={styles.follow}>{content.hero.follow}</p>
       </main>
 
       <footer className={styles.footer}>

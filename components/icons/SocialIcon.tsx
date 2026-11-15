@@ -59,22 +59,3 @@ export function SocialIcon({ network }: { network: SocialNetwork }) {
     </svg>
   );
 }
-
-/** Lucide "check", used for the joined state. Decorative: the text beside it says what happened. */
-export function CheckIcon() {
-  return (
-    <svg
-      className={styles.icon}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
