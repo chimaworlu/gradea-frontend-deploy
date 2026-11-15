@@ -756,7 +756,7 @@ function buildLayout(tokens, css) {
   section.add('--layout-max-width-app', rem(app), `${app}px: dashboard, billing, profile`);
   const text = get(widths, 'text pages (About, Privacy, Terms)');
   section.add('--layout-max-width-text', rem(text), `${text}px: About, Privacy, Terms`);
-  const form = get(widths, 'form and waitlist column (Coming soon, Job board waitlist)');
+  const form = get(widths, 'coming-soon page column (G12)');
   section.add('--layout-max-width-form', rem(form), `${form}px: form and waitlist column`);
   section.add('--layout-max-width-reading', '70ch', 'about 70 characters per line');
 
