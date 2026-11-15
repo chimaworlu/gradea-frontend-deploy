@@ -4,7 +4,13 @@ import Script from "next/script";
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { getConfig, getTurnstileSiteKey } from "../lib/config";
 import { TURNSTILE_SCRIPT_URL, createTurnstileTokenGetter } from "../lib/turnstile";
-import { createSingleFlight, submitWaitlist, type WaitlistOutcome } from "../lib/waitlist";
+import { trackWaitlistOutcome } from "../lib/analytics";
+import {
+  WAITLIST_SOURCE,
+  createSingleFlight,
+  submitWaitlist,
+  type WaitlistOutcome,
+} from "../lib/waitlist";
 import { CheckIcon } from "./icons/SocialIcon";
 import styles from "./WaitlistForm.module.css";
 
@@ -83,6 +89,8 @@ export function WaitlistForm({ text }: { text: WaitlistFormText }) {
     if (outcome === undefined) {
       return;
     }
+    // Sends waitlist_submitted (source only, never the email) when the join succeeded.
+    trackWaitlistOutcome(outcome, WAITLIST_SOURCE);
     if (outcome === "joined") {
       setError(null);
       setJoined(true);
