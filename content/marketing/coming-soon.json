@@ -11,27 +11,8 @@
   "hero": {
     "tag": "Coming soon",
     "headline": "Find out what's holding your CV back",
-    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens."
-  },
-  "waitlistForm": {
-    "default": {
-      "label": "Your email",
-      "placeholder": "Your email",
-      "button": "Notify me"
-    },
-    "sending": {
-      "button": "Joining..."
-    },
-    "joined": {
-      "title": "You're on the list",
-      "body": "We will email you when Gradea opens."
-    },
-    "error": {
-      "invalidEmail": "Enter a valid email, like name@example.com.",
-      "rateLimited": "Too many tries. Please wait a minute and try again.",
-      "generic": "Something went wrong. Please try again."
-    },
-    "helper": "One email, when we launch. No spam."
+    "subline": "Gradea grades your CV, shows the exact lines to fix, and helps you fix them. Join the list and we will email you when it opens.",
+    "follow": "Follow us for updates."
   },
   "socials": {
     "listLabel": "Gradea on social media",

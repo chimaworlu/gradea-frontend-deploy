@@ -9,14 +9,9 @@ describe("G12 coming-soon content", () => {
     expect(content.meta.description.length).toBeGreaterThan(0);
   });
 
-  it("has the three agreed error messages", () => {
-    expect(content.waitlistForm.error.invalidEmail).toBe(
-      "Enter a valid email, like name@example.com.",
-    );
-    expect(content.waitlistForm.error.rateLimited).toBe(
-      "Too many tries. Please wait a minute and try again.",
-    );
-    expect(content.waitlistForm.error.generic).toBe("Something went wrong. Please try again.");
+  it("has the follow line and no waitlist text", () => {
+    expect(content.hero.follow).toBe("Follow us for updates.");
+    expect(Object.keys(content)).not.toContain("waitlistForm");
   });
 
   it("fills the year into the footer", () => {

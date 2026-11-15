@@ -5,7 +5,7 @@
  * Events (name: allowed properties). Add a new event here first, with its allowed properties,
  * then call track(...) where it happens. Any property not listed is dropped before sending.
  *   $pageview           (none)      Sent by PostHog itself on each page load.
- *   waitlist_submitted  source      A waitlist join succeeded. source: "launch" (G12).
+ * No other event yet: the coming-soon page has no form (PRD FR-55).
  *
  * Off unless NEXT_PUBLIC_POSTHOG_KEY is set. With no key (local, CI, tests) posthog-js is not
  * even loaded and nothing is sent. It is also not loaded when the browser asks not to be
@@ -15,16 +15,12 @@
  */
 import type { PostHogConfig } from "posthog-js";
 
-export const ANALYTICS_EVENTS = {
-  waitlist_submitted: ["source"],
-} as const satisfies Record<string, readonly string[]>;
+export const ANALYTICS_EVENTS = {} as const satisfies Record<string, readonly string[]>;
 
 export type AnalyticsEvent = keyof typeof ANALYTICS_EVENTS;
 
 /** The typed properties each event may carry. Must match ANALYTICS_EVENTS above. */
-export type AnalyticsEventProperties = {
-  waitlist_submitted: { source: "launch" };
-};
+export type AnalyticsEventProperties = Record<AnalyticsEvent, Record<string, string>>;
 
 export const DEFAULT_POSTHOG_HOST = "https://eu.i.posthog.com";
 
@@ -160,13 +156,6 @@ export function track<E extends AnalyticsEvent>(
     }
   }
   client.capture(event, safe);
-}
-
-/** Sends waitlist_submitted only when the join succeeded. Never the email. */
-export function trackWaitlistOutcome(outcome: string, source: "launch"): void {
-  if (outcome === "joined") {
-    track("waitlist_submitted", { source });
-  }
 }
 
 /** Test helper: forgets the started client so each test starts clean. */
