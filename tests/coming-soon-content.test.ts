@@ -52,14 +52,16 @@ describe("G12 coming-soon content", () => {
   });
 });
 
-// Reports, without failing CI, every social profile that still has no link. The icon shows
-// without a link until the founder sends the real profile url (it is never invented).
-describe("G12 visible social profiles still without a url", () => {
-  const missing = content.socials.items.filter((item) => item.visible && item.url === "");
-  for (const item of missing) {
-    it.todo(`add the ${item.name} profile url to content/marketing/coming-soon.json`);
-  }
-  it("counts the profiles still without a url", () => {
-    expect(missing.length).toBeLessThanOrEqual(content.socials.items.length);
+describe("G12 social profile links", () => {
+  it("has the four real profile urls and keeps Facebook and Instagram empty", () => {
+    const urls = Object.fromEntries(content.socials.items.map((item) => [item.network, item.url]));
+    expect(urls).toEqual({
+      linkedin: "https://www.linkedin.com/company/usegradea",
+      tiktok: "https://www.tiktok.com/@usegradea",
+      facebook: "",
+      youtube: "https://www.youtube.com/@usegradea",
+      x: "https://x.com/usegradea",
+      instagram: "",
+    });
   });
 });
