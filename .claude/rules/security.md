@@ -24,8 +24,9 @@ Always apply. Data rules are in database-schema and uploads-and-storage. Money r
 - Never build a database query by joining strings. Use Prisma.
 
 ## 5. Public endpoints
-- Sign-up, login, password reset, contact, waitlist and scan endpoints are rate limited. A guest upload cannot be used to run unlimited AI calls.
-- The contact and waitlist forms carry the hidden spam check and the rate limit.
+- Sign-up, login, password reset, contact and scan endpoints are rate limited. A guest upload cannot be used to run unlimited AI calls.
+- The contact form carries the hidden spam check and the rate limit.
+- There is no email waitlist. The coming-soon page collects no emails and makes no API call.
 
 ## 6. Data in transit and at rest
 - HTTPS everywhere. Affiliate payout details are encrypted at rest and readable only by the admin payout screen's server code.

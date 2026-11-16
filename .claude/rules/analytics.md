@@ -28,7 +28,8 @@ Gradea uses PostHog to see how people use the site and the app: pages, clicks, s
 - Autocapture must not read the text of inputs or text areas.
 
 ## 5. What to track
-- Page views, clicks on key buttons, scan started and finished, upload started and not finished, results viewed, category opened, AutoFix and Magic Write used, plan picker opened, checkout started and paid, sign-up and login, contact and waitlist submissions, FAQ opens, video plays, and search words (for example Job board searches once it ships).
+- Page views, clicks on key buttons, scan started and finished, upload started and not finished, results viewed, category opened, AutoFix and Magic Write used, plan picker opened, checkout started and paid, sign-up and login, contact form submissions, FAQ opens, video plays, and search words (for example Job board searches once it ships).
+- The coming-soon page (G12) has no form, so PostHog tracks only its page view there.
 - Track where people drop off in the main flow: upload, scan, results, sign-up, download, upgrade.
 
 ## 6. Cookies and consent
