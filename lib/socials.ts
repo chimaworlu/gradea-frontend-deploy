@@ -1,14 +1,10 @@
 /**
  * Which social icons the coming-soon page (G12) shows.
  *
- * Founder decision (before launch): every entry marked "visible" shows, in list order. An icon
- * whose url is still empty shows as a plain icon, not a link (links are never invented).
- *
- * At launch, once the real profile urls are filled in content/marketing/coming-soon.json, set
- * SHOW_SOCIAL_ICONS_WITHOUT_URL to false. The tokens rule then applies ("social icons":
- * "Show an icon only when its link is filled"): an icon shows only if it is visible AND has a url.
+ * Tokens rule ("social icons": "Show an icon only when its link is filled") and the Marketing
+ * dev notes: an icon shows only if it is marked visible AND its url is filled, in list order.
+ * Links are never invented; a profile with no url simply does not show.
  */
-export const SHOW_SOCIAL_ICONS_WITHOUT_URL = true;
 
 export const SOCIAL_NETWORKS = [
   "linkedin",
@@ -38,10 +34,7 @@ export function toSocialItems(items: readonly SocialContentItem[]): SocialItem[]
   });
 }
 
-/** The icons to show, in list order: visible ones, and (after launch) only those with a url. */
-export function selectShownSocials(
-  items: readonly SocialItem[],
-  showWithoutUrl: boolean = SHOW_SOCIAL_ICONS_WITHOUT_URL,
-): SocialItem[] {
-  return items.filter((item) => item.visible && (showWithoutUrl || item.url !== ""));
+/** The icons to show, in list order: only visible ones whose url is filled. */
+export function selectShownSocials(items: readonly SocialItem[]): SocialItem[] {
+  return items.filter((item) => item.visible && item.url !== "");
 }

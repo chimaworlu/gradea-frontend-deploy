@@ -11,33 +11,27 @@ type Props = {
 };
 
 /**
- * The social icons shown on G12. An icon is a link only when its profile url is filled in the
- * content file. Until then it shows as a plain icon, never a dead link (founder decision:
- * profiles are not created yet, and links are never invented).
+ * The social icons shown on G12. Every icon is a real link that opens the profile in a new tab.
+ * An item with an empty url is never rendered, so there is no dead link or plain icon.
  */
 export function SocialLinks({ listLabel, linkLabel, items }: Props) {
-  if (items.length === 0) {
+  const linked = items.filter((item) => item.url !== "");
+  if (linked.length === 0) {
     return null;
   }
   return (
     <ul className={styles.list} aria-label={listLabel}>
-      {items.map((item) => (
+      {linked.map((item) => (
         <li key={item.network}>
-          {item.url === "" ? (
-            <span className={styles.item} aria-hidden="true">
-              <SocialIcon network={item.network} />
-            </span>
-          ) : (
-            <a
-              className={`${styles.item} ${styles.link}`}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={fillPlaceholders(linkLabel, { network: item.name })}
-            >
-              <SocialIcon network={item.network} />
-            </a>
-          )}
+          <a
+            className={`${styles.item} ${styles.link}`}
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={fillPlaceholders(linkLabel, { network: item.name })}
+          >
+            <SocialIcon network={item.network} />
+          </a>
         </li>
       ))}
     </ul>

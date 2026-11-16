@@ -18,11 +18,26 @@
     "listLabel": "Gradea on social media",
     "linkLabel": "Gradea on {network}",
     "items": [
-      { "network": "linkedin", "name": "LinkedIn", "url": "", "visible": true },
-      { "network": "tiktok", "name": "TikTok", "url": "", "visible": true },
+      {
+        "network": "linkedin",
+        "name": "LinkedIn",
+        "url": "https://www.linkedin.com/company/usegradea",
+        "visible": true
+      },
+      {
+        "network": "tiktok",
+        "name": "TikTok",
+        "url": "https://www.tiktok.com/@usegradea",
+        "visible": true
+      },
       { "network": "facebook", "name": "Facebook", "url": "", "visible": false },
-      { "network": "youtube", "name": "YouTube", "url": "", "visible": true },
-      { "network": "x", "name": "X", "url": "", "visible": true },
+      {
+        "network": "youtube",
+        "name": "YouTube",
+        "url": "https://www.youtube.com/@usegradea",
+        "visible": true
+      },
+      { "network": "x", "name": "X", "url": "https://x.com/usegradea", "visible": true },
       { "network": "instagram", "name": "Instagram", "url": "", "visible": false }
     ]
   },
