@@ -35,9 +35,9 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 ## 3. Data Model / Database Schema
 
 **User**
-- `id`, `email`, `password_hash` (nullable if Google-only), `google_id` (nullable), `career_level` (enum: entry, mid, senior, executive), `created_at`
+- `id`, `email`, `password_hash` (nullable if Google-only), `google_id` (nullable), `career_level` (enum: entry, mid, senior, executive; required, chosen at signup, no database default), `created_at`
 - `subscription_status` (enum: free, pro, grace), `grace_until` (nullable timestamp, set to 24 hours after PRO access ends; in grace, view and download are allowed but AI actions and Re-score are blocked), `subscription_plan` (enum: day_pass, weekly, monthly, three_month, nullable if free), `subscription_expires_at` (nullable), `auto_renew` (boolean)
-- `region` (enum: nigeria, international), for pricing currency
+- `region` (enum: nigeria, international; database default nigeria), for pricing currency. If the location lookup fails the user falls back to nigeria (naira prices) and can switch with the manual override.
 - `autofix_trial_used` (boolean, default false; set true only when a validated draft is shown, never on AI failure or validation rejection)
 - `autofix_trial_regen_used` (boolean, default false; the one free "Try another version")
 - `launch_promo_redeemed` (boolean, default false)
@@ -49,7 +49,7 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 - `created_at`
 
 **ScanResult**
-- `id`, `scan_session_id`, `overall_score` (int, general only), `category_scores` (JSON: impact, brevity, leadership, ats), `relevancy_score` (int, smart_target only), `keyword_gap` (JSON, smart_target only)
+- A session can have several results (Re-score runs on the same session, and the "+X points" change and Historical Review need the earlier ones); read newest first. `id`, `scan_session_id`, `overall_score` (int, general only), `category_scores` (JSON: impact, brevity, leadership, ats), `relevancy_score` (int, smart_target only), `keyword_gap` (JSON, smart_target only)
 - `line_level_feedback` (JSON array, nullable, populated on-demand only, automatically for PRO scans, for a Free user's one open category (the lowest-scoring, scoped call), or for the single line a Free user unlocks via their AutoFix trial, not computed by default for cost control). Each flagged-line entry includes its positional reference (section, sequence) so the frontend can highlight it directly on a rendered view of the original CV, alongside the quoted text and explanation, rather than displaying only an abstracted card.
 
 **ImprovementAction** (AutoFix / Magic Write)
@@ -58,8 +58,16 @@ Gradea is built as **two apps in two repositories**: `gradea-frontend` (Next.js)
 **UsageCounter**
 - `id`, `user_id`, `month` (year-month), `general_scans_used`, `smart_target_scans_used`
 
-**Subscription / Transaction**
+**Subscription / Transaction** (two tables: Subscription holds one row per paid plan with the plan, payment method, `card_authorization_ref` and `renewal_failed_count`; Transaction holds one row per charge with `provider_transaction_id`, plan, amount, currency, status, payment method and `proration_credit`; the access fields stay on User)
 - `id`, `user_id`, `provider` (flutterwave), `provider_transaction_id`, `plan`, `amount`, `currency`, `status`, `created_at`, `payment_method` (card/transfer/ussd), `card_authorization_ref` (nullable provider token for renewals; never raw card data), `proration_credit` (nullable amount), `renewal_failed_count`
+
+**Data conventions** (implemented in the first migration)
+- Table names are plural snake_case (`users`, `scan_sessions`, `scan_results`, `improvement_actions`, `usage_counters`, `subscriptions`, `transactions`) and columns are snake_case; the code keeps PascalCase and camelCase model names through Prisma mapping. `user` is a reserved word in Postgres, so it is never a table name.
+- Money is stored as whole numbers in kobo or cents, never as floats. Currency is NGN or USD. Transaction status is successful, failed or reversed.
+- `usage_counters.month` is text in the form YYYY-MM. Emails are stored lowercase and are unique.
+- Database checks (raw SQL in the migration, because Prisma does not manage them): a user has at least one sign-in method (password or Google), the usage month has the YYYY-MM form, and counters are never negative.
+- Guest sessions have no token column yet: a guest session is a scan session with no user, and its 30-minute expiry counts from `created_at`. The token itself is decided with auth.
+- Database tests run with `npm run test:db` against a local database only. CI does not run them yet; adding a Postgres service to the CI workflow is a later task.
 
 **User (additions)**
 - `role` (enum: user, admin; default user). Admin routes check this on the server, never only in the browser.
@@ -301,7 +309,7 @@ Each function's internal provider routing (which provider, which model tier) is 
 
 **Environment variables / secrets management:** all API keys (DeepSeek, GPT, payment provider, geolocation service, email service, OAuth credentials, the Turnstile secret, and the read-only PostHog key and project id used by the admin Metrics screen) managed via environment variables and a secrets manager, never committed to source control.
 
-**Backend settings (environment variables):** `NODE_ENV`, `PORT`, `DATABASE_URL`, `DIRECT_DATABASE_URL` (migrations only), `ALLOWED_ORIGIN`, `BOT_CHECK_ENABLED`, `TURNSTILE_SECRET_KEY` (required when the bot check is on) and `TRUST_PROXY` (default off; turned on only when the host puts a proxy in front and the server cannot be reached except through it, because Fastify then trusts the first `X-Forwarded-For` value). The server refuses to start in production if the origin is a wildcard or not https, if `BOT_CHECK_ENABLED` is not true, or if the Turnstile secret is missing. Errors name the setting and never print its value.
+**Backend settings (environment variables):** `NODE_ENV`, `PORT`, `DATABASE_URL`, `DIRECT_DATABASE_URL` (migrations only), `ALLOWED_ORIGIN`, `BOT_CHECK_ENABLED`, `TURNSTILE_SECRET_KEY` (required when the bot check is on) and `TRUST_PROXY` (default off; turned on only when the host puts a proxy in front and the server cannot be reached except through it, because the server then reads the client address from the forwarded header; it uses only the last entry, which the host's own proxy adds, because a visitor can write the earlier entries). The server refuses to start in production if the origin is a wildcard or not https, if `BOT_CHECK_ENABLED` is not true, or if the Turnstile secret is missing. Errors name the setting and never print its value.
 
 **Database migrations:** Prisma's migration system for all schema changes, tested in staging before production, never manual production database edits.
 
