@@ -1,0 +1,27 @@
+{
+  "id": "Shared",
+  "title": "Error messages",
+  "byCode": {
+    "validation_failed": "Something in the form isn't right. Check it and try again.",
+    "bot_check_failed": "We couldn't confirm you're a person. Refresh the page and try again.",
+    "rate_limited": "Too many tries in a short time. Wait a minute, then try again.",
+    "not_found": "We can't find what you're looking for. Check the link and try again.",
+    "internal_error": "Something went wrong on our side. Please try again in a moment.",
+    "email_disposable": "Please use a real email address.",
+    "email_domain_not_found": "We can't find that email domain. Check for typos.",
+    "email_taken": "That email already has an account.",
+    "password_too_short": "Use at least 8 characters.",
+    "password_too_long": "Use at most 72 characters.",
+    "password_too_common": "That password is too common.",
+    "career_level_required": "Choose your career level.",
+    "invalid_credentials": "Email or password is wrong.",
+    "not_signed_in": "You're not logged in. Log in to carry on.",
+    "origin_not_allowed": "We couldn't send that from this page. Refresh the page and try again.",
+    "guest_session_invalid": "This scan has expired or can't be found. Please upload your CV again.",
+    "reset_token_invalid": "This link has expired. Request a new one.",
+    "google_not_configured": "Google sign-in isn't available right now. Use your email and password instead.",
+    "google_pending_invalid": "Your Google sign-in has timed out. Continue with Google again.",
+    "wrong_password": "That password is wrong."
+  },
+  "network": "We couldn't reach Gradea. Check your connection and try again."
+}

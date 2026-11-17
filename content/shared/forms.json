@@ -1,0 +1,18 @@
+{
+  "id": "Shared",
+  "title": "Form fields",
+  "passwordToggle": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "careerLevel": {
+    "label": "Career level",
+    "placeholder": "Select your career level",
+    "options": {
+      "entry": "Entry-level",
+      "mid": "Mid-level",
+      "senior": "Senior",
+      "executive": "Executive"
+    }
+  }
+}
