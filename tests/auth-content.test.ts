@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CareerLevel, ErrorCode, GOOGLE_FRONTEND_PATHS } from "../lib/api/shared";
+import { PASSWORD_RESET_LINK_LIFETIME_SECONDS } from "../lib/config";
+import { resetLinkDuration } from "../lib/password-reset";
 import {
   careerLevelLabel,
   errorMessage,
@@ -99,12 +101,26 @@ describe("A4, A5 and A6 wording", () => {
     expect(fillPlaceholders(getContent("app/account-link").linkForm.body, { email })).toBe(
       `${email} already has a Gradea account. Enter your password once to link it with Google.`,
     );
-    expect(fillPlaceholders(getContent("app/forgot-password").emailSent.body, { email })).toContain(
-      `If there is an account for ${email},`,
+    const reset = getContent("app/forgot-password");
+    const duration = resetLinkDuration();
+    expect(fillPlaceholders(reset.emailSent.body, { email, duration })).toBe(
+      `If there is an account for ${email}, we've sent a link to reset your password. It works for 1 hour.`,
+    );
+    expect(fillPlaceholders(reset.linkExpired.body, { duration })).toBe(
+      "Reset links work for 1 hour and only once. Request a new one.",
     );
     expect(fillPlaceholders(getContent("app/google-signup").finishForm.body, { email })).toContain(
       email,
     );
+  });
+
+  it("takes the reset link lifetime from the config setting, never from the text", () => {
+    expect(PASSWORD_RESET_LINK_LIFETIME_SECONDS).toBe(60 * 60);
+    expect(resetLinkDuration(2 * 60 * 60)).toBe("2 hours");
+    const reset = getContent("app/forgot-password");
+    expect(reset.emailSent.body).toContain("{duration}");
+    expect(reset.linkExpired.body).toContain("{duration}");
+    expect(JSON.stringify(reset)).not.toMatch(/\d+ hours?/);
   });
 
   it("keeps the consent line the same on both sign-up paths", () => {
