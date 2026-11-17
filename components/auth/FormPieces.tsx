@@ -3,8 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useEffect, useState, type InputHTMLAttributes, type ReactNode } from "react";
-import { careerLevelLabel, getContent, placeholderParts } from "../../lib/content";
-import { CAREER_LEVELS } from "../../lib/auth/forms";
+import { getContent, placeholderParts } from "../../lib/content";
 import { FieldIcon } from "../icons/FieldIcon";
 import styles from "./form.module.css";
 
@@ -29,7 +28,7 @@ type FieldFrameProps = {
 export function Field({ id, label, error, helper, children }: FieldFrameProps) {
   return (
     <div className={styles.field}>
-      <label className={styles.label} htmlFor={id}>
+      <label id={`${id}-label`} className={styles.label} htmlFor={id}>
         {label}
       </label>
       <div className={styles.control}>{children}</div>
@@ -127,58 +126,14 @@ export function PasswordField({
         className={styles.iconButton}
         onClick={() => setShown((current) => !current)}
         aria-label={shown ? toggle.hide : toggle.show}
-        aria-pressed={shown}
         aria-controls={id}
         disabled={disabled}
       >
-        <FieldIcon name={shown ? "eyeOff" : "eye"} />
+        {/* The icon shows the current state, by the founder's decision (the Figma frames will be
+            updated): crossed-out eye while hidden (the default), open eye while shown. The label
+            says what a press will do. */}
+        <FieldIcon name={shown ? "eye" : "eyeOff"} />
       </button>
-    </Field>
-  );
-}
-
-export type CareerLevelPickerProps = {
-  id: string;
-  value: string;
-  onValueChange: (value: string) => void;
-  error?: string;
-  disabled?: boolean;
-};
-
-/** The career level picker (FR-23). Labels and the empty choice come from content/shared. */
-export function CareerLevelPicker({
-  id,
-  value,
-  onValueChange,
-  error,
-  disabled,
-}: CareerLevelPickerProps) {
-  const text = getContent("shared/forms").careerLevel;
-  const empty = value === "";
-  return (
-    <Field id={id} label={text.label} error={error}>
-      <select
-        id={id}
-        name={id}
-        className={`${styles.input} ${styles.select} ${styles.withIcon} ${empty ? styles.selectEmpty : ""} ${error ? styles.invalid : ""}`}
-        value={value}
-        onChange={(event) => onValueChange(event.target.value)}
-        disabled={disabled}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, undefined, error)}
-      >
-        <option value="" disabled>
-          {text.placeholder}
-        </option>
-        {CAREER_LEVELS.map((level) => (
-          <option key={level} value={level}>
-            {careerLevelLabel(level)}
-          </option>
-        ))}
-      </select>
-      <span className={styles.chevron}>
-        <FieldIcon name="chevronDown" />
-      </span>
     </Field>
   );
 }

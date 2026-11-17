@@ -18,8 +18,8 @@ import {
 } from "../../lib/auth/forms";
 import { getContent } from "../../lib/content";
 import { BotCheck } from "./BotCheck";
+import { CareerLevelPicker } from "./CareerLevelPicker";
 import {
-  CareerLevelPicker,
   ConsentLine,
   Divider,
   FooterPrompt,

@@ -96,17 +96,92 @@
   border-color: var(--color-error);
 }
 
-/* A native select, so keyboard and screen readers work as the platform expects. */
-.select {
+/* The browser's own reveal and clear buttons would sit beside the eye toggle; only ours shows. */
+.input::-ms-reveal,
+.input::-ms-clear {
+  display: none;
+}
+
+/* ---- Career level picker (A3 "Career level open") ---- */
+
+.picker {
+  display: flex;
+  align-items: center;
+  text-align: left;
   cursor: pointer;
 }
 
-.selectEmpty {
+.pickerEmpty {
   color: var(--color-on-surface-variant);
 }
 
-.select option {
+/* Open: the field keeps the 2px navy ring with a 2px gap, as in the design. */
+.picker[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* 4px under the field, the same width, the one soft shadow (A3 dev notes). */
+.listbox {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  left: 0;
+  z-index: 10;
+  margin: 0;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  list-style: none;
+  animation: listFade var(--duration-medium) var(--easing-standard);
+}
+
+.listbox[hidden] {
+  display: none;
+}
+
+/* Rows are 44 tall. The text lines up with the field's text (4 list padding + 12). */
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-sm);
   color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+/* Hover and the keyboard highlight: the light navy tint. */
+.optionActive {
+  background: var(--color-primary-soft);
+}
+
+/* The chosen row: the darker tint with a navy check. */
+.optionSelected {
+  background: var(--color-primary-container);
+}
+
+.optionCheck {
+  display: flex;
+  color: var(--color-primary);
+}
+
+@keyframes listFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .iconButton,

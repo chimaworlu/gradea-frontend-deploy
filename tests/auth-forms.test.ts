@@ -207,7 +207,7 @@ describe("A4 screens render from the content file", () => {
     expect(html).toContain('href="/privacy"');
     expect(html).toContain('href="/login"');
     expect(html).toContain(getContent("shared/forms").careerLevel.placeholder);
-    expect(html).toContain('<label class="');
+    expect(html).toMatch(/<label id="signup-email-label"[^>]*for="signup-email"/);
   });
 
   it("renders Log in, and the Google error from the query at the top", () => {

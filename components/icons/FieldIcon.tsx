@@ -1,9 +1,10 @@
 import styles from "./icon.module.css";
 
-export type FieldIconName = "eye" | "eyeOff" | "chevronDown";
+export type FieldIconName = "eye" | "eyeOff" | "chevronDown" | "chevronUp" | "check";
 
 /**
- * Lucide outline icons at 1.5px stroke (design tokens "icons"): eye, eye-off and chevron-down.
+ * Lucide outline icons at 1.5px stroke (design tokens "icons"): eye, eye-off, chevron-down,
+ * chevron-up and check.
  * Decorative only: the control around an icon carries the accessible name.
  */
 export function FieldIcon({ name }: { name: FieldIconName }) {
@@ -34,6 +35,8 @@ export function FieldIcon({ name }: { name: FieldIconName }) {
         </>
       )}
       {name === "chevronDown" && <path d="m6 9 6 6 6-6" />}
+      {name === "chevronUp" && <path d="m18 15-6-6-6 6" />}
+      {name === "check" && <path d="M20 6 9 17l-5-5" />}
     </svg>
   );
 }
