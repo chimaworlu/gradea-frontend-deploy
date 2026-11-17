@@ -1,6 +1,12 @@
 {
   "id": "Shared",
   "title": "Form fields",
+  "email": {
+    "invalid": "Check your email address. It should look like you@example.com."
+  },
+  "password": {
+    "required": "Enter your password."
+  },
   "passwordToggle": {
     "show": "Show password",
     "hide": "Hide password"

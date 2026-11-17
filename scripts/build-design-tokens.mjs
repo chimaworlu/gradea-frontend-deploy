@@ -758,6 +758,8 @@ function buildLayout(tokens, css) {
   section.add('--layout-max-width-text', rem(text), `${text}px: About, Privacy, Terms`);
   const form = get(widths, 'coming-soon page column (G12)');
   section.add('--layout-max-width-form', rem(form), `${form}px: form and waitlist column`);
+  const auth = get(widths, 'auth form column (A4, A5, A6)');
+  section.add('--layout-max-width-auth', rem(auth), `${auth}px: sign up, log in, reset, Google link`);
   section.add('--layout-max-width-reading', '70ch', 'about 70 characters per line');
 
   const results = get(layout, 'results screen desktop');
