@@ -1,0 +1,35 @@
+{
+  "id": "A4",
+  "title": "Sign up / Log in page, finish Google sign-up",
+  "meta": {
+    "title": "Finish creating your Gradea account"
+  },
+  "header": {
+    "logoAlt": "Gradea"
+  },
+  "checking": {
+    "text": "Checking your Google sign-in..."
+  },
+  "finishForm": {
+    "heading": "Finish creating your account",
+    "body": "You're signing up as {email}. Choose your career level to finish.",
+    "submit": {
+      "default": "Create account",
+      "loading": "Creating your account..."
+    },
+    "consent": {
+      "text": "By creating an account you agree to our {terms} and {privacy}.",
+      "terms": "Terms",
+      "privacy": "Privacy policy"
+    },
+    "cancel": {
+      "default": "Cancel",
+      "loading": "Cancelling..."
+    }
+  },
+  "expired": {
+    "heading": "This sign-in has timed out",
+    "body": "For your safety, a Google sign-in only waits a short time. Continue with Google again to create your account.",
+    "signUp": "Back to sign up"
+  }
+}

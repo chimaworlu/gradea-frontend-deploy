@@ -1,0 +1,35 @@
+{
+  "id": "A6",
+  "title": "Account link confirm",
+  "meta": {
+    "title": "Link your Google account"
+  },
+  "header": {
+    "logoAlt": "Gradea"
+  },
+  "checking": {
+    "text": "Checking your Google sign-in..."
+  },
+  "linkForm": {
+    "heading": "Link your Google account",
+    "body": "{email} already has a Gradea account. Enter your password once to link it with Google.",
+    "password": {
+      "label": "Password",
+      "placeholder": "Your password"
+    },
+    "forgotPassword": "Forgot password?",
+    "submit": {
+      "default": "Link accounts",
+      "loading": "Linking..."
+    },
+    "cancel": {
+      "default": "Cancel",
+      "loading": "Cancelling..."
+    }
+  },
+  "expired": {
+    "heading": "This sign-in has timed out",
+    "body": "For your safety, a Google sign-in only waits a short time. Continue with Google again to link your accounts.",
+    "logIn": "Back to log in"
+  }
+}
