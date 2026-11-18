@@ -281,11 +281,41 @@ export type ClaimResponse = z.infer<typeof ClaimResponse>;
 
 // Every event name. Names are object_action (analytics.md section 1), except `$pageview`,
 // which PostHog sends itself on each page load. Add a new event here first.
-export const AnalyticsEventName = z.enum(["$pageview"]);
+// The account events are sent by the backend, identified by the internal user id only.
+export const AnalyticsEventName = z.enum([
+  "$pageview",
+  "account_signed_up",
+  "account_logged_in",
+  "password_reset_completed",
+  "google_linked",
+]);
 export type AnalyticsEventName = z.infer<typeof AnalyticsEventName>;
 
 // The only properties each event may carry. Any other property is dropped before sending.
 // `satisfies` makes a missing or an extra event a type error.
 export const ANALYTICS_EVENTS = {
   $pageview: [],
+  account_signed_up: ["method"],
+  account_logged_in: ["method"],
+  password_reset_completed: [],
+  google_linked: [],
 } as const satisfies Record<AnalyticsEventName, readonly string[]>;
+
+// How the person signed up or logged in.
+export const AccountMethod = z.enum(["email", "google"]);
+export type AccountMethod = z.infer<typeof AccountMethod>;
+
+// The allowed values of each account event's properties. z.object drops any other property.
+export const AccountEvent = z.discriminatedUnion("event", [
+  z.object({
+    event: z.literal("account_signed_up"),
+    properties: z.object({ method: AccountMethod }),
+  }),
+  z.object({
+    event: z.literal("account_logged_in"),
+    properties: z.object({ method: AccountMethod }),
+  }),
+  z.object({ event: z.literal("password_reset_completed"), properties: z.object({}) }),
+  z.object({ event: z.literal("google_linked"), properties: z.object({}) }),
+]);
+export type AccountEvent = z.infer<typeof AccountEvent>;
