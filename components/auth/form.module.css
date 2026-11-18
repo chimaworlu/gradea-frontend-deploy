@@ -1,0 +1,384 @@
+/* Shared auth form pieces (A3, A4, A5, A6). Token variables only.
+   Spacing from the A4 dev notes: heading to subline 8, subline to Google button 24, Google
+   button, "or" and first field 16, between fields 16, field to button 24, button to the lines
+   under it 16. */
+
+.heading {
+  color: var(--color-on-surface);
+  font: var(--font-headline-large);
+  letter-spacing: var(--font-headline-large-letter-spacing);
+}
+
+.subline {
+  margin-top: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.intro {
+  margin-bottom: var(--space-24);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* ---- Field ---- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.label {
+  color: var(--color-on-surface);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: var(--size-input);
+  padding: 0 var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  appearance: none;
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.input::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 1;
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.input:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.input:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Room for the eye toggle and the picker chevron. */
+.withIcon {
+  padding-right: calc(var(--space-16) + var(--size-touch-target));
+}
+
+.invalid,
+.invalid:hover:not(:disabled),
+.invalid:focus-visible {
+  border-color: var(--color-error);
+}
+
+/* The browser's own reveal and clear buttons would sit beside the eye toggle; only ours shows. */
+.input::-ms-reveal,
+.input::-ms-clear {
+  display: none;
+}
+
+/* ---- Career level picker (A3 "Career level open") ---- */
+
+.picker {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pickerEmpty {
+  color: var(--color-on-surface-variant);
+}
+
+/* Open: the field keeps the 2px navy ring with a 2px gap, as in the design. */
+.picker[aria-expanded="true"] {
+  border-color: var(--color-primary);
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* 4px under the field, the same width, the one soft shadow (A3 dev notes). */
+.listbox {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  left: 0;
+  z-index: 10;
+  margin: 0;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  list-style: none;
+  animation: listFade var(--duration-medium) var(--easing-standard);
+}
+
+.listbox[hidden] {
+  display: none;
+}
+
+/* Rows are 44 tall. The text lines up with the field's text (4 list padding + 12). */
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+/* Hover and the keyboard highlight: the light navy tint. */
+.optionActive {
+  background: var(--color-primary-soft);
+}
+
+/* The chosen row: the darker tint with a navy check. */
+.optionSelected {
+  background: var(--color-primary-container);
+}
+
+.optionCheck {
+  display: flex;
+  color: var(--color-primary);
+}
+
+@keyframes listFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.iconButton,
+.chevron {
+  position: absolute;
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-touch-target);
+  height: var(--size-touch-target);
+  color: var(--color-on-surface-variant);
+}
+
+.chevron {
+  pointer-events: none;
+}
+
+.iconButton {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.iconButton:hover:not(:disabled) {
+  color: var(--color-on-surface);
+}
+
+.iconButton:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.helper {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.error {
+  color: var(--color-error);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+/* Empty live regions take no space until a message arrives. */
+.error:empty,
+.formError:empty {
+  display: none;
+}
+
+/* Form-level error: one plain red line above the button (A4 Log in error). */
+.formError {
+  color: var(--color-error);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* ---- Buttons ---- */
+
+.primary,
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: var(--size-button);
+  padding: 0 var(--space-16);
+  border-radius: var(--radius-md);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.primary {
+  margin-top: var(--space-8);
+  border: 0;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--color-primary-pressed);
+}
+
+.primary:focus-visible {
+  outline-color: var(--color-focus-ring);
+}
+
+/* Loading keeps full colour with its wording; a plain disabled button fades. */
+.primary:disabled:not([aria-busy="true"]) {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.primary[aria-busy="true"] {
+  cursor: progress;
+}
+
+.secondary {
+  border: var(--border-width) solid var(--color-border-input);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-primary);
+}
+
+.secondary:hover {
+  border-color: var(--color-primary);
+}
+
+.secondary:active {
+  background: var(--color-surface-container-low);
+}
+
+.secondary[aria-busy="true"] {
+  cursor: progress;
+}
+
+.googleIcon {
+  display: block;
+  flex-shrink: 0;
+  width: var(--size-icon);
+  height: var(--size-icon);
+}
+
+/* ---- "or" divider ---- */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  margin: var(--space-16) 0;
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: var(--border-width) solid var(--color-border-card);
+}
+
+/* ---- Lines under the button ---- */
+
+.note,
+.footer {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.note {
+  margin-top: var(--space-16);
+}
+
+.footer {
+  margin-top: var(--space-16);
+}
+
+.inlineLink {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}
+
+.strongLink {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.strongLink:hover {
+  text-decoration: underline;
+}
+
+.alignEnd {
+  align-self: flex-end;
+}
+
+/* Phones: inputs at 16px or larger so the browser does not zoom on focus. */
+@media (width < 640px) {
+  .input {
+    font-size: var(--font-text-input-size-phone);
+  }
+}

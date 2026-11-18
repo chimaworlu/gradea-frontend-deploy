@@ -1,0 +1,47 @@
+/* A4, A5, A6 page frame. Token variables only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-surface);
+}
+
+/* Logged out: the top bar shows only the wordmark (A4 dev notes). */
+.topBar {
+  display: flex;
+  align-items: center;
+  height: var(--layout-nav-height);
+  padding: 0 var(--space-page-gutter);
+  background: var(--color-surface-container-lowest);
+}
+
+/* Optical centre: the area under the top bar is centred with extra space at the bottom.
+   A form taller than the screen gets a fixed top gap instead (A4 dev notes). */
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-64) var(--space-page-gutter) calc(var(--space-64) + var(--space-96));
+}
+
+.column {
+  width: 100%;
+  max-width: var(--layout-max-width-auth);
+  margin: 0 auto;
+}
+
+@media (width < 640px) {
+  .main {
+    justify-content: flex-start;
+    padding: var(--space-32) var(--space-page-gutter) var(--space-48);
+  }
+}
+
+@media (width >= 1024px) {
+  .topBar {
+    padding: 0 var(--space-48);
+  }
+}

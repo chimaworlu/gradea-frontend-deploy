@@ -516,6 +516,7 @@
       "dashboard, billing, profile": 1120,
       "text pages (About, Privacy, Terms)": 720,
       "coming-soon page column (G12)": 640,
+      "auth form column (A4, A5, A6)": 480,
       "reading text": "about 70 characters per line"
     },
     "touch targets": "At least 44 x 44 on phones for every button and tappable icon.",

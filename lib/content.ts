@@ -55,6 +55,11 @@ export function loginQueryErrorMessage(code: LoginQueryError): string {
   return loginQueryErrors[code];
 }
 
+/** True when a /login ?error= value is one the API sends, so its wording exists. */
+export function isLoginQueryError(value: string): value is LoginQueryError {
+  return Object.hasOwn(loginQueryErrors, value);
+}
+
 /** The label for a career level, for example "Entry-level" for entry. */
 export function careerLevelLabel(level: CareerLevel): string {
   return careerLevelOptions[level];
@@ -96,4 +101,30 @@ export function fillPlaceholders(template: string, values: PlaceholderValues): s
     }
     return String(value);
   });
+}
+
+/**
+ * Splits a content string at its placeholders and puts a value (text or an element, such as a
+ * link) in each one, for example the consent line's {terms} and {privacy} links. Throws on a
+ * placeholder with no value, like fillPlaceholders.
+ */
+export function placeholderParts<T>(
+  template: string,
+  values: Record<string, T>,
+): Array<string | T> {
+  const parts: Array<string | T> = [];
+  for (const piece of template.split(/(\{[a-zA-Z][a-zA-Z0-9]*\})/)) {
+    const match = /^\{([a-zA-Z][a-zA-Z0-9]*)\}$/.exec(piece);
+    if (match === null) {
+      if (piece !== "") parts.push(piece);
+      continue;
+    }
+    const name = match[1] ?? "";
+    const value = Object.hasOwn(values, name) ? values[name] : undefined;
+    if (value === undefined) {
+      throw new Error(`Missing value for placeholder {${name}}.`);
+    }
+    parts.push(value);
+  }
+  return parts;
 }
