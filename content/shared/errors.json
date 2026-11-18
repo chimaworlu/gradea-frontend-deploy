@@ -23,5 +23,10 @@
     "google_pending_invalid": "Your Google sign-in has timed out. Continue with Google again.",
     "wrong_password": "That password is wrong."
   },
-  "network": "We couldn't reach Gradea. Check your connection and try again."
+  "network": "We couldn't reach Gradea. Check your connection and try again.",
+  "screen": {
+    "logoAlt": "Gradea",
+    "heading": "Something went wrong",
+    "retry": "Reload the page"
+  }
 }

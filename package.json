@@ -19,6 +19,7 @@
     "check": "npm run typecheck && npm run lint && npm run tokens:check && npm run test"
   },
   "dependencies": {
+    "@sentry/nextjs": "11.10.0",
     "next": "16.4.6",
     "posthog-js": "1.449.2",
     "react": "19.3.1",
