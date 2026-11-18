@@ -9,7 +9,7 @@ Source of truth for rules: PRD Section 25.
 - "Apply" for a logged-out visitor goes to sign up, then I1. Logged-in goes straight to I1.
 
 ## I1 Apply
-- Any signed-in user can apply. Link error frame shows when the application fails to send.
+- Anyone who can introduce Gradea to people who may need it can apply. They do not have to be a Gradea customer, but they need a free Gradea account to get their link and see their earnings. Link error frame shows when the application fails to send.
 
 ## I2 Status
 - Pending, Approved, Not approved. Not approved can reapply after 30 days. Approval is manual.
