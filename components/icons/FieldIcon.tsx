@@ -1,16 +1,17 @@
 import styles from "./icon.module.css";
 
-export type FieldIconName = "eye" | "eyeOff" | "chevronDown" | "chevronUp" | "check";
+export type FieldIconName =
+  "eye" | "eyeOff" | "chevronDown" | "chevronUp" | "check" | "circleCheck";
 
 /**
  * Lucide outline icons at 1.5px stroke (design tokens "icons"): eye, eye-off, chevron-down,
- * chevron-up and check.
+ * chevron-up, check and circle-check.
  * Decorative only: the control around an icon carries the accessible name.
  */
-export function FieldIcon({ name }: { name: FieldIconName }) {
+export function FieldIcon({ name, className }: { name: FieldIconName; className?: string }) {
   return (
     <svg
-      className={styles.icon}
+      className={className ?? styles.icon}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -37,6 +38,12 @@ export function FieldIcon({ name }: { name: FieldIconName }) {
       {name === "chevronDown" && <path d="m6 9 6 6 6-6" />}
       {name === "chevronUp" && <path d="m18 15-6-6-6 6" />}
       {name === "check" && <path d="M20 6 9 17l-5-5" />}
+      {name === "circleCheck" && (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <path d="m9 12 2 2 4-4" />
+        </>
+      )}
     </svg>
   );
 }

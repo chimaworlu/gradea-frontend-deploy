@@ -143,5 +143,9 @@ export function queryErrorWording(error: string | string[] | undefined): string 
     : undefined;
 }
 
+/** The log in and sign up pages, where a cancelled Google step goes back to. */
+export const LOGIN_PATH = "/login";
+export const SIGNUP_PATH = "/signup";
+
 /** Where a signed-in user goes for now. The Dashboard does not exist yet. */
 export const AFTER_AUTH_PATH = "/";

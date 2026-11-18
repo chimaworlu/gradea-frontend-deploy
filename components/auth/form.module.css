@@ -382,3 +382,93 @@
     font-size: var(--font-text-input-size-phone);
   }
 }
+
+/* ---- A5 and A6 pieces ---- */
+
+/* "Back to log in", "Cancel", "Send again": centred navy text actions under the button. */
+.textAction {
+  align-self: center;
+  margin-top: var(--space-16);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.textAction:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.textAction:disabled {
+  color: var(--color-on-surface-variant);
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.centerNote {
+  margin-top: var(--space-16);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  text-align: center;
+}
+
+.inlineAction {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.inlineAction:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.inlineAction:disabled {
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  cursor: not-allowed;
+}
+
+/* A navy check above the A5 success heading. */
+.successIcon {
+  display: block;
+  width: var(--space-32);
+  height: var(--space-32);
+  margin-bottom: var(--space-24);
+  color: var(--color-primary);
+}
+
+/* The Google email on /signup/google: shown, not editable. */
+.readOnly {
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
+}
+
+/* While A6 is linking: the field and the Forgot password link drop to 40% (A6 dev notes). */
+.faded {
+  opacity: var(--opacity-disabled);
+  pointer-events: none;
+}
+
+.status {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* A button's own text for a link that goes somewhere (for example "Back to log in"). */
+a.primary {
+  text-decoration: none;
+}
