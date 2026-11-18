@@ -12,3 +12,9 @@ export const PASSWORD_RESET_LINK_LIFETIME_SECONDS = 60 * 60;
  * short countdown). Only slows the button down; the server rate limits requests on its own.
  */
 export const PASSWORD_RESET_RESEND_COOLDOWN_SECONDS = 30;
+
+/**
+ * The share of page loads and requests Sentry traces for performance (0.1 is 10%). Errors are
+ * always sent when Sentry is on; this only limits tracing.
+ */
+export const SENTRY_TRACES_SAMPLE_RATE = 0.1;

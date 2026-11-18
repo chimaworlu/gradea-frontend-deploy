@@ -33,7 +33,7 @@ Status: 4 of 7 tasks done.
 
 ## Phase 1 — Foundation
 
-Status: 2 of 5 tasks done.
+Status: 3 of 5 tasks done.
 
 - ✅ **Repository setup** (frontend side). ESLint and Prettier with exact versions, `.env.example` with the PostHog settings. The Action in `gradea-backend` that opens pull requests here is (other repo).
 - ⏸ **API on our own domain.** Moved to Phase 10. Nothing in this repo reads an API address now.
@@ -41,7 +41,7 @@ Status: 2 of 5 tasks done.
 - (other repo) **Auth (in `gradea-backend`).** The frontend screens for it (A4 Sign up / Log in, A5 Forgot password, A6 Account link) are not started; their designs are in `docs/design/phase-1/`.
 - (other repo) **`lib/ai/` abstraction skeleton.**
 - ⏸ **Deployment pipeline.** Moved to Phase 10.
-- ⬜ **Error tracking** (frontend side). No Sentry or equivalent in `package.json` or the code.
+- ✅ **Error tracking** (frontend side). `@sentry/nextjs` 11.10.0 (the same major as the backend), on only when `NEXT_PUBLIC_SENTRY_DSN` is set: browser errors, server render and route errors, and a global error screen. No session replay, no personal or request data, tracing at 0.1, no source map upload yet.
 - ✅ **Frontend fonts and tokens.** Same evidence as Phase 0 "Frontend setup", including `--font-lora` and `--font-inter`.
 - 🟡 **Usage analytics.** One send function (`track`) and one event list with allowed properties, and the PRD Section 19 privacy limits. Missing: the list does not come from the shared generated file yet, and no Phase 1 events exist because no Phase 1 screen is built.
 - 🟡 **Content files.** `content/app`, `content/marketing`, `content/emails` and `content/shared` exist, and the loader fails the type check on a missing or misspelled key. Missing: the content files for A4, A5 and A6.
