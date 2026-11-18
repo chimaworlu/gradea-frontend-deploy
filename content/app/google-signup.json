@@ -13,6 +13,9 @@
   "finishForm": {
     "heading": "Finish creating your account",
     "body": "You're signing up as {email}. Choose your career level to finish.",
+    "email": {
+      "label": "Email"
+    },
     "submit": {
       "default": "Create account",
       "loading": "Creating your account..."

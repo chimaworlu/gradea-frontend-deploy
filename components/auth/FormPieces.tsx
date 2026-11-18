@@ -57,6 +57,8 @@ export type TextFieldProps = InputProps & {
   onValueChange: (value: string) => void;
   error?: string;
   helper?: string;
+  /** An extra class for the input, for example the read-only look. */
+  inputClassName?: string;
 };
 
 export function TextField({
@@ -66,6 +68,7 @@ export function TextField({
   onValueChange,
   error,
   helper,
+  inputClassName,
   ...inputProps
 }: TextFieldProps) {
   return (
@@ -74,7 +77,7 @@ export function TextField({
         {...inputProps}
         id={id}
         name={id}
-        className={`${styles.input} ${error ? styles.invalid : ""}`}
+        className={`${styles.input} ${inputClassName ?? ""} ${error ? styles.invalid : ""}`}
         value={value}
         onChange={(event) => onValueChange(event.target.value)}
         aria-invalid={error ? true : undefined}
@@ -84,7 +87,10 @@ export function TextField({
   );
 }
 
-export type PasswordFieldProps = Omit<TextFieldProps, "type" | "autoComplete"> & {
+export type PasswordFieldProps = Omit<
+  TextFieldProps,
+  "type" | "autoComplete" | "inputClassName"
+> & {
   autoComplete: "new-password" | "current-password";
 };
 
