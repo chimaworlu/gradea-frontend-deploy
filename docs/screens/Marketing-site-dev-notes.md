@@ -58,7 +58,7 @@ Frames: S1 shared parts, G1 Homepage (plus Dollars pricing frame), G2 General An
 - Component "Logo / Lockup": navy mark 28px, lowercase "gradea" Inter Bold 21 navy, gap 10. Social profile pictures use the mark only. Favicon: use a simplified mark (a 16px version may need the notch removed).
 
 ## Open items for the founder (not design)
-- Buy usegradea.com and set up the support email. The Contact page and Privacy page use support@usegradea.com as a placeholder.
+- The support email is support@usegradea.com. The Contact page and Privacy page use it, as a mailto link.
 - Record the how-to video. Add the real founder photo and edit the About story.
 - Check the AI providers' terms before keeping the "not used to train models" idea on the Privacy page.
 - Check Nigerian job coverage before promising anything on the Job board page.

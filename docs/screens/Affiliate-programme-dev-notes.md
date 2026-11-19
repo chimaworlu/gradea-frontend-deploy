@@ -26,7 +26,7 @@ Source of truth for rules: PRD Section 25.
 
 ## I5 Programme terms
 - 720 wide reading column, 8 numbered sections from PRD 25. Date "Last updated 10 November 2026".
-- "[support email]" is a placeholder. Legal wording needs review before launch.
+- Contact email in the terms: support@usegradea.com (a mailto link). Legal wording needs review before launch.
 
 ## Tracking and privacy
 - Own tracking. Attribution 30 days, most recent link wins. Self-referrals and existing accounts excluded.
