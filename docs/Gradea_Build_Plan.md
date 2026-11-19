@@ -156,7 +156,7 @@ This plan assumes the PRD and SRS as settled inputs. Where a phase depends on an
 - Launch offer sold out: offer tags and "spots left" text disappear at 20 redemptions.
 - Expiry handling: Day Pass and subscription expiry move the user to a 24-hour download-only grace state, then to Free automatically. Banner with deadline and Renew action. Saved PRO sessions are locked, not deleted, and restore on repurchase. Cancelling renewal keeps access until the paid period ends. No refund flow (purchases are non-refundable).
 - "Get PRO" preview popover content: benefits, Day Pass and Weekly prices in local currency, and the launch offer line driven by the real redemption counter (shown only while spots remain; Monthly and 3-Month only).
-- Dashboard billing display: current plan, renewal status, time remaining for an active Day Pass. Billing page with the seven states in PRD Section 15 (Free, Day Pass or Weekly, Monthly or 3-Month by card, renewal cancelled, paid by transfer, grace, expired), payment history from `GET /api/billing/history`, and the billing-error contact link (temporary support email until the domain is registered).
+- Dashboard billing display: current plan, renewal status, time remaining for an active Day Pass. Billing page with the seven states in PRD Section 15 (Free, Day Pass or Weekly, Monthly or 3-Month by card, renewal cancelled, paid by transfer, grace, expired), payment history from `GET /api/billing/history`, and the billing-error contact link (support email support@usegradea.com).
 
 **Done when:** a user in Nigeria sees NGN pricing and can complete a real payment; a user elsewhere sees USD pricing and can do the same; a Day Pass expires correctly after 24 hours; the launch promo correctly stops after 20 redemptions.
 

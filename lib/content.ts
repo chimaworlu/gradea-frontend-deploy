@@ -3,6 +3,7 @@ import auth from "../content/app/auth.json";
 import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
 import comingSoon from "../content/marketing/coming-soon.json";
+import contact from "../content/shared/contact.json";
 import errors from "../content/shared/errors.json";
 import forms from "../content/shared/forms.json";
 import type { CareerLevel, ErrorCode, GOOGLE_FRONTEND_PATHS } from "./api/shared";
@@ -18,6 +19,7 @@ const contentFiles = {
   "app/forgot-password": forgotPassword,
   "app/google-signup": googleSignup,
   "marketing/coming-soon": comingSoon,
+  "shared/contact": contact,
   "shared/errors": errors,
   "shared/forms": forms,
 } satisfies Record<string, ContentFileHeader>;
@@ -127,4 +129,17 @@ export function placeholderParts<T>(
     parts.push(value);
   }
   return parts;
+}
+
+/**
+ * The support address, from content/shared/contact.json. The Contact, Privacy and Terms pages,
+ * the billing-error link and any help text read it from here, never typed in a component.
+ */
+export function supportEmail(): string {
+  return contact.supportEmail;
+}
+
+/** A mailto link to the support address, for example href={supportMailto()}. */
+export function supportMailto(): string {
+  return `mailto:${contact.supportEmail}`;
 }
