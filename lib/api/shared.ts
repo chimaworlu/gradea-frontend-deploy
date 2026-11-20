@@ -36,6 +36,13 @@ export const ErrorCode = z.enum([
   "google_not_configured",
   "google_pending_invalid",
   "wrong_password",
+  // Uploading a CV (SRS Section 8, PRD Section 9.6).
+  "file_required",
+  "file_too_large",
+  "file_type_not_supported",
+  "file_unreadable",
+  "file_not_english",
+  "extraction_failed",
 ]);
 export type ErrorCode = z.infer<typeof ErrorCode>;
 
@@ -62,6 +69,12 @@ export const ERROR_STATUSES = {
   google_not_configured: [503],
   google_pending_invalid: [401],
   wrong_password: [401],
+  file_required: [400],
+  file_too_large: [413],
+  file_type_not_supported: [415],
+  file_unreadable: [422],
+  file_not_english: [422],
+  extraction_failed: [503],
 } as const satisfies Record<ErrorCode, readonly number[]>;
 
 // Every error from every route has this body. `message` is safe to show, but the frontend
@@ -276,6 +289,28 @@ export type ClaimParams = z.infer<typeof ClaimParams>;
 
 export const ClaimResponse = OkResponse;
 export type ClaimResponse = z.infer<typeof ClaimResponse>;
+
+// POST /api/scan/general. A multipart form (not JSON) with exactly one file field and these
+// text fields. The file is a PDF or DOCX of at most CV_FILE_MAX_BYTES; the server decides the
+// type from the file's content, not its name.
+export const CV_FILE_MAX_BYTES = 2 * 1024 * 1024;
+export const SCAN_UPLOAD_FILE_FIELD = "file";
+export const ScanUploadFields = z.strictObject({
+  // Optional. A guest chooses it on the signup wall; a signed-in user defaults to their stored
+  // level, and this override applies to this scan only (FR-24).
+  career_level: z.preprocess(trim, CareerLevel).optional(),
+  // Required for guests when the bot check is on. Signed-in users skip it.
+  bot_token: BotToken,
+});
+export type ScanUploadFields = z.input<typeof ScanUploadFields>;
+
+// 201. `guest` is set only for an upload without a login: the token is shown this once and is
+// sent back in GUEST_TOKEN_HEADER to claim the scan after signup, before `expires_at`.
+export const ScanUploadResponse = z.strictObject({
+  scan_session_id: z.string(),
+  guest: z.strictObject({ token: z.string(), expires_at: z.iso.datetime() }).nullable(),
+});
+export type ScanUploadResponse = z.infer<typeof ScanUploadResponse>;
 
 // ---- Analytics (PRD Section 19, analytics.md) -----------------------------------------------
 
