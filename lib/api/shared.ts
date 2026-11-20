@@ -43,6 +43,8 @@ export const ErrorCode = z.enum([
   "file_unreadable",
   "file_not_english",
   "extraction_failed",
+  // The Free monthly limit (SRS Section 7). The answer also carries `reset_at`.
+  "scan_limit_reached",
 ]);
 export type ErrorCode = z.infer<typeof ErrorCode>;
 
@@ -75,11 +77,18 @@ export const ERROR_STATUSES = {
   file_unreadable: [422],
   file_not_english: [422],
   extraction_failed: [503],
+  scan_limit_reached: [403],
 } as const satisfies Record<ErrorCode, readonly number[]>;
 
 // Every error from every route has this body. `message` is safe to show, but the frontend
 // shows its own wording chosen by `code`.
-export const ErrorResponse = z.object({ code: ErrorCode, message: z.string() });
+// `reset_at` is set only with scan_limit_reached: when the monthly allowance starts again (the
+// 1st of next month, 00:00 Lagos time), so the upgrade modal can show the date.
+export const ErrorResponse = z.object({
+  code: ErrorCode,
+  message: z.string(),
+  reset_at: z.iso.datetime().optional(),
+});
 export type ErrorResponse = z.infer<typeof ErrorResponse>;
 
 // ---- Shared enums (SRS Section 3) -----------------------------------------------------------
@@ -284,11 +293,37 @@ export type GoogleOkResponse = z.infer<typeof GoogleOkResponse>;
 export const GUEST_TOKEN_HEADER = "x-guest-token";
 
 // POST /api/scan/:id/claim. Session ids are cuids; anything else is refused like an unknown id.
-export const ClaimParams = z.strictObject({ id: z.string().regex(/^[a-z0-9]{1,64}$/) });
-export type ClaimParams = z.infer<typeof ClaimParams>;
+export const ScanIdParams = z.strictObject({ id: z.string().regex(/^[a-z0-9]{1,64}$/) });
+export type ScanIdParams = z.infer<typeof ScanIdParams>;
+export const ClaimParams = ScanIdParams;
+export type ClaimParams = ScanIdParams;
 
+// 200 as soon as the scan is attached. Scoring then runs in the background; the processing
+// screen polls GET /api/scan/:id/status. A Free user at the monthly limit gets 403
+// scan_limit_reached with reset_at instead, and keeps the scan (status waiting).
 export const ClaimResponse = OkResponse;
 export type ClaimResponse = z.infer<typeof ClaimResponse>;
+
+// Where a scan's scoring is. failed means scoring failed after its retry: the upload is kept
+// and the person can retry with POST /api/scan/:id/retry; no scan was used.
+export const ScanStatus = z.enum(["waiting", "working", "done", "failed"]);
+export type ScanStatus = z.infer<typeof ScanStatus>;
+
+// Why a scan is failed: the AI step failed twice, or the monthly limit was reached by the time
+// scoring finished (two scans at once).
+export const ScanFailure = z.enum(["scoring_failed", "scan_limit_reached"]);
+export type ScanFailure = z.infer<typeof ScanFailure>;
+
+// GET /api/scan/:id/status, and the answer of POST /api/scan/:id/retry. retry_after (seconds,
+// also sent as the Retry-After header) is how long to wait before asking again; null once the
+// scan is done or failed. Signed-in owner only.
+export const ScanStatusResponse = z.strictObject({
+  scan_session_id: z.string(),
+  status: ScanStatus,
+  retry_after: z.int().min(1).nullable(),
+  failure: ScanFailure.nullable(),
+});
+export type ScanStatusResponse = z.infer<typeof ScanStatusResponse>;
 
 // POST /api/scan/general. A multipart form (not JSON) with exactly one file field and these
 // text fields. The file is a PDF or DOCX of at most CV_FILE_MAX_BYTES; the server decides the
