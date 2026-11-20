@@ -21,7 +21,13 @@
     "reset_token_invalid": "This link has expired. Request a new one.",
     "google_not_configured": "Google sign-in isn't available right now. Use your email and password instead.",
     "google_pending_invalid": "Your Google sign-in has timed out. Continue with Google again.",
-    "wrong_password": "That password is wrong."
+    "wrong_password": "That password is wrong.",
+    "file_required": "Choose a CV to upload.",
+    "file_too_large": "That file is over 2MB. Try a smaller version.",
+    "file_type_not_supported": "That file type isn't supported. Upload a PDF or DOCX.",
+    "file_unreadable": "We couldn't read that file. Try another copy of your CV.",
+    "file_not_english": "Gradea reads CVs written in English for now. Upload an English version.",
+    "extraction_failed": "We couldn't read your CV just now. Please try uploading it again."
   },
   "network": "We couldn't reach Gradea. Check your connection and try again.",
   "screen": {
