@@ -1,0 +1,18 @@
+{
+  "id": "S2",
+  "title": "App top bar and account menu",
+  "topBar": {
+    "logoAlt": "Gradea",
+    "logIn": "Log in"
+  },
+  "avatar": {
+    "label": "Account menu"
+  },
+  "menu": {
+    "label": "Account",
+    "signOut": {
+      "default": "Sign out",
+      "loading": "Signing out..."
+    }
+  }
+}

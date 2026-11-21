@@ -4,10 +4,6 @@
   "meta": {
     "title": "Upload your CV"
   },
-  "topBar": {
-    "logoAlt": "Gradea",
-    "logIn": "Log in"
-  },
   "hero": {
     "heading": "Upload your CV and get your grade",
     "subline": "Get a clear score and a short list of what to fix first. Free to start."

@@ -3,10 +3,13 @@
    button, "or" and first field 16, between fields 16, field to button 24, button to the lines
    under it 16. */
 
+/* 32px in the A3, A4, A5 and A6 designs (measured on the 1440 frames): headline medium. Never
+   cut or broken oddly. */
 .heading {
   color: var(--color-on-surface);
-  font: var(--font-headline-large);
-  letter-spacing: var(--font-headline-large-letter-spacing);
+  font: var(--font-headline-medium);
+  letter-spacing: var(--font-headline-medium-letter-spacing);
+  text-wrap: balance;
 }
 
 .subline {

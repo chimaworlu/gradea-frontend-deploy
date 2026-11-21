@@ -12,11 +12,12 @@ export type FieldIconName =
   | "alert"
   | "close"
   | "lock"
-  | "loader";
+  | "loader"
+  | "logOut";
 
 /**
  * Lucide outline icons at 1.5px stroke (design tokens "icons"): eye, eye-off, chevron-down,
- * chevron-up, check, circle-check, upload, file-text, circle-alert, x, lock and loader-circle.
+ * chevron-up, check, circle-check, upload, file-text, circle-alert, x, lock, loader-circle and log-out.
  * Decorative only: the control around an icon carries the accessible name.
  */
 export function FieldIcon({ name, className }: { name: FieldIconName; className?: string }) {
@@ -91,6 +92,13 @@ export function FieldIcon({ name, className }: { name: FieldIconName; className?
         </>
       )}
       {name === "loader" && <path d="M21 12a9 9 0 1 1-6.219-8.56" />}
+      {name === "logOut" && (
+        <>
+          <path d="m16 17 5-5-5-5" />
+          <path d="M21 12H9" />
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        </>
+      )}
     </svg>
   );
 }

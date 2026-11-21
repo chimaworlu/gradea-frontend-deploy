@@ -6,6 +6,7 @@ import processing from "../content/app/processing.json";
 import signupWall from "../content/app/signup-wall.json";
 import upload from "../content/app/upload.json";
 import comingSoon from "../content/marketing/coming-soon.json";
+import accountMenu from "../content/shared/account-menu.json";
 import contact from "../content/shared/contact.json";
 import errors from "../content/shared/errors.json";
 import forms from "../content/shared/forms.json";
@@ -25,6 +26,7 @@ const contentFiles = {
   "app/signup-wall": signupWall,
   "app/upload": upload,
   "marketing/coming-soon": comingSoon,
+  "shared/account-menu": accountMenu,
   "shared/contact": contact,
   "shared/errors": errors,
   "shared/forms": forms,

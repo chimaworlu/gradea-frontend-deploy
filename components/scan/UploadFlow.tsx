@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { CareerLevel } from "../../lib/api/shared";
-import { LOGIN_PATH, isCareerLevel } from "../../lib/auth/forms";
+import { isCareerLevel } from "../../lib/auth/forms";
 import { fillPlaceholders, getContent } from "../../lib/content";
 import {
   ACCEPT_ATTRIBUTE,
@@ -27,6 +26,7 @@ import {
   saveWaitingScan,
   takeWaitingScan,
 } from "../../lib/scan/waiting-scan";
+import { AppTopBar } from "../app/AppTopBar";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
@@ -219,24 +219,8 @@ export function UploadFlow() {
     window.location.assign(outcome.kind === "processing" ? outcome.path : UPLOAD_PATH);
   }
 
-  const topBar = (
-    <header className={styles.topBar}>
-      {/* Logo / Lockup, used exactly as exported (never redrawn). */}
-      <Image
-        src="/brand/gradea-logo-light.svg"
-        alt={text.topBar.logoAlt}
-        width={107}
-        height={32}
-        priority
-      />
-      {/* Signed in: the account avatar and its menu (S2) go here when that screen is built. */}
-      {viewer?.kind === "guest" ? (
-        <Link className={styles.topBarLogIn} href={LOGIN_PATH}>
-          {text.topBar.logIn}
-        </Link>
-      ) : null}
-    </header>
-  );
+  // S2: the shared top bar, with the account menu once signed in.
+  const topBar = <AppTopBar viewer={viewer} />;
 
   if (wall !== undefined) {
     return (
