@@ -99,6 +99,8 @@ describe("B3 CV panel", () => {
     );
     expect(openHtml.match(/data-flagged="true"/g)).toHaveLength(1);
     expect(openHtml).toContain("Flagged in Impact &amp; Achievements");
+    // The note's flag is styled amber (the warning colour), as in the design.
+    expect(openHtml).toContain('data-kind="flagged"');
     const lockedHtml = renderToStaticMarkup(
       createElement(CvPanel, { result: data, row: locked, activeLine: undefined }),
     );

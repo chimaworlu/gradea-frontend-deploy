@@ -494,7 +494,7 @@ export function CvPanel({
   return (
     <section className={styles.cvPanel} aria-label={text.label}>
       {note !== undefined ? (
-        <p className={styles.cvNote}>
+        <p className={styles.cvNote} data-kind={note.kind}>
           <FieldIcon name={note.kind === "flagged" ? "flag" : "lock"} />
           {note.text}
         </p>

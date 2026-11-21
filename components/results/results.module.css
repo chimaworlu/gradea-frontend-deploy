@@ -443,6 +443,12 @@
   letter-spacing: var(--font-body-medium-letter-spacing);
 }
 
+/* "Flagged in …": the flag is amber, as in the CV highlights frame (#C7742A, the warning
+   colour); the text stays grey. A locked category's lock stays grey-blue. */
+.cvNote[data-kind="flagged"] svg {
+  color: var(--color-warning);
+}
+
 /* The CV page: radius 10 like popups (design-system-rules section 5), 760 at most. */
 .cvPage {
   max-width: var(--layout-results-cv-page);
