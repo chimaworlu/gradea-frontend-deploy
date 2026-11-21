@@ -412,6 +412,12 @@ export const ResultCategory = z.strictObject({
 });
 export type ResultCategory = z.infer<typeof ResultCategory>;
 
+// The job or project a line belongs to, as a short label such as "Product Designer at Acme".
+// Built in code from the entry's own heading line above it, never by the AI. Left out when the
+// entry has no clear heading, and on lines outside an experience or project entry.
+export const ROLE_LABEL_MAX_LENGTH = 80;
+const RoleLabel = z.string().min(1).max(ROLE_LABEL_MAX_LENGTH);
+
 // A flagged line of the open category. index and index_in_section place it on the CV (from 0).
 export const FlaggedLine = z.strictObject({
   line_id: z.string(),
@@ -419,10 +425,50 @@ export const FlaggedLine = z.strictObject({
   index: z.int().min(0),
   index_in_section: z.int().min(0),
   text: z.string(),
+  role: RoleLabel.optional(),
   issue: LineIssue,
   reason: z.string(),
 });
 export type FlaggedLine = z.infer<typeof FlaggedLine>;
+
+// One line of the CV panel, in document order. It is the person's own CV, so every line is sent
+// on every tier, with its personal details as written. `flagged` is true only for a flagged line
+// of the open category once line detail is done; a line flagged only in a locked category is
+// never marked, so the panel never shows what a locked category found (PRD Section 12.1).
+export const CvLineKind = z.enum(["heading", "bullet", "text"]);
+export type CvLineKind = z.infer<typeof CvLineKind>;
+export const CvPanelLine = z.strictObject({
+  line_id: z.string(),
+  section: CvSection,
+  index_in_section: z.int().min(0),
+  kind: CvLineKind,
+  text: z.string(),
+  role: RoleLabel.optional(),
+  flagged: z.boolean(),
+});
+export type CvPanelLine = z.infer<typeof CvPanelLine>;
+
+// The lines grouped by section, each run of lines in one section as one group, in CV order.
+export const CvPanelSection = z.strictObject({
+  section: CvSection,
+  lines: z.array(CvPanelLine).min(1),
+});
+export type CvPanelSection = z.infer<typeof CvPanelSection>;
+
+// Checks the CV passes, verified in code from the stored CV with no AI call (PRD Section 12.1).
+// Ids only: the wording is in the frontend. A check that cannot be verified, or that a kept
+// flagged line contradicts, is never listed.
+//   contact_details_present    an email and a phone number in the contact lines
+//   standard_section_headings  every section after the contact lines opens with a standard name
+//   consistent_date_format     two or more dated roles, all in one date style
+//   every_role_has_dates       every job in experience has a start date
+export const PassedCheck = z.enum([
+  "contact_details_present",
+  "standard_section_headings",
+  "consistent_date_format",
+  "every_role_has_dates",
+]);
+export type PassedCheck = z.infer<typeof PassedCheck>;
 
 export const ScanResultResponse = z.strictObject({
   scan_session_id: z.string(),
@@ -440,7 +486,15 @@ export const ScanResultResponse = z.strictObject({
     category: ScoreCategory.nullable(),
     // Only the open category's lines, only once line detail is done.
     lines: z.array(FlaggedLine),
+    // One short plain sentence about the open category's flagged lines, from the same line
+    // detail answer, once line detail is done. Null when that category has no flagged line or
+    // the server's checks dropped it. A locked category never has one.
+    summary: z.string().min(1).nullable(),
   }),
+  // The whole CV for the CV panel, once the overview is scored (empty before).
+  cv: z.array(CvPanelSection),
+  // Once line detail is done (empty before).
+  passed_checks: z.array(PassedCheck),
   // Seconds to wait before asking again while the overview or line detail is still running;
   // null once both are settled. Also sent as the Retry-After header.
   retry_after: z.int().min(1).nullable(),
@@ -468,6 +522,27 @@ export const ScanUploadResponse = z.strictObject({
   guest: z.strictObject({ token: z.string(), expires_at: z.iso.datetime() }).nullable(),
 });
 export type ScanUploadResponse = z.infer<typeof ScanUploadResponse>;
+
+// ---- Usage (SRS Section 7) ------------------------------------------------------------------
+
+// One allowance for this month. limit and remaining are null on an active PRO plan (no monthly
+// counter). remaining is never below 0.
+export const UsageAllowance = z.strictObject({
+  used: z.int().min(0),
+  limit: z.int().min(0).nullable(),
+  remaining: z.int().min(0).nullable(),
+});
+export type UsageAllowance = z.infer<typeof UsageAllowance>;
+
+// GET /api/usage. Signed-in only, for the caller's own account. The current calendar month in
+// Lagos time, counted exactly as the scan limit counts it. reset_at is the 1st of next month,
+// 00:00 Lagos time. Never cached.
+export const UsageResponse = z.strictObject({
+  general: UsageAllowance,
+  job_specific: UsageAllowance,
+  reset_at: z.iso.datetime(),
+});
+export type UsageResponse = z.infer<typeof UsageResponse>;
 
 // ---- Analytics (PRD Section 19, analytics.md) -----------------------------------------------
 

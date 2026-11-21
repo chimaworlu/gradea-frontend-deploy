@@ -44,7 +44,10 @@ function result(
       category: lineDetail === "done" ? "impact_achievements" : null,
       lines:
         lineDetail === "done" ? Array.from({ length: counts[0] }, (_, index) => line(index)) : [],
+      summary: null,
     },
+    cv: [],
+    passed_checks: [],
     retry_after: lineDetail === "done" ? null : 3,
   };
 }
