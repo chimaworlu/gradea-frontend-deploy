@@ -1,0 +1,431 @@
+/* B3 Results. Token variables only (design-system-rules). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-surface-container-lowest);
+}
+
+/* Desktop: the left rail (248) and the middle panel (440), as in the B3 Shell frame. The CV
+   panel on the right comes when the API sends the CV's extracted content. */
+.layout {
+  display: grid;
+  grid-template-columns: var(--layout-results-rail) minmax(0, var(--layout-results-detail));
+  gap: var(--space-48);
+  flex: 1;
+  padding: var(--space-32) var(--space-48) var(--space-48);
+}
+
+/* ---- Left rail ---- */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-24);
+}
+
+.overallLabel {
+  color: var(--color-on-surface);
+  font: var(--font-title-small);
+  letter-spacing: var(--font-title-small-letter-spacing);
+}
+
+/* The score ring is round (design-system-rules section 5): the arc is the score, green from 75,
+   amber below, on the light track; never red. */
+.ring {
+  --ring-color: var(--color-warning);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-96) + var(--space-16));
+  height: calc(var(--space-96) + var(--space-16));
+  border-radius: var(--radius-full);
+  background: conic-gradient(var(--ring-color) calc(var(--score) * 1%), var(--color-border-card) 0);
+}
+
+.ringStrong {
+  --ring-color: var(--color-success);
+}
+
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-lowest);
+}
+
+/* The score number: Lora, the big moment on this screen (design tokens, "score ring"). */
+.ringNumber {
+  position: relative;
+  color: var(--color-on-surface);
+  font: var(--font-display-small);
+  letter-spacing: var(--font-display-small-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categoryCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-12) var(--space-16);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  text-align: left;
+  cursor: pointer;
+}
+
+.categoryCard:hover {
+  border-color: var(--color-border-input);
+}
+
+/* Selected: the light navy fill, as in the design. */
+.categoryCard[aria-current="true"] {
+  border-color: var(--color-primary-container);
+  background: var(--color-primary-container);
+}
+
+.categoryName {
+  color: var(--color-on-surface);
+  font: var(--font-title-small);
+  letter-spacing: var(--font-title-small-letter-spacing);
+}
+
+.categoryCard[aria-current="true"] .categoryName {
+  color: var(--color-primary);
+}
+
+.categoryMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Locked or PRO-only: the neutral grey-blue with a lock icon, never amber or green. */
+.proTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+  font: var(--font-label-medium);
+  letter-spacing: var(--font-label-medium-letter-spacing);
+}
+
+.proTag svg {
+  width: var(--space-12);
+  height: var(--space-12);
+}
+
+.scanAnother {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-button);
+  margin-top: var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+}
+
+.scanAnother:hover {
+  background: var(--color-primary-soft);
+}
+
+.scanAnother:active {
+  background: var(--color-primary-container);
+}
+
+/* ---- Middle panel ---- */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.detailHeading {
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+  text-wrap: balance;
+}
+
+.detailSummary {
+  margin-top: var(--space-4);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
+.detailBody {
+  margin-top: var(--space-16);
+  color: var(--color-on-surface);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+  text-wrap: pretty;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-32);
+  color: var(--color-on-surface);
+  font: var(--font-title-small);
+  letter-spacing: var(--font-title-small-letter-spacing);
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: var(--space-16) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A flagged line: the amber edge marks it as flagged, with the issue label as a second cue. */
+.lineCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-16) var(--space-24);
+  border: var(--border-width) solid var(--color-border-card);
+  border-left: var(--border-width-selected) solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+}
+
+.lineSection {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.lineText {
+  color: var(--color-on-surface);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+/* Flagged: amber tint, warning text, flag icon (design tokens, "tags"). */
+.issueTag {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-container);
+  color: var(--color-on-warning-container);
+  font: var(--font-label-medium);
+  letter-spacing: var(--font-label-medium-letter-spacing);
+}
+
+.issueTag svg {
+  width: var(--space-12);
+  height: var(--space-12);
+}
+
+.lineReason {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-wrap: pretty;
+}
+
+.showMore {
+  align-self: flex-start;
+  min-height: var(--size-touch-target);
+  margin-top: var(--space-8);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.showMore:hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width);
+}
+
+/* Locked lines: grey placeholder shapes with a lock, no text (the server sent none). */
+.lockedCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-24);
+  border: var(--border-width) solid var(--color-border-card);
+  border-left: var(--border-width-selected) solid var(--color-border-card);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+}
+
+.lockedBar {
+  height: var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-high);
+  filter: blur(var(--space-4));
+}
+
+.lockedBar:nth-child(1) {
+  width: 30%;
+}
+
+.lockedBar:nth-child(2) {
+  width: 90%;
+}
+
+.lockedBar:nth-child(3) {
+  width: 70%;
+}
+
+.lockedIcon {
+  position: absolute;
+  top: var(--space-16);
+  right: var(--space-16);
+  display: flex;
+  color: var(--color-on-surface-variant);
+}
+
+/* ---- Details failed ---- */
+
+.errorIcon {
+  display: flex;
+  margin-bottom: var(--space-16);
+  color: var(--color-error);
+}
+
+.errorIcon svg {
+  width: var(--space-24);
+  height: var(--space-24);
+}
+
+.errorHeading {
+  color: var(--color-on-surface);
+  font: var(--font-title-medium);
+  letter-spacing: var(--font-title-medium-letter-spacing);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-24);
+  margin-top: var(--space-24);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-button);
+  padding: 0 var(--space-24);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--color-primary-pressed);
+}
+
+.primary[aria-busy="true"] {
+  cursor: progress;
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch-target);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width);
+}
+
+.formError {
+  margin-top: var(--space-16);
+  color: var(--color-error);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.formError:empty {
+  display: none;
+}
+
+.failedMain {
+  width: 100%;
+  max-width: calc(var(--layout-max-width-auth) + var(--space-page-gutter) * 2);
+  margin: 0 auto;
+  padding: var(--space-96) var(--space-page-gutter) var(--space-48);
+}
+
+/* Tablet and phone: the rail, then the open category under it. */
+@media (width < 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-32);
+    padding: var(--space-24) var(--space-page-gutter) var(--space-48);
+  }
+}
+
+@media (width < 640px) {
+  .primary {
+    width: 100%;
+  }
+}

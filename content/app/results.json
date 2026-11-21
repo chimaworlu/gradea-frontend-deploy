@@ -4,8 +4,71 @@
   "meta": {
     "title": "Your results"
   },
-  "placeholder": {
-    "heading": "Your results",
-    "subline": "Your scores are ready."
+  "leftRail": {
+    "overallScore": "Overall score",
+    "scoreOutOf": "{score} out of 100",
+    "issues": {
+      "one": "{count} issue",
+      "other": "{count} issues"
+    },
+    "noIssues": "No issues",
+    "pro": "PRO",
+    "proLabel": "Locked. The lines unlock with PRO.",
+    "categoriesLabel": "Categories",
+    "scanAnother": "Scan another CV"
+  },
+  "middleDetail": {
+    "summary": "{score} out of 100",
+    "flaggedLines": "Flagged lines",
+    "showMore": "Show {count} more",
+    "noIssues": {
+      "heading": "No issues",
+      "body": "Nothing in this category needs work right now."
+    },
+    "locked": {
+      "body": {
+        "one": "Unlock the line behind this issue with PRO.",
+        "other": "Unlock the lines behind these {count} issues with PRO."
+      }
+    },
+    "detailsFailed": {
+      "heading": "We couldn't load the details for this category.",
+      "body": "Your scores are safe. Try again to see the line-by-line feedback.",
+      "tryAgain": {
+        "default": "Try again",
+        "loading": "Trying again..."
+      },
+      "uploadAnother": "Upload another CV"
+    }
+  },
+  "sections": {
+    "contact": "Contact details",
+    "summary": "Summary",
+    "experience": "Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "projects": "Projects",
+    "certifications": "Certifications",
+    "other": "Other"
+  },
+  "issues": {
+    "no_numbers": "No numbers",
+    "weak_verb": "Weak opening verb",
+    "duty_not_result": "A duty, not a result",
+    "vague_claim": "Vague claim",
+    "too_long": "Too long",
+    "filler_words": "Filler words",
+    "cliche": "Overused phrase",
+    "spelling_grammar": "Spelling or grammar",
+    "repetition": "Repeated wording",
+    "no_leadership_signal": "No sign of leading",
+    "no_growth_shown": "No growth shown",
+    "no_ownership": "Unclear who did the work",
+    "date_format_inconsistent": "Dates in mixed styles",
+    "unusual_symbols": "Unusual symbols",
+    "contact_details_unclear": "Contact details unclear",
+    "section_name_nonstandard": "Unusual section heading",
+    "layout_not_machine_readable": "Hard for hiring software to read",
+    "role_details_missing": "Job title, company or dates missing"
   }
 }
