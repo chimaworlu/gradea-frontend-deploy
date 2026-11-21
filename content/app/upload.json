@@ -12,6 +12,13 @@
     "heading": "Upload your CV and get your grade",
     "subline": "Get a clear score and a short list of what to fix first. Free to start."
   },
+  "modeSwitch": {
+    "label": "Type of scan",
+    "general": "General",
+    "jobSpecific": "Job-specific",
+    "comingSoon": "Coming soon",
+    "generalHelper": "Score your CV for any job."
+  },
   "uploadBox": {
     "label": "Upload your CV",
     "title": "Drag your CV here",

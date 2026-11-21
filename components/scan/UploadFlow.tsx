@@ -242,6 +242,22 @@ export function UploadFlow() {
         <h1 className={styles.heading}>{text.hero.heading}</h1>
         <p className={styles.subline}>{text.hero.subline}</p>
 
+        {/* Job-specific is shown but switched off until its phase (Build Plan Phase 3). */}
+        <div className={styles.switch} role="group" aria-label={text.modeSwitch.label}>
+          <button
+            type="button"
+            className={`${styles.switchOption} ${styles.switchSelected}`}
+            aria-pressed="true"
+          >
+            <span>{text.modeSwitch.general}</span>
+          </button>
+          <button type="button" className={styles.switchOption} aria-pressed="false" disabled>
+            <span>{text.modeSwitch.jobSpecific}</span>
+            <span className={styles.comingSoon}>{text.modeSwitch.comingSoon}</span>
+          </button>
+        </div>
+        <p className={styles.switchHelper}>{text.modeSwitch.generalHelper}</p>
+
         <section className={boxClass} aria-label={text.uploadBox.label}>
           <input
             ref={fileInput}
@@ -259,7 +275,7 @@ export function UploadFlow() {
           </span>
           {showFile ? (
             <>
-              <p className={styles.boxTitle}>
+              <p className={styles.fileName}>
                 {fillPlaceholders(text.uploadBox.fileSummary, {
                   name: file.name,
                   size: fileSizeLabel(file.size),

@@ -1,6 +1,14 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import type { CareerLevel } from "../../lib/api/shared";
 import { CAREER_LEVELS } from "../../lib/auth/forms";
 import { listboxKey } from "../../lib/auth/listbox";
@@ -28,6 +36,7 @@ export function CareerLevelMenu({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const root = useRef<HTMLDivElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
 
   const listId = "scan-career-level-list";
   const optionId = (index: number) => `scan-career-level-${CAREER_LEVELS[index] ?? index}`;
@@ -53,6 +62,26 @@ export function CareerLevelMenu({
     };
     document.addEventListener("pointerdown", outside);
     return () => document.removeEventListener("pointerdown", outside);
+  }, [open]);
+
+  // The menu is never cut off: it opens upward when there is not room below, and if neither
+  // side has room it takes the larger one and scrolls inside.
+  useLayoutEffect(() => {
+    const list = menu.current;
+    const anchor = root.current;
+    if (!open || list === null || anchor === null) return;
+    delete list.dataset.up;
+    list.style.maxHeight = "";
+    const gap = list.offsetTop - anchor.offsetHeight;
+    const needed = list.offsetHeight + gap;
+    const box = anchor.getBoundingClientRect();
+    const below = window.innerHeight - box.bottom;
+    const above = box.top;
+    if (needed <= below) return;
+    const up = needed <= above || above > below;
+    if (up) list.dataset.up = "true";
+    const room = (up ? above : below) - gap * 2;
+    if (needed > room + gap) list.style.maxHeight = `${Math.max(room, 0)}px`;
   }, [open]);
 
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
@@ -101,7 +130,7 @@ export function CareerLevelMenu({
       >
         {text.change}
       </button>
-      <div className={styles.menu} hidden={!open}>
+      <div className={styles.menu} hidden={!open} ref={menu}>
         <ul
           id={listId}
           role="listbox"
