@@ -8,14 +8,22 @@
   background: var(--color-surface-container-lowest);
 }
 
-/* Desktop: the left rail (248) and the middle panel (440), as in the B3 Shell frame. The CV
-   panel on the right comes when the API sends the CV's extracted content. */
+/* Desktop: the left rail (248), the middle panel (440) and the CV panel filling the rest on its
+   grey surface, as in the B3 Shell frame. */
 .layout {
   display: grid;
-  grid-template-columns: var(--layout-results-rail) minmax(0, var(--layout-results-detail));
+  grid-template-columns:
+    var(--layout-results-rail) minmax(0, var(--layout-results-detail))
+    minmax(0, 1fr);
   gap: var(--space-48);
   flex: 1;
-  padding: var(--space-32) var(--space-48) var(--space-48);
+  padding-left: var(--space-48);
+}
+
+.rail,
+.detail {
+  padding-top: var(--space-32);
+  padding-bottom: var(--space-48);
 }
 
 /* ---- Left rail ---- */
@@ -201,11 +209,24 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  width: 100%;
   padding: var(--space-16) var(--space-24);
   border: var(--border-width) solid var(--color-border-card);
   border-left: var(--border-width-selected) solid var(--color-warning);
   border-radius: var(--radius-md);
   background: var(--color-surface-container-lowest);
+  text-align: left;
+  cursor: pointer;
+}
+
+.lineCard:hover {
+  border-color: var(--color-border-input);
+  border-left-color: var(--color-warning);
+}
+
+/* The picked line: its CV line is highlighted too. */
+.lineCard[aria-pressed="true"] {
+  border-color: var(--color-warning);
 }
 
 .lineSection {
@@ -393,11 +414,156 @@
 }
 
 /* Tablet and phone: the rail, then the open category under it. */
+/* ---- Passed checks ---- */
+
+.passedChecks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: var(--space-16) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passedCheck {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  color: var(--color-on-surface);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+}
+
+/* Green only means passed (design-system-rules section 2). */
+.passedIcon {
+  display: flex;
+  color: var(--color-success);
+}
+
+/* ---- CV panel ---- */
+
+.cvPanel {
+  padding: var(--space-32) var(--space-48) var(--space-48);
+  background: var(--color-surface);
+}
+
+.cvNote {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* The CV page: radius 10 like popups (design-system-rules section 5), 760 at most. */
+.cvPage {
+  max-width: var(--layout-results-cv-page);
+  padding: var(--space-48);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+}
+
+.cvSection + .cvSection {
+  margin-top: var(--space-24);
+}
+
+.cvLine {
+  position: relative;
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.cvName {
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+}
+
+.cvSectionHeading {
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-8);
+  border-bottom: var(--border-width) solid var(--color-border-card);
+  font: var(--font-title-small);
+  letter-spacing: var(--font-title-small-letter-spacing);
+}
+
+.cvHeading {
+  margin-top: var(--space-12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cvText {
+  margin-top: var(--space-4);
+  color: var(--color-on-surface-variant);
+}
+
+.cvBullet {
+  margin-top: var(--space-4);
+  padding-left: var(--space-16);
+}
+
+.cvBullet::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--color-on-surface-variant);
+}
+
+/* A flagged line: amber tint, a dashed amber underline and a flag in the margin, so colour is
+   never the only cue (FR-37, design tokens "tags"). */
+.cvLine[data-flagged="true"] .cvLineText {
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-container);
+  text-decoration: underline dashed var(--color-warning);
+  text-decoration-thickness: var(--border-width);
+  text-underline-offset: var(--space-4);
+}
+
+.cvLine[data-active="true"] .cvLineText {
+  outline: var(--border-width-selected) solid var(--color-warning);
+  outline-offset: var(--border-width-selected);
+}
+
+.cvFlag {
+  position: absolute;
+  top: 0;
+  left: calc(var(--space-32) * -1);
+  display: flex;
+  color: var(--color-warning);
+}
+
+.cvFlag svg {
+  width: var(--space-16);
+  height: var(--space-16);
+}
+
 @media (width < 1024px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-32);
+    padding: 0;
+  }
+
+  .rail,
+  .detail {
+    padding: var(--space-24) var(--space-page-gutter) 0;
+  }
+
+  .cvPanel {
     padding: var(--space-24) var(--space-page-gutter) var(--space-48);
+  }
+
+  .cvPage {
+    padding: var(--space-card-padding);
+  }
+
+  .cvFlag {
+    left: calc(var(--space-16) * -1);
   }
 }
 

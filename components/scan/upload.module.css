@@ -316,6 +316,14 @@
   letter-spacing: var(--font-body-small-letter-spacing);
 }
 
+/* Free usage: always neutral grey text, never a warning colour (A1 dev notes). */
+.usage {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
 .actions {
   margin-top: var(--space-16);
 }

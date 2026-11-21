@@ -19,6 +19,7 @@ import type {
   ErrorCode,
   GOOGLE_FRONTEND_PATHS,
   LineIssue,
+  PassedCheck,
   ScoreCategory,
 } from "./api/shared";
 
@@ -72,6 +73,16 @@ const scoreCategoryNames: ExactTextRecord<ScoreCategory, typeof signupWall.previ
 
 const lineIssueLabels: ExactTextRecord<LineIssue, typeof results.issues> = results.issues;
 const cvSectionNames: ExactTextRecord<CvSection, typeof results.sections> = results.sections;
+
+const passedCheckLabels: ExactTextRecord<
+  PassedCheck,
+  typeof results.middleDetail.passedChecks.checks
+> = results.middleDetail.passedChecks.checks;
+
+/** The line for a check the CV passes, for example "Every role has dates" (B3 Passed checks). */
+export function passedCheckLabel(check: PassedCheck): string {
+  return passedCheckLabels[check];
+}
 
 /** The short label for a flagged line's issue type, for example "No numbers" (B3). */
 export function lineIssueLabel(issue: LineIssue): string {

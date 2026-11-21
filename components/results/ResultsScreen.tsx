@@ -3,20 +3,27 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
-import type { ScanResultResponse, ScoreCategory } from "../../lib/api/shared";
+import type {
+  CvPanelLine,
+  PassedCheck,
+  ScanResultResponse,
+  ScoreCategory,
+} from "../../lib/api/shared";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
 import {
-  cvSectionName,
   fillPlaceholders,
   getContent,
   lineIssueLabel,
+  passedCheckLabel,
   scoreCategoryLabel,
 } from "../../lib/content";
 import {
   LINES_SHOWN_FIRST,
   categoryRows,
+  cvPanelNote,
   getScanResult,
   issuesLabel,
+  lineMeta,
   openLines,
   resultView,
   retryLineDetail,
@@ -223,6 +230,17 @@ export function Results({ result }: { result: ScanResultResponse }) {
   const opened = result.line_detail.category ?? rows[0]?.category;
   const [selected, setSelected] = useState<ScoreCategory | undefined>(opened);
   const current = rows.find((row) => row.category === selected) ?? rows[0];
+  // The flagged line picked from a card, highlighted and scrolled to in the CV panel.
+  const [activeLine, setActiveLine] = useState<string | undefined>(undefined);
+
+  // Scrolls the CV panel to the picked line (instant with reduced motion).
+  useEffect(() => {
+    if (activeLine === undefined) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document
+      .getElementById(cvLineId(activeLine))
+      ?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  }, [activeLine]);
 
   return (
     <div className={styles.layout}>
@@ -230,13 +248,30 @@ export function Results({ result }: { result: ScanResultResponse }) {
         overallScore={result.overall_score ?? 0}
         rows={rows}
         selected={current?.category}
-        onSelect={setSelected}
+        onSelect={(category) => {
+          setSelected(category);
+          setActiveLine(undefined);
+        }}
       />
       {current !== undefined ? (
-        <CategoryDetail key={current.category} row={current} result={result} />
+        <CategoryDetail
+          key={current.category}
+          row={current}
+          result={result}
+          activeLine={activeLine}
+          onLineSelect={setActiveLine}
+        />
+      ) : null}
+      {current !== undefined ? (
+        <CvPanel result={result} row={current} activeLine={activeLine} />
       ) : null}
     </div>
   );
+}
+
+/** The id of a line in the CV panel, so a line card can scroll to it. */
+function cvLineId(lineId: string): string {
+  return `cv-line-${lineId}`;
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -307,7 +342,17 @@ function Rail({
   );
 }
 
-function CategoryDetail({ row, result }: { row: CategoryRow; result: ScanResultResponse }) {
+function CategoryDetail({
+  row,
+  result,
+  activeLine,
+  onLineSelect,
+}: {
+  row: CategoryRow;
+  result: ScanResultResponse;
+  activeLine: string | undefined;
+  onLineSelect: (lineId: string) => void;
+}) {
   const text = getContent("app/results").middleDetail;
   const [showAll, setShowAll] = useState(false);
   const lines = row.state === "open" ? openLines(result) : [];
@@ -325,6 +370,11 @@ function CategoryDetail({ row, result }: { row: CategoryRow; result: ScanResultR
           ? getContent("app/results").leftRail.noIssues
           : issuesLabel(row.flaggedCount)}
       </p>
+
+      {/* The open category's one-sentence summary, from line detail, when the server kept one. */}
+      {row.state === "open" && result.line_detail.summary !== null ? (
+        <p className={styles.detailBody}>{result.line_detail.summary}</p>
+      ) : null}
 
       {row.state === "noIssues" ? <p className={styles.detailBody}>{text.noIssues.body}</p> : null}
 
@@ -367,25 +417,151 @@ function CategoryDetail({ row, result }: { row: CategoryRow; result: ScanResultR
           <h2 className={styles.sectionTitle}>{text.flaggedLines}</h2>
           <ul className={styles.lines}>
             {shown.map((line) => (
-              <li key={line.line_id} className={styles.lineCard}>
-                <span className={styles.lineSection}>{cvSectionName(line.section)}</span>
-                <p className={styles.lineText}>{line.text}</p>
-                <span className={styles.issueTag}>
-                  <FieldIcon name="flag" />
-                  {lineIssueLabel(line.issue)}
-                </span>
-                <p className={styles.lineReason}>{line.reason}</p>
+              <li key={line.line_id}>
+                {/* The whole card picks the line: the CV panel scrolls to it and highlights it. */}
+                <button
+                  type="button"
+                  className={styles.lineCard}
+                  aria-pressed={activeLine === line.line_id}
+                  aria-describedby="show-on-cv"
+                  onClick={() => onLineSelect(line.line_id)}
+                >
+                  <span className={styles.lineSection}>{lineMeta(line)}</span>
+                  <span className={styles.lineText}>{line.text}</span>
+                  <span className={styles.issueTag}>
+                    <FieldIcon name="flag" />
+                    {lineIssueLabel(line.issue)}
+                  </span>
+                  <span className={styles.lineReason}>{line.reason}</span>
+                </button>
                 {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
               </li>
             ))}
           </ul>
+          <span id="show-on-cv" className={scanStyles.visuallyHidden}>
+            {text.showOnCv}
+          </span>
           {hidden > 0 ? (
             <button type="button" className={styles.showMore} onClick={() => setShowAll(true)}>
               {fillPlaceholders(text.showMore, { count: hidden })}
             </button>
           ) : null}
+          <PassedChecks checks={result.passed_checks} />
         </>
       ) : null}
     </section>
+  );
+}
+
+/** "Passed checks": the checks the server verified in code, hidden when there are none. */
+export function PassedChecks({ checks }: { checks: readonly PassedCheck[] }) {
+  if (checks.length === 0) return null;
+  const text = getContent("app/results").middleDetail.passedChecks;
+  return (
+    <>
+      <h2 className={styles.sectionTitle}>{text.heading}</h2>
+      <ul className={styles.passedChecks}>
+        {checks.map((check) => (
+          <li key={check} className={styles.passedCheck}>
+            {/* Green means passed; the words say it too (design-system-rules section 2). */}
+            <span className={styles.passedIcon}>
+              <FieldIcon name="check" />
+            </span>
+            {passedCheckLabel(check)}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+/**
+ * The CV panel: the whole CV from result.cv, section by section. Only when the open category is
+ * selected are its flagged lines highlighted; a locked or clean category marks nothing (the
+ * server never marks a locked category's lines either).
+ */
+export function CvPanel({
+  result,
+  row,
+  activeLine,
+}: {
+  result: ScanResultResponse;
+  row: CategoryRow;
+  activeLine: string | undefined;
+}) {
+  const text = getContent("app/results").cvPanel;
+  if (result.cv.length === 0) return null;
+  const note = cvPanelNote(row.state, scoreCategoryLabel(row.category));
+  const marking = row.state === "open";
+  return (
+    <section className={styles.cvPanel} aria-label={text.label}>
+      {note !== undefined ? (
+        <p className={styles.cvNote}>
+          <FieldIcon name={note.kind === "flagged" ? "flag" : "lock"} />
+          {note.text}
+        </p>
+      ) : null}
+      <div className={styles.cvPage}>
+        {result.cv.map((group, groupIndex) => (
+          <div key={`${group.section}-${groupIndex}`} className={styles.cvSection}>
+            {group.lines.map((line, index) => (
+              <CvLine
+                key={line.line_id}
+                line={line}
+                isName={group.section === "contact" && groupIndex === 0 && index === 0}
+                isSectionHeading={
+                  group.section !== "contact" && index === 0 && line.kind === "heading"
+                }
+                flagged={marking && line.flagged}
+                active={marking && line.line_id === activeLine}
+                flaggedLabel={text.flaggedLine}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CvLine({
+  line,
+  isName,
+  isSectionHeading,
+  flagged,
+  active,
+  flaggedLabel,
+}: {
+  line: CvPanelLine;
+  isName: boolean;
+  isSectionHeading: boolean;
+  flagged: boolean;
+  active: boolean;
+  flaggedLabel: string;
+}) {
+  const kindClass = isName
+    ? styles.cvName
+    : isSectionHeading
+      ? styles.cvSectionHeading
+      : line.kind === "heading"
+        ? styles.cvHeading
+        : line.kind === "bullet"
+          ? styles.cvBullet
+          : styles.cvText;
+  return (
+    <p
+      id={cvLineId(line.line_id)}
+      className={`${styles.cvLine} ${kindClass}`}
+      data-flagged={flagged ? "true" : undefined}
+      data-active={active ? "true" : undefined}
+    >
+      {flagged ? (
+        <span className={styles.cvFlag}>
+          <FieldIcon name="flag" />
+          <span className={scanStyles.visuallyHidden}>{flaggedLabel}</span>
+        </span>
+      ) : null}
+      <span className={styles.cvLineText}>{line.text}</span>
+    </p>
   );
 }

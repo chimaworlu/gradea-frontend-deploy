@@ -38,6 +38,17 @@
         "loading": "Trying again..."
       },
       "uploadAnother": "Upload another CV"
+    },
+    "lineMeta": "{section}, {role}",
+    "showOnCv": "Show this line on your CV",
+    "passedChecks": {
+      "heading": "Passed checks",
+      "checks": {
+        "contact_details_present": "Your contact details are there",
+        "standard_section_headings": "Your section headings are standard",
+        "consistent_date_format": "Your dates use one style",
+        "every_role_has_dates": "Every role has dates"
+      }
     }
   },
   "sections": {
@@ -69,5 +80,11 @@
     "section_name_nonstandard": "Unusual section heading",
     "layout_not_machine_readable": "Hard for hiring software to read",
     "role_details_missing": "Job title, company or dates missing"
+  },
+  "cvPanel": {
+    "label": "Your CV",
+    "flaggedIn": "Flagged in {category}",
+    "lockedHighlights": "Highlights for {category} unlock with PRO",
+    "flaggedLine": "Flagged line"
   }
 }

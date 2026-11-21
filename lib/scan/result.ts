@@ -5,7 +5,7 @@ import {
   type ResultCategory,
   type ScoreCategory,
 } from "../api/shared";
-import { fillPlaceholders, getContent } from "../content";
+import { cvSectionName, fillPlaceholders, getContent } from "../content";
 import { processingPath } from "./upload";
 import { pollDelayMs } from "./status";
 
@@ -125,4 +125,35 @@ export const STRONG_SCORE_FROM = 75;
 
 export function scoreTone(score: number): "strong" | "flagged" {
   return score >= STRONG_SCORE_FROM ? "strong" : "flagged";
+}
+
+/** "Experience, Product Designer at Acme", or just "Experience" when the line has no role. */
+export function lineMeta(line: {
+  section: FlaggedLine["section"];
+  role?: string | undefined;
+}): string {
+  const section = cvSectionName(line.section);
+  if (line.role === undefined) return section;
+  return fillPlaceholders(getContent("app/results").middleDetail.lineMeta, {
+    section,
+    role: line.role,
+  });
+}
+
+/** The CV panel's label: what the highlights show for the selected category, if anything. */
+export function cvPanelNote(
+  state: CategoryState,
+  categoryName: string,
+): { kind: "flagged" | "locked"; text: string } | undefined {
+  const text = getContent("app/results").cvPanel;
+  if (state === "open") {
+    return { kind: "flagged", text: fillPlaceholders(text.flaggedIn, { category: categoryName }) };
+  }
+  if (state === "locked") {
+    return {
+      kind: "locked",
+      text: fillPlaceholders(text.lockedHighlights, { category: categoryName }),
+    };
+  }
+  return undefined;
 }

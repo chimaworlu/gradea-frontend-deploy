@@ -22,6 +22,7 @@ import {
   type ScanErrorCode,
   type Viewer,
 } from "../../lib/scan/upload";
+import { fetchUsage, usageLine } from "../../lib/scan/usage";
 import { saveScanFileInfo } from "../../lib/scan/scan-file-info";
 import {
   clearWaitingScan,
@@ -69,6 +70,7 @@ export function UploadFlow() {
   // B2 for a file the server read but could not use; D1 for a guest scan gone or out of time.
   const [scanError, setScanError] = useState<ScanErrorCode | undefined>(undefined);
   const [expired, setExpired] = useState(false);
+  const [usageText, setUsageText] = useState<string | undefined>(undefined);
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const scanButton = useRef<HTMLButtonElement>(null);
@@ -102,7 +104,12 @@ export function UploadFlow() {
         if (outcome.kind === "expired") setExpired(true);
       }
       setViewer(found);
-      if (found.kind === "signedIn") setCareerLevel(found.user.career_level);
+      if (found.kind === "signedIn") {
+        setCareerLevel(found.user.career_level);
+        // The usage line, asked once for a signed-in user (SRS Section 7). Hidden on failure.
+        const usage = await fetchUsage();
+        if (usage.kind === "ok") setUsageText(usageLine(usage.data));
+      }
     });
   }, [router]);
 
@@ -411,8 +418,8 @@ export function UploadFlow() {
               onValueChange={setCareerLevel}
               disabled={status === "uploading"}
             />
-            {/* The "4 of 5 General scans left this month" line goes here, for Free users only,
-                once the API sends the usage (no usage endpoint yet). */}
+            {/* Free only: PRO has no monthly limit, so no line (A1 dev notes, neutral grey). */}
+            {usageText !== undefined ? <p className={styles.usage}>{usageText}</p> : null}
             <div className={styles.actions}>
               <button
                 ref={scanButton}
