@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { CvPanel, PassedChecks, Results } from "../components/results/ResultsScreen";
 import type { ScanResultResponse, UsageResponse } from "../lib/api/shared";
 import { getContent } from "../lib/content";
-import { categoryRows, lineMeta } from "../lib/scan/result";
+import { categoryRows, cvDisplayText, lineMeta, splitEntryHeading } from "../lib/scan/result";
 import { usageLine } from "../lib/scan/usage";
 
 const text = getContent("app/results");
@@ -153,5 +153,55 @@ describe("A1 usage line", () => {
 
   it("is hidden on a PRO plan, which has no monthly limit", () => {
     expect(usageLine(usage(null, null))).toBeUndefined();
+  });
+});
+
+describe("B3 CV panel display", () => {
+  it("splits an entry heading into its title and its trailing date range", () => {
+    expect(
+      splitEntryHeading("Product Designer, EverTry (Fintech), Lagos, Nigeria May 2026 to Present"),
+    ).toEqual({
+      title: "Product Designer, EverTry (Fintech), Lagos, Nigeria",
+      dates: "May 2026 to Present",
+    });
+    expect(
+      splitEntryHeading("Product Designer | Squama Marketing | Toronto   March 2026 to Present"),
+    ).toEqual({
+      title: "Product Designer, Squama Marketing, Toronto",
+      dates: "March 2026 to Present",
+    });
+    expect(splitEntryHeading("Designer, Beta Studio, Jan 2024 - Mar 2025")).toEqual({
+      title: "Designer, Beta Studio",
+      dates: "Jan 2024 - Mar 2025",
+    });
+    expect(splitEntryHeading("Product Design Bootcamp, Dev and Design HQ 2025")).toEqual({
+      title: "Product Design Bootcamp, Dev and Design HQ",
+      dates: "2025",
+    });
+  });
+
+  it("shows a heading with no clear date range at the end whole", () => {
+    expect(
+      splitEntryHeading("UXLens AI | Product Designer and Builder | Case study | Live"),
+    ).toBeUndefined();
+    expect(splitEntryHeading("Product Designer at Acme")).toBeUndefined();
+  });
+
+  it("names sections from the content files and shows contact separators as dots", () => {
+    const heading = {
+      line_id: "h",
+      section: "experience" as const,
+      index_in_section: 0,
+      kind: "heading" as const,
+      text: "WORK EXPERIENCE",
+      flagged: false,
+    };
+    expect(cvDisplayText(heading, true)).toBe(text.sections.experience);
+    expect(
+      cvDisplayText(
+        { ...heading, section: "contact", kind: "text", text: "+234 700 | ada@example.test" },
+        false,
+      ),
+    ).toBe("+234 700 · ada@example.test");
   });
 });

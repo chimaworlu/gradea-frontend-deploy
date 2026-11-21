@@ -13,15 +13,17 @@ import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
 import {
   fillPlaceholders,
   getContent,
-  lineIssueLabel,
   passedCheckLabel,
   scoreCategoryLabel,
 } from "../../lib/content";
 import {
   LINES_SHOWN_FIRST,
   categoryRows,
+  cvDisplayText,
   cvPanelNote,
   getScanResult,
+  hasDatedEntries,
+  splitEntryHeading,
   issuesLabel,
   lineMeta,
   openLines,
@@ -428,10 +430,6 @@ function CategoryDetail({
                 >
                   <span className={styles.lineSection}>{lineMeta(line)}</span>
                   <span className={styles.lineText}>{line.text}</span>
-                  <span className={styles.issueTag}>
-                    <FieldIcon name="flag" />
-                    {lineIssueLabel(line.issue)}
-                  </span>
                   <span className={styles.lineReason}>{line.reason}</span>
                 </button>
                 {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
@@ -548,6 +546,30 @@ function CvLine({
         : line.kind === "bullet"
           ? styles.cvBullet
           : styles.cvText;
+  // A job, project or study heading: the title bold on the left, its dates on the right.
+  const entry =
+    !isName && !isSectionHeading && line.kind === "heading" && hasDatedEntries(line.section)
+      ? splitEntryHeading(line.text)
+      : undefined;
+  if (entry !== undefined) {
+    return (
+      <p
+        id={cvLineId(line.line_id)}
+        className={`${styles.cvLine} ${styles.cvHeading} ${styles.cvEntry}`}
+        data-flagged={flagged ? "true" : undefined}
+        data-active={active ? "true" : undefined}
+      >
+        {flagged ? (
+          <span className={styles.cvFlag}>
+            <FieldIcon name="flag" />
+            <span className={scanStyles.visuallyHidden}>{flaggedLabel}</span>
+          </span>
+        ) : null}
+        <span className={styles.cvLineText}>{entry.title}</span>
+        <span className={styles.cvDates}>{entry.dates}</span>
+      </p>
+    );
+  }
   return (
     <p
       id={cvLineId(line.line_id)}
@@ -561,7 +583,7 @@ function CvLine({
           <span className={scanStyles.visuallyHidden}>{flaggedLabel}</span>
         </span>
       ) : null}
-      <span className={styles.cvLineText}>{line.text}</span>
+      <span className={styles.cvLineText}>{cvDisplayText(line, isSectionHeading)}</span>
     </p>
   );
 }

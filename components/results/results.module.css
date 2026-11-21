@@ -9,21 +9,19 @@
 }
 
 /* Desktop: the left rail (248), the middle panel (440) and the CV panel filling the rest on its
-   grey surface, as in the B3 Shell frame. */
+   grey surface, as in the B3 Shell frame. The rail and middle panel carry their own 24 padding
+   (measured on the 1440 frames: the rail's cards start at 24, the middle text at 272). */
 .layout {
   display: grid;
   grid-template-columns:
     var(--layout-results-rail) minmax(0, var(--layout-results-detail))
     minmax(0, 1fr);
-  gap: var(--space-48);
   flex: 1;
-  padding-left: var(--space-48);
 }
 
 .rail,
 .detail {
-  padding-top: var(--space-32);
-  padding-bottom: var(--space-48);
+  padding: var(--space-24) var(--space-24) var(--space-48);
 }
 
 /* ---- Left rail ---- */
@@ -42,10 +40,11 @@
   margin-bottom: var(--space-24);
 }
 
+/* 14px semibold in the design. */
 .overallLabel {
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 /* The score ring is round (design-system-rules section 5): the arc is the score, green from 75,
@@ -97,7 +96,7 @@
   flex-direction: column;
   gap: var(--space-4);
   width: 100%;
-  padding: var(--space-12) var(--space-16);
+  padding: var(--space-12);
   border: var(--border-width) solid var(--color-border-card);
   border-radius: var(--radius-md);
   background: var(--color-surface-container-lowest);
@@ -115,10 +114,11 @@
   background: var(--color-primary-container);
 }
 
+/* 14px semibold name and 14px meta, as measured on the design. */
 .categoryName {
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 .categoryCard[aria-current="true"] .categoryName {
@@ -131,8 +131,8 @@
   justify-content: space-between;
   gap: var(--space-8);
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   font-variant-numeric: tabular-nums;
 }
 
@@ -169,30 +169,33 @@
   text-wrap: balance;
 }
 
+/* "52 out of 100 · 6 issues": 14px. */
 .detailSummary {
   margin-top: var(--space-4);
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   font-variant-numeric: tabular-nums;
 }
 
+/* The category summary and the locked and clean lines: 15px on 24. */
 .detailBody {
   margin-top: var(--space-16);
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
   text-wrap: pretty;
 }
 
+/* "Flagged lines" and "Passed checks": 14px semibold. */
 .sectionTitle {
   display: flex;
   align-items: center;
   gap: var(--space-8);
   margin-top: var(--space-32);
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 .lines {
@@ -204,13 +207,13 @@
   list-style: none;
 }
 
-/* A flagged line: the amber edge marks it as flagged, with the issue label as a second cue. */
+/* A flagged line: the amber edge marks it as flagged, and the reason says why in words. */
 .lineCard {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   width: 100%;
-  padding: var(--space-16) var(--space-24);
+  padding: var(--space-16);
   border: var(--border-width) solid var(--color-border-card);
   border-left: var(--border-width-selected) solid var(--color-warning);
   border-radius: var(--radius-md);
@@ -229,42 +232,25 @@
   border-color: var(--color-warning);
 }
 
+/* Measured on the Open category frame: section and role 12px, the CV line 15px, the reason
+   14px. */
 .lineSection {
   color: var(--color-on-surface-variant);
-  font: var(--font-body-small);
-  letter-spacing: var(--font-body-small-letter-spacing);
+  font: var(--font-label-small);
+  letter-spacing: var(--font-label-small-letter-spacing);
 }
 
 .lineText {
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
   overflow-wrap: anywhere;
-}
-
-/* Flagged: amber tint, warning text, flag icon (design tokens, "tags"). */
-.issueTag {
-  display: inline-flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: var(--space-4);
-  padding: 0 var(--space-8);
-  border-radius: var(--radius-sm);
-  background: var(--color-warning-container);
-  color: var(--color-on-warning-container);
-  font: var(--font-label-medium);
-  letter-spacing: var(--font-label-medium-letter-spacing);
-}
-
-.issueTag svg {
-  width: var(--space-12);
-  height: var(--space-12);
 }
 
 .lineReason {
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   text-wrap: pretty;
 }
 
@@ -413,14 +399,13 @@
   padding: var(--space-96) var(--space-page-gutter) var(--space-48);
 }
 
-/* Tablet and phone: the rail, then the open category under it. */
 /* ---- Passed checks ---- */
 
+/* 15px rows, 44 apart, as in the design. */
 .passedChecks {
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
-  margin: var(--space-16) 0 0;
+  margin: var(--space-8) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -429,9 +414,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-12);
+  min-height: var(--size-touch-target);
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
 }
 
 /* Green only means passed (design-system-rules section 2). */
@@ -470,11 +456,12 @@
   margin-top: var(--space-24);
 }
 
+/* The CV page is compact, as in the CV highlights frame: 14px text on 22px lines. */
 .cvLine {
   position: relative;
   color: var(--color-on-surface);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   overflow-wrap: anywhere;
 }
 
@@ -484,12 +471,13 @@
   letter-spacing: var(--font-title-large-letter-spacing);
 }
 
+/* Section headings: 14px semibold with the divider under them. */
 .cvSectionHeading {
   margin-bottom: var(--space-12);
   padding-bottom: var(--space-8);
   border-bottom: var(--border-width) solid var(--color-border-card);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 .cvHeading {
@@ -497,21 +485,40 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* An entry heading: the title on the left, its dates right-aligned in regular muted text. */
+.cvEntry {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.cvDates {
+  flex-shrink: 0;
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
 .cvText {
-  margin-top: var(--space-4);
   color: var(--color-on-surface-variant);
 }
 
 .cvBullet {
-  margin-top: var(--space-4);
+  margin-top: var(--space-8);
   padding-left: var(--space-16);
 }
 
+/* A small dot with a hanging indent: wrapped lines line up with the text, not the dot. */
 .cvBullet::before {
-  content: "•";
+  content: "";
   position: absolute;
-  left: 0;
-  color: var(--color-on-surface-variant);
+  top: calc(var(--font-body-small-line-height) / 2 - var(--border-width-selected));
+  left: var(--space-4);
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-on-surface-variant);
 }
 
 /* A flagged line: amber tint, a dashed amber underline and a flag in the margin, so colour is

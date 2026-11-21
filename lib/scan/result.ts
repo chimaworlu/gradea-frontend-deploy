@@ -1,6 +1,7 @@
 import { apiRequest, type ApiResult } from "../api/client";
 import {
   ScanResultResponse,
+  type CvPanelLine,
   type FlaggedLine,
   type ResultCategory,
   type ScoreCategory,
@@ -138,6 +139,59 @@ export function lineMeta(line: {
     section,
     role: line.role,
   });
+}
+
+/**
+ * What the CV panel shows for a line. Display only; the stored text is unchanged:
+ * - a section's heading shows the section's name from the content files in title case
+ *   ("Experience", not "EXPERIENCE"); a section the server could not name ("other") keeps its
+ *   own words, with an all-capitals heading shown with only its first letter capital;
+ * - contact lines show " | " between their parts as " · ", as in the design.
+ */
+export function cvDisplayText(line: CvPanelLine, isSectionHeading: boolean): string {
+  if (isSectionHeading) {
+    if (line.section !== "other") return cvSectionName(line.section);
+    const own = line.text.trim();
+    return own === own.toUpperCase() && own !== own.toLowerCase()
+      ? own.charAt(0) + own.slice(1).toLowerCase()
+      : own;
+  }
+  if (line.section === "contact") return line.text.replace(/\s*\|\s*/g, " · ");
+  return line.text;
+}
+
+// One date in an entry heading: "May 2026", "Sept. 2025", "03/2024" or a bare year.
+const MONTH =
+  "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sept?(?:ember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\\.?";
+const ONE_DATE = `(?:${MONTH}\\s+\\d{4}|\\d{1,2}/\\d{4}|\\d{4})`;
+const RANGE_END = `(?:${ONE_DATE}|Present|Current|Now|Today)`;
+// A date or a date range at the very end, after a separator or a gap: "May 2026 to Present",
+// "Jan 2024 - Mar 2025", "2025". Anything else is not split.
+const TRAILING_DATES = new RegExp(
+  `^(.*?\\S)(?:\\s*[,|·]\\s*|\\s+)(${ONE_DATE}(?:\\s*(?:to|-|–|—)\\s*${RANGE_END})?)\\s*$`,
+  "i",
+);
+
+/** An entry heading split into its title and its trailing date range. */
+export type EntryHeading = { title: string; dates: string };
+
+/**
+ * Splits an entry heading ("Product Designer | Acme   May 2026 to Present") into the title on
+ * the left and the date range on the right, as in the CV highlights frame. Display only: the
+ * stored text is unchanged. " | " in the title shows as ", ". When no clear date range ends the
+ * line, the whole line shows as it is (undefined here).
+ */
+export function splitEntryHeading(text: string): EntryHeading | undefined {
+  const match = TRAILING_DATES.exec(text.trim());
+  const title = match?.[1]?.replace(/\s*\|\s*/g, ", ").replace(/[\s,|·–—-]+$/, "");
+  const dates = match?.[2];
+  if (title === undefined || dates === undefined || title === "") return undefined;
+  return { title, dates };
+}
+
+/** The sections whose headings are entries with dates (jobs, projects, studies). */
+export function hasDatedEntries(section: CvPanelLine["section"]): boolean {
+  return section === "experience" || section === "projects" || section === "education";
 }
 
 /** The CV panel's label: what the highlights show for the selected category, if anything. */
