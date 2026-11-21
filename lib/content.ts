@@ -13,7 +13,14 @@ import accountMenu from "../content/shared/account-menu.json";
 import contact from "../content/shared/contact.json";
 import errors from "../content/shared/errors.json";
 import forms from "../content/shared/forms.json";
-import type { CareerLevel, ErrorCode, GOOGLE_FRONTEND_PATHS, ScoreCategory } from "./api/shared";
+import type {
+  CareerLevel,
+  CvSection,
+  ErrorCode,
+  GOOGLE_FRONTEND_PATHS,
+  LineIssue,
+  ScoreCategory,
+} from "./api/shared";
 
 /** Every content file starts with an id and a title that match the screen list. */
 export type ContentFileHeader = { id: string; title: string };
@@ -62,6 +69,19 @@ const careerLevelOptions: ExactTextRecord<CareerLevel, typeof forms.careerLevel.
   forms.careerLevel.options;
 const scoreCategoryNames: ExactTextRecord<ScoreCategory, typeof signupWall.preview.categories> =
   signupWall.preview.categories;
+
+const lineIssueLabels: ExactTextRecord<LineIssue, typeof results.issues> = results.issues;
+const cvSectionNames: ExactTextRecord<CvSection, typeof results.sections> = results.sections;
+
+/** The short label for a flagged line's issue type, for example "No numbers" (B3). */
+export function lineIssueLabel(issue: LineIssue): string {
+  return lineIssueLabels[issue];
+}
+
+/** The name of a CV section, for example "Experience" (B3 flagged line cards). */
+export function cvSectionName(section: CvSection): string {
+  return cvSectionNames[section];
+}
 
 /** The name of a General Analysis category, for example "Brevity & Style" (PRD Section 12.1). */
 export function scoreCategoryLabel(category: ScoreCategory): string {

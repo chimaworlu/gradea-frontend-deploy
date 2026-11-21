@@ -1,0 +1,391 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type CSSProperties } from "react";
+import type { ScanResultResponse, ScoreCategory } from "../../lib/api/shared";
+import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
+import {
+  cvSectionName,
+  fillPlaceholders,
+  getContent,
+  lineIssueLabel,
+  scoreCategoryLabel,
+} from "../../lib/content";
+import {
+  LINES_SHOWN_FIRST,
+  categoryRows,
+  getScanResult,
+  issuesLabel,
+  openLines,
+  resultView,
+  retryLineDetail,
+  scoreTone,
+  type CategoryRow,
+} from "../../lib/scan/result";
+import { isTakingLonger } from "../../lib/scan/status";
+import { readScanFileInfo, type ScanFileInfo } from "../../lib/scan/scan-file-info";
+import { UPLOAD_PATH } from "../../lib/scan/upload";
+import { AppTopBar } from "../app/AppTopBar";
+import { ViewerTopBar } from "../app/ViewerTopBar";
+import { FieldIcon } from "../icons/FieldIcon";
+import { ProcessingMain } from "../scan/ScanProcessing";
+import { SessionExpired } from "../scan/SessionExpired";
+import scanStyles from "../scan/scan.module.css";
+import styles from "./results.module.css";
+
+type View =
+  | { kind: "preparing" }
+  | { kind: "ready"; result: ScanResultResponse }
+  | { kind: "detailsFailed" }
+  | { kind: "expired" };
+
+/**
+ * B3 Results for one scan (Build Plan Phase 2, PRD Section 12.1). The result is asked once, and
+ * again only while line detail runs, waiting the server's retry_after (never under 2 seconds,
+ * paused while the tab is hidden). Until line detail is done the page keeps the processing
+ * look, so the scores shown never change in front of the person.
+ */
+export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
+  const errors = getContent("shared/errors");
+  const router = useRouter();
+  const [view, setView] = useState<View>({ kind: "preparing" });
+  const [takingLonger, setTakingLonger] = useState(false);
+  const [file, setFile] = useState<ScanFileInfo | undefined>(undefined);
+  const [round, setRound] = useState(0);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const startedAt = Date.now();
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let paused = false;
+    let nextDelay = 0;
+    let fileRead = false;
+
+    const schedule = (delayMs: number) => {
+      nextDelay = delayMs;
+      if (document.hidden) {
+        paused = true;
+        return;
+      }
+      timer = setTimeout(() => void check(), delayMs);
+    };
+
+    const check = async () => {
+      timer = undefined;
+      const answer = await getScanResult(scanSessionId);
+      if (stopped) return;
+      if (!fileRead) {
+        fileRead = true;
+        const kept = readScanFileInfo(scanSessionId);
+        if (kept !== undefined) setFile(kept);
+      }
+      setTakingLonger(isTakingLonger((Date.now() - startedAt) / 1000));
+      const next = resultView(answer, scanSessionId);
+      switch (next.kind) {
+        case "ready":
+          setView({ kind: "ready", result: next.result });
+          return;
+        case "preparing":
+          setView({ kind: "preparing" });
+          schedule(next.delayMs);
+          return;
+        case "retryLater":
+          schedule(next.delayMs);
+          return;
+        case "detailsFailed":
+          setView({ kind: "detailsFailed" });
+          return;
+        case "notScored":
+          router.replace(next.path);
+          return;
+        case "expired":
+          setView({ kind: "expired" });
+          return;
+        case "signedOut":
+          window.location.assign(LOGIN_PATH);
+          return;
+      }
+    };
+
+    const onVisibility = () => {
+      if (!document.hidden && paused) {
+        paused = false;
+        timer = setTimeout(() => void check(), nextDelay);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    void check();
+    return () => {
+      stopped = true;
+      if (timer !== undefined) clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [scanSessionId, round, router]);
+
+  async function tryAgain() {
+    if (retrying) return;
+    setRetrying(true);
+    setRetryError(undefined);
+    const answer = await retryLineDetail(scanSessionId);
+    setRetrying(false);
+    if (answer.kind === "ok") {
+      setView({ kind: "preparing" });
+      setRound((value) => value + 1);
+      return;
+    }
+    setRetryError(answer.kind === "network" ? errors.network : problemMessage(answer.code));
+  }
+
+  if (view.kind === "expired") {
+    return (
+      <div className={scanStyles.page}>
+        <AppTopBar viewer={undefined} />
+        <SessionExpired />
+      </div>
+    );
+  }
+
+  if (view.kind === "preparing") {
+    return (
+      <div className={scanStyles.page}>
+        <ViewerTopBar />
+        <ProcessingMain status="done" file={file} takingLonger={takingLonger} />
+      </div>
+    );
+  }
+
+  if (view.kind === "detailsFailed") {
+    return (
+      <div className={styles.page}>
+        <ViewerTopBar />
+        <DetailsFailed onTryAgain={() => void tryAgain()} retrying={retrying} error={retryError} />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <ViewerTopBar />
+      <Results result={view.result} />
+    </div>
+  );
+}
+
+/**
+ * "Details failed": line detail failed after its retry. No score shows yet, because the scores
+ * are recomputed when line detail ends (PRD 12.1); Try again runs only the failed categories.
+ */
+function DetailsFailed({
+  onTryAgain,
+  retrying,
+  error,
+}: {
+  onTryAgain: () => void;
+  retrying: boolean;
+  error: string | undefined;
+}) {
+  const text = getContent("app/results").middleDetail.detailsFailed;
+  return (
+    <main className={styles.failedMain}>
+      <span className={styles.errorIcon}>
+        <FieldIcon name="alert" />
+      </span>
+      <h1 className={styles.errorHeading}>{text.heading}</h1>
+      <p className={styles.detailBody}>{text.body}</p>
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.primary}
+          onClick={onTryAgain}
+          disabled={retrying}
+          aria-busy={retrying ? true : undefined}
+        >
+          {retrying ? text.tryAgain.loading : text.tryAgain.default}
+        </button>
+        <Link className={styles.textLink} href={UPLOAD_PATH}>
+          {text.uploadAnother}
+        </Link>
+      </div>
+      <p className={styles.formError} role="alert">
+        {error ?? ""}
+      </p>
+    </main>
+  );
+}
+
+/** The rail and the selected category, once line detail is done. */
+export function Results({ result }: { result: ScanResultResponse }) {
+  const rows = categoryRows(result);
+  const opened = result.line_detail.category ?? rows[0]?.category;
+  const [selected, setSelected] = useState<ScoreCategory | undefined>(opened);
+  const current = rows.find((row) => row.category === selected) ?? rows[0];
+
+  return (
+    <div className={styles.layout}>
+      <Rail
+        overallScore={result.overall_score ?? 0}
+        rows={rows}
+        selected={current?.category}
+        onSelect={setSelected}
+      />
+      {current !== undefined ? (
+        <CategoryDetail key={current.category} row={current} result={result} />
+      ) : null}
+    </div>
+  );
+}
+
+function ScoreRing({ score }: { score: number }) {
+  const text = getContent("app/results").leftRail;
+  // The arc's length is the score; the custom property feeds the CSS conic gradient.
+  const ringStyle: CSSProperties & Record<"--score", number> = { "--score": score };
+  return (
+    <div
+      className={`${styles.ring} ${scoreTone(score) === "strong" ? styles.ringStrong : ""}`}
+      style={ringStyle}
+      role="img"
+      aria-label={fillPlaceholders(text.scoreOutOf, { score })}
+    >
+      <span className={styles.ringNumber} aria-hidden="true">
+        {score}
+      </span>
+    </div>
+  );
+}
+
+function Rail({
+  overallScore,
+  rows,
+  selected,
+  onSelect,
+}: {
+  overallScore: number;
+  rows: CategoryRow[];
+  selected: ScoreCategory | undefined;
+  onSelect: (category: ScoreCategory) => void;
+}) {
+  const text = getContent("app/results").leftRail;
+  return (
+    <aside className={styles.rail}>
+      <div className={styles.overall}>
+        <ScoreRing score={overallScore} />
+        <p className={styles.overallLabel}>{text.overallScore}</p>
+      </div>
+      <ul className={styles.categories} aria-label={text.categoriesLabel}>
+        {rows.map((row) => (
+          <li key={row.category}>
+            <button
+              type="button"
+              className={styles.categoryCard}
+              aria-current={row.category === selected ? "true" : undefined}
+              onClick={() => onSelect(row.category)}
+            >
+              <span className={styles.categoryName}>{scoreCategoryLabel(row.category)}</span>
+              <span className={styles.categoryMeta}>
+                <span>
+                  {row.score} ·{" "}
+                  {row.state === "noIssues" ? text.noIssues : issuesLabel(row.flaggedCount)}
+                </span>
+                {row.state === "locked" ? (
+                  <span className={styles.proTag}>
+                    <FieldIcon name="lock" />
+                    <span aria-hidden="true">{text.pro}</span>
+                    <span className={scanStyles.visuallyHidden}>{text.proLabel}</span>
+                  </span>
+                ) : null}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {/* "Try AutoFix free" and Magic Write come with their features (Build Plan Phase 4). */}
+    </aside>
+  );
+}
+
+function CategoryDetail({ row, result }: { row: CategoryRow; result: ScanResultResponse }) {
+  const text = getContent("app/results").middleDetail;
+  const [showAll, setShowAll] = useState(false);
+  const lines = row.state === "open" ? openLines(result) : [];
+  const shown = showAll ? lines : lines.slice(0, LINES_SHOWN_FIRST);
+  const hidden = lines.length - shown.length;
+
+  return (
+    <section className={styles.detail} aria-labelledby="category-heading">
+      <h1 id="category-heading" className={styles.detailHeading}>
+        {scoreCategoryLabel(row.category)}
+      </h1>
+      <p className={styles.detailSummary}>
+        {fillPlaceholders(text.summary, { score: row.score })} ·{" "}
+        {row.state === "noIssues"
+          ? getContent("app/results").leftRail.noIssues
+          : issuesLabel(row.flaggedCount)}
+      </p>
+
+      {row.state === "noIssues" ? <p className={styles.detailBody}>{text.noIssues.body}</p> : null}
+
+      {row.state === "locked" ? (
+        <>
+          <p className={styles.detailBody}>
+            {fillPlaceholders(
+              row.flaggedCount === 1 ? text.locked.body.one : text.locked.body.other,
+              {
+                count: row.flaggedCount,
+              },
+            )}
+          </p>
+          <h2 className={styles.sectionTitle}>
+            {text.flaggedLines}
+            <span className={styles.proTag}>
+              <FieldIcon name="lock" />
+              {getContent("app/results").leftRail.pro}
+            </span>
+          </h2>
+          <ul className={styles.lines} aria-hidden="true">
+            {Array.from({ length: Math.min(row.flaggedCount, LINES_SHOWN_FIRST) }, (_, index) => (
+              <li key={index} className={styles.lockedCard}>
+                <span className={styles.lockedBar} />
+                <span className={styles.lockedBar} />
+                <span className={styles.lockedBar} />
+                <span className={styles.lockedIcon}>
+                  <FieldIcon name="lock" />
+                </span>
+              </li>
+            ))}
+          </ul>
+          {/* "Unlock with PRO" and its price go here once the plans endpoint exists: the price
+              must come from the server, never typed in (as in the limit popup). */}
+        </>
+      ) : null}
+
+      {row.state === "open" ? (
+        <>
+          <h2 className={styles.sectionTitle}>{text.flaggedLines}</h2>
+          <ul className={styles.lines}>
+            {shown.map((line) => (
+              <li key={line.line_id} className={styles.lineCard}>
+                <span className={styles.lineSection}>{cvSectionName(line.section)}</span>
+                <p className={styles.lineText}>{line.text}</p>
+                <span className={styles.issueTag}>
+                  <FieldIcon name="flag" />
+                  {lineIssueLabel(line.issue)}
+                </span>
+                <p className={styles.lineReason}>{line.reason}</p>
+                {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
+              </li>
+            ))}
+          </ul>
+          {hidden > 0 ? (
+            <button type="button" className={styles.showMore} onClick={() => setShowAll(true)}>
+              {fillPlaceholders(text.showMore, { count: hidden })}
+            </button>
+          ) : null}
+        </>
+      ) : null}
+    </section>
+  );
+}

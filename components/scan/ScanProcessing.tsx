@@ -39,7 +39,6 @@ type View =
  * the scan is done or failed (SRS Section 4, AGENTS.md section 5). Done goes to the results.
  */
 export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
-  const text = getContent("app/processing");
   const errors = getContent("shared/errors");
   const router = useRouter();
   const [view, setView] = useState<View>({ kind: "processing", status: "waiting" });
@@ -172,28 +171,46 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
     );
   }
 
-  const steps = processingSteps(view.status);
+  return (
+    <div className={styles.page}>
+      <ViewerTopBar />
+      <ProcessingMain status={view.status} file={file} takingLonger={takingLonger} />
+    </div>
+  );
+}
+
+/**
+ * The B1 body: heading, the three steps for a status, the file line and the "taking longer"
+ * line. Also used by B3 while line detail is still running ("Preparing your results").
+ */
+export function ProcessingMain({
+  status,
+  file,
+  takingLonger,
+}: {
+  status: ScanStatus;
+  file: ScanFileInfo | undefined;
+  takingLonger: boolean;
+}) {
+  const text = getContent("app/processing");
+  const steps = processingSteps(status);
   const rows: Array<{ key: keyof typeof steps; label: string }> = [
     { key: "reading", label: text.steps.reading },
     { key: "checking", label: text.steps.checking },
     { key: "preparing", label: text.steps.preparing },
   ];
-
   return (
-    <div className={styles.page}>
-      <ViewerTopBar />
-      <main className={styles.main}>
-        <h1 className={styles.heading}>{text.hero.heading}</h1>
-        <p className={styles.subline}>{text.hero.subline}</p>
-        <ol className={styles.steps} aria-label={text.steps.label} aria-live="polite">
-          {rows.map(({ key, label }) => (
-            <Step key={key} state={steps[key]} label={label} />
-          ))}
-        </ol>
-        <ScanFileLine file={file} />
-        {takingLonger ? <p className={styles.note}>{text.takingLonger}</p> : null}
-      </main>
-    </div>
+    <main className={styles.main}>
+      <h1 className={styles.heading}>{text.hero.heading}</h1>
+      <p className={styles.subline}>{text.hero.subline}</p>
+      <ol className={styles.steps} aria-label={text.steps.label} aria-live="polite">
+        {rows.map(({ key, label }) => (
+          <Step key={key} state={steps[key]} label={label} />
+        ))}
+      </ol>
+      <ScanFileLine file={file} />
+      {takingLonger ? <p className={styles.note}>{text.takingLonger}</p> : null}
+    </main>
   );
 }
 
