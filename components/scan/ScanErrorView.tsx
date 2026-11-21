@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { fillPlaceholders, getContent } from "../../lib/content";
+import { getContent } from "../../lib/content";
 import { canTryAgain, scanErrorWording, type ScanErrorReason } from "../../lib/scan/scan-error";
-import { UPLOAD_PATH, fileSizeLabel } from "../../lib/scan/upload";
+import { UPLOAD_PATH } from "../../lib/scan/upload";
 import { FieldIcon } from "../icons/FieldIcon";
+import { ScanFileLine } from "./ScanFileLine";
 import styles from "./scan.module.css";
 
 export type ScanErrorViewProps = {
@@ -24,7 +25,6 @@ export type ScanErrorViewProps = {
  */
 export function ScanErrorView({ reason, file, onTryAgain, retrying, error }: ScanErrorViewProps) {
   const text = getContent("app/scan-error");
-  const fileSummary = getContent("app/upload").uploadBox.fileSummary;
   const wording = scanErrorWording(reason);
   const tryAgain = canTryAgain(reason) && onTryAgain !== undefined;
 
@@ -35,12 +35,7 @@ export function ScanErrorView({ reason, file, onTryAgain, retrying, error }: Sca
       </span>
       <h1 className={styles.heading}>{wording.heading}</h1>
       <p className={styles.subline}>{wording.body}</p>
-      {file !== undefined ? (
-        <p className={styles.file}>
-          <FieldIcon name="file" />
-          {fillPlaceholders(fileSummary, { name: file.name, size: fileSizeLabel(file.size) })}
-        </p>
-      ) : null}
+      <ScanFileLine file={file} />
       <div className={styles.actions}>
         {tryAgain ? (
           <>

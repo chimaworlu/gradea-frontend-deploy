@@ -21,6 +21,7 @@ import {
   signupBody,
 } from "../lib/auth/forms";
 import { getContent } from "../lib/content";
+import { saveScanFileInfo } from "../lib/scan/scan-file-info";
 import { saveWaitingScan } from "../lib/scan/waiting-scan";
 
 const ROOT = join(__dirname, "..");
@@ -161,13 +162,15 @@ describe("autofocus", () => {
 });
 
 describe("browser storage", () => {
-  // The one exception, agreed with the founder: the waiting guest scan is kept in
-  // sessionStorage while the A3 wall is open, so Google and Log in do not lose it.
+  // The two exceptions, agreed with the founder: the waiting guest scan is kept in
+  // sessionStorage while the A3 wall is open, so Google and Log in do not lose it; and the
+  // uploaded file's name and size, for the line on B1 and B2.
   const WAITING_SCAN_FILE = join(ROOT, "lib", "scan", "waiting-scan.ts");
+  const SCAN_FILE_INFO_FILE = join(ROOT, "lib", "scan", "scan-file-info.ts");
 
   it("never stores anything, least of all a password, in browser storage or cookies", () => {
     for (const file of sourceFiles("app", "components", "lib")) {
-      if (file === WAITING_SCAN_FILE) continue;
+      if (file === WAITING_SCAN_FILE || file === SCAN_FILE_INFO_FILE) continue;
       const source = readFileSync(file, "utf8");
       expect(source, file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie/);
     }
@@ -209,6 +212,40 @@ describe("browser storage", () => {
       "scanSessionId",
     ]);
     expect(value).not.toMatch(/someone@example\.test|hunter22|My CV text/);
+  });
+
+  it("keeps only the uploaded file's name and size, in sessionStorage, under one key prefix", () => {
+    const source = readFileSync(SCAN_FILE_INFO_FILE, "utf8");
+    expect(source).not.toMatch(/localStorage|indexedDB|document\.cookie/);
+    expect(source.match(/window\.sessionStorage/g)).toHaveLength(1);
+    expect(source.match(/setItem\(/g)).toHaveLength(1);
+    expect(source.match(/const KEY_PREFIX = "[^"]+";/g)).toHaveLength(1);
+
+    const stored = new Map<string, string>();
+    const storage = {
+      get length() {
+        return stored.size;
+      },
+      clear: () => stored.clear(),
+      getItem: (key: string) => stored.get(key) ?? null,
+      key: (index: number) => [...stored.keys()][index] ?? null,
+      removeItem: (key: string) => void stored.delete(key),
+      setItem: (key: string, value: string) => void stored.set(key, value),
+    };
+    // Extra fields passed by mistake are never written.
+    const file = {
+      name: "my-cv.pdf",
+      size: 412 * 1024,
+      email: "someone@example.test",
+      cvText: "My CV text",
+    };
+    expect(saveScanFileInfo("scan1", file, storage)).toBe(true);
+    // A second upload replaces the first: one entry at a time.
+    expect(saveScanFileInfo("scan2", file, storage)).toBe(true);
+    expect(stored.size).toBe(1);
+    const [value] = [...stored.values()];
+    expect(Object.keys(JSON.parse(value ?? "{}")).sort()).toEqual(["name", "size"]);
+    expect(value).not.toMatch(/someone@example\.test|My CV text/);
   });
 
   it("renders password fields empty and with the right autocomplete", () => {

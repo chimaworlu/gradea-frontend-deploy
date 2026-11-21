@@ -22,7 +22,7 @@ import {
   type ScanErrorCode,
   type Viewer,
 } from "../../lib/scan/upload";
-import { rememberUploadedFile } from "../../lib/scan/last-upload";
+import { saveScanFileInfo } from "../../lib/scan/scan-file-info";
 import {
   clearWaitingScan,
   rememberCareerLevel,
@@ -118,12 +118,8 @@ export function UploadFlow() {
     const outcome = uploadOutcome(result);
     switch (outcome.kind) {
       case "processing":
-        // In-app move, so B1 can still show the file name and size from this page's memory.
-        rememberUploadedFile({
-          scanSessionId: outcome.scanSessionId,
-          name: chosen.name,
-          size: chosen.size,
-        });
+        // The name and size only, for the line on B1 (lib/scan/scan-file-info.ts).
+        saveScanFileInfo(outcome.scanSessionId, { name: chosen.name, size: chosen.size });
         router.push(outcome.path);
         return;
       case "scanError":
@@ -132,6 +128,9 @@ export function UploadFlow() {
         return;
       case "wall":
         setStatus("idle");
+        // Saved now, under the scan id, so B1 shows the line after the claim, even when the
+        // guest signs up through Google and the page reloads.
+        saveScanFileInfo(outcome.scanSessionId, { name: chosen.name, size: chosen.size });
         // Kept for this tab while the wall is open, so Google or Log in do not lose the scan.
         saveWaitingScan({
           scanSessionId: outcome.scanSessionId,
@@ -239,12 +238,7 @@ export function UploadFlow() {
       waiting.scanSessionId,
     );
     if (outcome.kind === "processing") {
-      // In-app move, so B1 still shows the file name and size.
-      rememberUploadedFile({
-        scanSessionId: outcome.scanSessionId,
-        name: waiting.file.name,
-        size: waiting.file.size,
-      });
+      // The file line was saved when the upload succeeded.
       router.push(outcome.path);
       return;
     }

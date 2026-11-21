@@ -4,22 +4,27 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { ScanStatus } from "../../lib/api/shared";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
-import { fillPlaceholders, getContent } from "../../lib/content";
-import { uploadedFileFor } from "../../lib/scan/last-upload";
+import { getContent } from "../../lib/content";
+import {
+  clearScanFileInfo,
+  readScanFileInfo,
+  type ScanFileInfo,
+} from "../../lib/scan/scan-file-info";
 import {
   getScanStatus,
   isTakingLonger,
   processingSteps,
   retryScan,
+  scanFinished,
   statusView,
   type FailedReason,
   type StepState,
 } from "../../lib/scan/status";
-import { fileSizeLabel } from "../../lib/scan/upload";
 import { AppTopBar } from "../app/AppTopBar";
 import { ViewerTopBar } from "../app/ViewerTopBar";
 import { FieldIcon } from "../icons/FieldIcon";
 import { ScanErrorView } from "./ScanErrorView";
+import { ScanFileLine } from "./ScanFileLine";
 import { SessionExpired } from "./SessionExpired";
 import styles from "./scan.module.css";
 
@@ -43,7 +48,9 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
   const [retryError, setRetryError] = useState<string | undefined>(undefined);
   // A new round of checks after "Try again"; its start time drives "taking longer".
   const [round, setRound] = useState(0);
-  const file = uploadedFileFor(scanSessionId);
+  // Read in the browser only (with the first status answer), so the server and the browser
+  // render the same page first. Kept here after the stored copy is cleared.
+  const [file, setFile] = useState<ScanFileInfo | undefined>(undefined);
 
   useEffect(() => {
     const startedAt = Date.now();
@@ -51,6 +58,7 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let paused = false;
     let nextDelay = 0;
+    let fileRead = false;
 
     const schedule = (delayMs: number) => {
       nextDelay = delayMs;
@@ -69,6 +77,13 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
       const elapsed = (Date.now() - startedAt) / 1000;
       const next = statusView(result, scanSessionId, elapsed);
       setTakingLonger(isTakingLonger(elapsed));
+      if (!fileRead) {
+        fileRead = true;
+        const kept = readScanFileInfo(scanSessionId);
+        if (kept !== undefined) setFile(kept);
+      }
+      // Done or failed: the kept file line goes (the page keeps showing it from memory).
+      if (scanFinished(next)) clearScanFileInfo(scanSessionId);
       switch (next.kind) {
         case "polling":
           setView({ kind: "processing", status: next.status });
@@ -163,7 +178,6 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
     { key: "checking", label: text.steps.checking },
     { key: "preparing", label: text.steps.preparing },
   ];
-  const fileSummary = getContent("app/upload").uploadBox.fileSummary;
 
   return (
     <div className={styles.page}>
@@ -176,12 +190,7 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
             <Step key={key} state={steps[key]} label={label} />
           ))}
         </ol>
-        {file !== undefined ? (
-          <p className={styles.file}>
-            <FieldIcon name="file" />
-            {fillPlaceholders(fileSummary, { name: file.name, size: fileSizeLabel(file.size) })}
-          </p>
-        ) : null}
+        <ScanFileLine file={file} />
         {takingLonger ? <p className={styles.note}>{text.takingLonger}</p> : null}
       </main>
     </div>

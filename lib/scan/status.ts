@@ -103,6 +103,11 @@ export function statusView(
   return { kind: "polling", status, delayMs: pollDelayMs(retryAfter) };
 }
 
+/** True once the scan has an outcome: its kept file line can then be cleared. */
+export function scanFinished(view: StatusView): boolean {
+  return view.kind === "done" || view.kind === "failed";
+}
+
 /** The "taking longer" line on B1. */
 export function isTakingLonger(elapsedSeconds: number): boolean {
   return elapsedSeconds >= SCAN_TAKING_LONGER_SECONDS;
