@@ -148,18 +148,33 @@ export function claimScan(
 /** What the page shows after an upload answer. */
 export type UploadOutcome =
   | { kind: "wall"; scanSessionId: string; guestToken: string; expiresAt: string }
-  | { kind: "processing"; path: string }
+  | { kind: "processing"; path: string; scanSessionId: string }
   | { kind: "limit"; resetAt: string }
   | { kind: "fileError"; message: string }
+  | { kind: "scanError"; code: ScanErrorCode }
   | { kind: "failed"; message: string };
 
+/** Problems the browser could have caught: shown under the upload box (A1 error frames). */
 const FILE_CODES: readonly ErrorCode[] = [
   "file_required",
   "file_too_large",
   "file_type_not_supported",
+];
+
+/**
+ * The server read the file and could not use it: shown as the B2 error screen, with the file
+ * kept on the page so "Try again" can send it once more where that helps (extraction_failed).
+ */
+export const SCAN_ERROR_CODES = [
   "file_unreadable",
   "file_not_english",
-];
+  "extraction_failed",
+] as const;
+export type ScanErrorCode = (typeof SCAN_ERROR_CODES)[number];
+
+export function isScanErrorCode(code: ErrorCode): code is ScanErrorCode {
+  return SCAN_ERROR_CODES.some((known) => known === code);
+}
 
 /**
  * A guest goes to the signup wall with the scan waiting; a signed-in user goes straight to
@@ -170,7 +185,7 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
   if (result.kind === "ok") {
     const { scan_session_id: scanSessionId, guest } = result.data;
     return guest === null
-      ? { kind: "processing", path: processingPath(scanSessionId) }
+      ? { kind: "processing", path: processingPath(scanSessionId), scanSessionId }
       : { kind: "wall", scanSessionId, guestToken: guest.token, expiresAt: guest.expires_at };
   }
   if (result.kind === "network") {
@@ -179,28 +194,33 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
   if (result.code === "scan_limit_reached" && result.resetAt !== undefined) {
     return { kind: "limit", resetAt: result.resetAt };
   }
+  if (isScanErrorCode(result.code)) return { kind: "scanError", code: result.code };
   if (FILE_CODES.includes(result.code)) {
     return { kind: "fileError", message: errorMessage(result.code) };
   }
   return { kind: "failed", message: errorMessage(result.code) };
 }
 
-/** What follows a claim: processing, the limit popup, or the normal upload page. */
+/** What follows a claim: processing, the limit popup, D1, or the normal upload page. */
 export type ClaimOutcome =
-  | { kind: "processing"; path: string }
+  | { kind: "processing"; path: string; scanSessionId: string }
   | { kind: "limit"; resetAt: string }
+  | { kind: "expired" }
   | { kind: "uploadPage" };
 
 /**
  * Claimed: scoring runs and the processing screen follows it. At the Free limit the scan stays
- * attached and waiting, and the limit popup shows (SRS Section 4). Any other answer (for
- * example an expired guest session) leaves the new Free user on the upload page.
+ * attached and waiting, and the limit popup shows (SRS Section 4). The scan gone or past its
+ * 30 minutes (guest_session_invalid, the one answer for every such case) shows D1. Anything
+ * else (for example no connection) leaves the new Free user on the upload page.
  */
 export function claimOutcome(
   result: ApiResult<ClaimResponse>,
   scanSessionId: string,
 ): ClaimOutcome {
-  if (result.kind === "ok") return { kind: "processing", path: processingPath(scanSessionId) };
+  if (result.kind === "ok") {
+    return { kind: "processing", path: processingPath(scanSessionId), scanSessionId };
+  }
   if (
     result.kind === "error" &&
     result.code === "scan_limit_reached" &&
@@ -208,5 +228,7 @@ export function claimOutcome(
   ) {
     return { kind: "limit", resetAt: result.resetAt };
   }
+  if (result.kind === "error" && result.code === "guest_session_invalid")
+    return { kind: "expired" };
   return { kind: "uploadPage" };
 }

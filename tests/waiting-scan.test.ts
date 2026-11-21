@@ -87,6 +87,7 @@ describe("the waiting guest scan in sessionStorage", () => {
     expect(claimOutcome(result, scan.scanSessionId)).toEqual({
       kind: "processing",
       path: "/scan/scan1",
+      scanSessionId: "scan1",
     });
   });
 

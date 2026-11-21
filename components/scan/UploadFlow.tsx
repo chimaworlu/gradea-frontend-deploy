@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { CareerLevel } from "../../lib/api/shared";
 import { isCareerLevel } from "../../lib/auth/forms";
@@ -18,19 +19,24 @@ import {
   uploadHelperText,
   uploadOutcome,
   viewerFrom,
+  type ScanErrorCode,
   type Viewer,
 } from "../../lib/scan/upload";
+import { rememberUploadedFile } from "../../lib/scan/last-upload";
 import {
   clearWaitingScan,
   rememberCareerLevel,
   saveWaitingScan,
-  takeWaitingScan,
+  takeWaitingScanState,
+  type WaitingScanState,
 } from "../../lib/scan/waiting-scan";
 import { AppTopBar } from "../app/AppTopBar";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
 import { LimitPopup } from "./LimitPopup";
+import { ScanErrorView } from "./ScanErrorView";
+import { SessionExpired } from "./SessionExpired";
 import { SignupWall } from "./SignupWall";
 import styles from "./upload.module.css";
 
@@ -60,6 +66,10 @@ export function UploadFlow() {
   const [wall, setWall] = useState<WallState | undefined>(undefined);
   const [botToken, setBotToken] = useState<string | undefined>(undefined);
   const [botResetKey, setBotResetKey] = useState(0);
+  // B2 for a file the server read but could not use; D1 for a guest scan gone or out of time.
+  const [scanError, setScanError] = useState<ScanErrorCode | undefined>(undefined);
+  const [expired, setExpired] = useState(false);
+  const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const scanButton = useRef<HTMLButtonElement>(null);
   // A ref as well as state, so a double click or a second drop never sends two uploads.
@@ -70,27 +80,31 @@ export function UploadFlow() {
 
   // The session is checked once, when the page loads; nothing polls it (AGENTS.md section 5).
   // A user back from Google or the log in page with a guest scan waiting in this tab gets it
-  // claimed once, then goes on to processing (or sees the limit popup).
+  // claimed once, then goes on to processing (or sees the limit popup). One that ran out, or
+  // that the server no longer has, shows D1.
   useEffect(() => {
     void fetchViewer().then(async (result) => {
       const found = viewerFrom(result);
       // Taken (read and cleared) in one step, so the scan is claimed at most once.
-      const waiting = found.kind === "signedIn" ? takeWaitingScan() : undefined;
-      if (waiting !== undefined) {
+      const waiting: WaitingScanState =
+        found.kind === "signedIn" ? takeWaitingScanState() : { kind: "none" };
+      if (waiting.kind === "expired") setExpired(true);
+      if (waiting.kind === "ready") {
         const outcome = claimOutcome(
-          await claimScan(waiting.scanSessionId, waiting.guestToken),
-          waiting.scanSessionId,
+          await claimScan(waiting.scan.scanSessionId, waiting.scan.guestToken),
+          waiting.scan.scanSessionId,
         );
         if (outcome.kind === "processing") {
-          window.location.assign(outcome.path);
+          router.push(outcome.path);
           return;
         }
         if (outcome.kind === "limit") setLimitResetAt(outcome.resetAt);
+        if (outcome.kind === "expired") setExpired(true);
       }
       setViewer(found);
       if (found.kind === "signedIn") setCareerLevel(found.user.career_level);
     });
-  }, []);
+  }, [router]);
 
   async function upload(chosen: File, who: Viewer) {
     if (inFlight.current) return;
@@ -104,7 +118,17 @@ export function UploadFlow() {
     const outcome = uploadOutcome(result);
     switch (outcome.kind) {
       case "processing":
-        window.location.assign(outcome.path);
+        // In-app move, so B1 can still show the file name and size from this page's memory.
+        rememberUploadedFile({
+          scanSessionId: outcome.scanSessionId,
+          name: chosen.name,
+          size: chosen.size,
+        });
+        router.push(outcome.path);
+        return;
+      case "scanError":
+        setStatus("idle");
+        setScanError(outcome.code);
         return;
       case "wall":
         setStatus("idle");
@@ -214,13 +238,55 @@ export function UploadFlow() {
       await claimScan(waiting.scanSessionId, waiting.guestToken),
       waiting.scanSessionId,
     );
-    // Claimed: on to processing. Otherwise (for example the 30 minute guest session ran out,
-    // or the limit) the new Free user starts again on A1.
-    window.location.assign(outcome.kind === "processing" ? outcome.path : UPLOAD_PATH);
+    if (outcome.kind === "processing") {
+      // In-app move, so B1 still shows the file name and size.
+      rememberUploadedFile({
+        scanSessionId: outcome.scanSessionId,
+        name: waiting.file.name,
+        size: waiting.file.size,
+      });
+      router.push(outcome.path);
+      return;
+    }
+    if (outcome.kind === "expired") {
+      // The guest scan ran out or is gone: D1, start again.
+      setWall(undefined);
+      setExpired(true);
+      return;
+    }
+    // Otherwise (for example the limit, or no connection) the new Free user starts on A1.
+    window.location.assign(UPLOAD_PATH);
   }
 
   // S2: the shared top bar, with the account menu once signed in.
   const topBar = <AppTopBar viewer={viewer} />;
+
+  if (expired) {
+    return (
+      <div className={styles.page}>
+        {/* D1 shows the logo only. */}
+        <AppTopBar viewer={undefined} />
+        <SessionExpired />
+      </div>
+    );
+  }
+
+  if (scanError !== undefined) {
+    return (
+      <div className={styles.page}>
+        {topBar}
+        <ScanErrorView
+          reason={scanError}
+          file={file}
+          onTryAgain={() => {
+            // extraction_failed only: the same file is sent once more.
+            setScanError(undefined);
+            if (file !== undefined && viewer !== undefined) void upload(file, viewer);
+          }}
+        />
+      </div>
+    );
+  }
 
   if (wall !== undefined) {
     return (

@@ -1,0 +1,251 @@
+/* B1 Processing, B2 Scan error and D1 Guest session expired. Token variables only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-surface);
+}
+
+/* A 480 column, left-aligned text, as in the B1 and B2 frames. */
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: calc(var(--layout-max-width-auth) + var(--space-page-gutter) * 2);
+  margin: 0 auto;
+  padding: var(--space-96) var(--space-page-gutter) var(--space-48);
+}
+
+/* 40px in the B1 and B2 designs, as the upload title: display small. Never cut oddly. */
+.heading {
+  color: var(--color-on-surface);
+  font: var(--font-display-small);
+  letter-spacing: var(--font-display-small-letter-spacing);
+  text-wrap: balance;
+}
+
+.subline {
+  margin-top: var(--space-12);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+  text-wrap: pretty;
+}
+
+/* ---- B1 steps ---- */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin: var(--space-32) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  color: var(--color-on-surface);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+}
+
+.stepIcon {
+  display: flex;
+  color: var(--color-primary);
+}
+
+.stepCurrent {
+  font-weight: var(--font-weight-semibold);
+}
+
+.stepPending {
+  color: var(--color-on-surface-variant);
+}
+
+.stepPending .stepIcon {
+  color: var(--color-border-input);
+}
+
+/* Sized like the other step icons: FieldIcon drops its own size when given a class. */
+.spinner {
+  flex-shrink: 0;
+  width: var(--size-icon);
+  height: var(--size-icon);
+  animation: spin var(--duration-score) linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-32);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin-top: var(--space-24);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-wrap: pretty;
+}
+
+/* ---- B2 error ---- */
+
+/* A real error, so red with an icon, never colour alone (design-system-rules section 2). */
+.errorIcon {
+  display: flex;
+  margin-bottom: var(--space-24);
+  color: var(--color-error);
+}
+
+.errorIcon svg,
+.clockIcon svg {
+  width: var(--space-32);
+  height: var(--space-32);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-24);
+  margin-top: var(--space-32);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-button);
+  padding: 0 var(--space-24);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--color-primary-pressed);
+}
+
+.primary[aria-busy="true"] {
+  cursor: progress;
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch-target);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width);
+}
+
+.formError {
+  margin-top: var(--space-16);
+  color: var(--color-error);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.formError:empty {
+  display: none;
+}
+
+/* ---- D1 ---- */
+
+/* The D1 card: white, no outline, centred on the page (D1 design). */
+.centred {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-48) var(--space-page-gutter);
+}
+
+.card {
+  width: 100%;
+  max-width: var(--layout-max-width-auth);
+  padding: var(--space-card-padding);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+}
+
+/* 36px in the D1 design: headline large. */
+.cardHeading {
+  color: var(--color-on-surface);
+  font: var(--font-headline-large);
+  letter-spacing: var(--font-headline-large-letter-spacing);
+  text-wrap: balance;
+}
+
+.clockIcon {
+  display: flex;
+  margin-bottom: var(--space-24);
+  color: var(--color-primary);
+}
+
+.cardBody {
+  margin-top: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* Read by screen readers, not shown. */
+.visuallyHidden {
+  position: absolute;
+  width: var(--border-width);
+  height: var(--border-width);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wide {
+  width: 100%;
+}
+
+@media (width < 640px) {
+  .main {
+    padding-top: var(--space-48);
+  }
+
+  .primary {
+    width: 100%;
+  }
+}

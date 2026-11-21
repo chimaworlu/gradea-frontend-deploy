@@ -7,5 +7,15 @@
   "hero": {
     "heading": "Grading your CV",
     "subline": "This usually takes a few seconds."
-  }
+  },
+  "steps": {
+    "label": "Progress",
+    "reading": "Reading your CV",
+    "checking": "Checking the four categories",
+    "preparing": "Preparing your results",
+    "done": "Done",
+    "current": "In progress",
+    "pending": "Not started"
+  },
+  "takingLonger": "This is taking longer than usual. Your CV is safe. You can wait here and we'll keep going."
 }
