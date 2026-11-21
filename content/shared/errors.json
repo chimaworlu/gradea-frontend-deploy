@@ -28,7 +28,8 @@
     "file_unreadable": "We couldn't read that file. Try another copy of your CV.",
     "file_not_english": "Gradea reads CVs written in English for now. Upload an English version.",
     "extraction_failed": "We couldn't read your CV just now. Please try uploading it again.",
-    "scan_limit_reached": "You've used your free scans for this month."
+    "scan_limit_reached": "You've used your free scans for this month.",
+    "scan_not_scored": "Your scores aren't ready yet. Wait a moment and try again."
   },
   "network": "We couldn't reach Gradea. Check your connection and try again.",
   "screen": {
