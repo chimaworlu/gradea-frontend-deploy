@@ -1,0 +1,23 @@
+{
+  "id": "A3",
+  "title": "Signup wall",
+  "preview": {
+    "overallScore": "Overall score",
+    "locked": "Locked until you create your account",
+    "categories": {
+      "impact_achievements": "Impact & Achievements",
+      "brevity_style": "Brevity & Style",
+      "leadership_growth": "Leadership Signals",
+      "ats_formatting": "ATS & Formatting"
+    },
+    "uploaded": "Your CV is uploaded."
+  },
+  "form": {
+    "heading": "Your CV grade is one step away",
+    "subline": "Create a free account to see your grade. It takes a few seconds.",
+    "submit": {
+      "default": "Create my account",
+      "loading": "Creating your account..."
+    }
+  }
+}

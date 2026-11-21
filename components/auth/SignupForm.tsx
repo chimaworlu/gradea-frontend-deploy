@@ -4,7 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import type { ApiResult } from "../../lib/api/client";
 import type { AuthUserResponse } from "../../lib/api/shared";
 import {
-  AFTER_AUTH_PATH,
+  AFTER_SIGNUP_PATH,
   checkSignup,
   googleStartUrl,
   hasProblems,
@@ -44,8 +44,20 @@ function focusFirstProblem(problems: FieldProblems) {
   if (first !== undefined) document.getElementById(FIELD_IDS[first])?.focus();
 }
 
-/** A4 Sign up. Values live in React state only and are kept on every error (A4 dev notes). */
-export function SignupForm() {
+/** The A3 signup wall's own words and what happens once the account exists. */
+export type SignupWallOptions = {
+  heading: string;
+  subline: string;
+  submit: { default: string; loading: string };
+  /** Runs instead of the A4 redirect, for example to claim the guest's scan. */
+  onSignedUp: () => void;
+};
+
+/**
+ * A4 Sign up, and the form on the A3 signup wall when `wall` is given. Values live in React
+ * state only and are kept on every error (A4 dev notes).
+ */
+export function SignupForm({ wall }: { wall?: SignupWallOptions } = {}) {
   const text = getContent("app/auth").signUp;
   const [values, setValues] = useState<SignupValues>({ email: "", password: "", careerLevel: "" });
   const [problems, setProblems] = useState<FieldProblems>({});
@@ -63,8 +75,12 @@ export function SignupForm() {
 
   function showResult(result: ApiResult<AuthUserResponse>) {
     if (result.kind === "ok") {
-      // No app yet: go to the home page with the new session cookie (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      if (wall !== undefined) {
+        wall.onSignedUp();
+        return;
+      }
+      // No scan waiting: the new Free user lands on the upload page (Build Plan Phase 2).
+      window.location.assign(AFTER_SIGNUP_PATH);
       return;
     }
     // A bot token works once, so get a fresh one for the next try.
@@ -113,9 +129,15 @@ export function SignupForm() {
 
   return (
     <>
-      <FormIntro heading={text.heading} subline={text.subline} />
-      <GoogleButton href={googleStartUrl()} text={text.google} />
-      <Divider text={text.divider} />
+      <FormIntro heading={wall?.heading ?? text.heading} subline={wall?.subline ?? text.subline} />
+      {/* Not on the wall yet: the Google round trip leaves the page, and the guest token lives
+          only in this page's memory, so the waiting scan could not be claimed afterwards. */}
+      {wall === undefined ? (
+        <>
+          <GoogleButton href={googleStartUrl()} text={text.google} />
+          <Divider text={text.divider} />
+        </>
+      ) : null}
       <form
         className={styles.form}
         onSubmit={submit}
@@ -152,7 +174,7 @@ export function SignupForm() {
         />
         <BotCheck onToken={setBotToken} resetKey={botResetKey} />
         <FormError id="signup-form-error" message={formError} />
-        <SubmitButton text={text.form.submit} loading={submitting} />
+        <SubmitButton text={wall?.submit ?? text.form.submit} loading={submitting} />
       </form>
       <ConsentLine text={text.form.consent} />
       <FooterPrompt prompt={text.footer.prompt} link={text.footer.link} href="/login" />

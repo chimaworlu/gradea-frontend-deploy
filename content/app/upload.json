@@ -1,0 +1,54 @@
+{
+  "id": "A1",
+  "title": "Upload",
+  "meta": {
+    "title": "Upload your CV"
+  },
+  "topBar": {
+    "logoAlt": "Gradea",
+    "logIn": "Log in"
+  },
+  "hero": {
+    "heading": "Upload your CV and get your grade",
+    "subline": "Get a clear score and a short list of what to fix first. Free to start."
+  },
+  "uploadBox": {
+    "label": "Upload your CV",
+    "title": "Drag your CV here",
+    "draggingTitle": "Drop your CV to upload",
+    "or": "or",
+    "choose": "Choose a file",
+    "helper": "PDF or DOCX, up to {maxSize}",
+    "fileSummary": "{name}, {size}",
+    "remove": "Remove",
+    "chooseDifferent": "Choose a different file",
+    "severalFiles": "Upload one CV at a time.",
+    "uploading": "Uploading...",
+    "uploadFailed": "We couldn't upload your CV. Check your connection and try again.",
+    "tryAgain": "Try again"
+  },
+  "fileSize": {
+    "kb": "{value} KB",
+    "mb": "{value} MB"
+  },
+  "careerLevel": {
+    "scoringAs": "Scoring as {level}",
+    "change": "Change",
+    "menuNote": "Applies to this scan only."
+  },
+  "scanButton": {
+    "default": "Scan my CV",
+    "loading": "Scanning..."
+  },
+  "footerNote": {
+    "text": "We don't keep your original file.",
+    "link": "How we handle your data"
+  },
+  "popups": {
+    "limitReached": {
+      "title": "You've used your scans for this month",
+      "body": "Your free scans reset on {date}. PRO gives you unlimited scans, full line-by-line feedback, AutoFix and Magic Write.",
+      "close": "Close"
+    }
+  }
+}

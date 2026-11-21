@@ -22,15 +22,24 @@ export function apiUrl(path: `/${string}`): string {
   return `${apiBaseUrl()}${path}`;
 }
 
-/** What a call can end in. A network failure never reached the server, so it has no code. */
+/**
+ * What a call can end in. A network failure never reached the server, so it has no code.
+ * resetAt is there only with scan_limit_reached: when the monthly allowance starts again.
+ */
 export type ApiResult<T> =
-  { kind: "ok"; data: T } | { kind: "error"; code: ErrorCode } | { kind: "network" };
+  | { kind: "ok"; data: T }
+  | { kind: "error"; code: ErrorCode; resetAt?: string }
+  | { kind: "network" };
 
 export type ApiRequest<S extends z.ZodType> = {
   method: "GET" | "POST";
   path: `/${string}`;
   /** Sent as JSON. Leave out for a request with no body. */
   body?: unknown;
+  /** Sent as a multipart form instead of JSON, for example the CV upload. */
+  form?: FormData;
+  /** Extra request headers, for example the guest token on a scan claim. */
+  headers?: Record<string, string>;
   /** The shared schema the success answer must match. */
   response: S;
   /** For tests. Defaults to the browser's fetch. */
@@ -42,6 +51,9 @@ export async function apiRequest<S extends z.ZodType>(
 ): Promise<ApiResult<z.infer<S>>> {
   const fetchFn = request.fetchFn ?? fetch;
   const hasBody = request.body !== undefined;
+  const headers: Record<string, string> = { Accept: "application/json", ...request.headers };
+  // A multipart form sets its own Content-Type with the boundary, so it is never set here.
+  if (hasBody && request.form === undefined) headers["Content-Type"] = "application/json";
 
   let response: Response;
   let text: string;
@@ -50,10 +62,8 @@ export async function apiRequest<S extends z.ZodType>(
       method: request.method,
       // The session cookie is httpOnly and set by the API, so it must travel with every call.
       credentials: "include",
-      headers: hasBody
-        ? { Accept: "application/json", "Content-Type": "application/json" }
-        : { Accept: "application/json" },
-      body: hasBody ? JSON.stringify(request.body) : undefined,
+      headers,
+      body: request.form ?? (hasBody ? JSON.stringify(request.body) : undefined),
     });
     text = await response.text();
   } catch {
@@ -73,7 +83,9 @@ export async function apiRequest<S extends z.ZodType>(
   }
 
   const error = ErrorResponse.safeParse(json);
-  return { kind: "error", code: error.success ? error.data.code : "internal_error" };
+  if (!error.success) return { kind: "error", code: "internal_error" };
+  const { code, reset_at: resetAt } = error.data;
+  return resetAt === undefined ? { kind: "error", code } : { kind: "error", code, resetAt };
 }
 
 /**

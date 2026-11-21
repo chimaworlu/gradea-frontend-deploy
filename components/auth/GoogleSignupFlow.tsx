@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { AFTER_AUTH_PATH, SIGNUP_PATH, isCareerLevel, problemMessage } from "../../lib/auth/forms";
+import { AFTER_SIGNUP_PATH, SIGNUP_PATH, isCareerLevel, problemMessage } from "../../lib/auth/forms";
 import {
   cancelGoogle,
   completeBody,
@@ -46,8 +46,8 @@ export function GoogleSignupFlow() {
     setBusy("creating");
     const outcome = submitOutcome(await completeGoogleSignup(completeBody(careerLevel)));
     if (outcome.kind === "done") {
-      // No app yet: go to the home page with the new session cookie (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      // A new account with no scan waiting lands on the upload page (Build Plan Phase 2).
+      window.location.assign(AFTER_SIGNUP_PATH);
       return;
     }
     inFlight.current = false;

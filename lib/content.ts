@@ -2,11 +2,14 @@ import accountLink from "../content/app/account-link.json";
 import auth from "../content/app/auth.json";
 import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
+import processing from "../content/app/processing.json";
+import signupWall from "../content/app/signup-wall.json";
+import upload from "../content/app/upload.json";
 import comingSoon from "../content/marketing/coming-soon.json";
 import contact from "../content/shared/contact.json";
 import errors from "../content/shared/errors.json";
 import forms from "../content/shared/forms.json";
-import type { CareerLevel, ErrorCode, GOOGLE_FRONTEND_PATHS } from "./api/shared";
+import type { CareerLevel, ErrorCode, GOOGLE_FRONTEND_PATHS, ScoreCategory } from "./api/shared";
 
 /** Every content file starts with an id and a title that match the screen list. */
 export type ContentFileHeader = { id: string; title: string };
@@ -18,6 +21,9 @@ const contentFiles = {
   "app/auth": auth,
   "app/forgot-password": forgotPassword,
   "app/google-signup": googleSignup,
+  "app/processing": processing,
+  "app/signup-wall": signupWall,
+  "app/upload": upload,
   "marketing/coming-soon": comingSoon,
   "shared/contact": contact,
   "shared/errors": errors,
@@ -46,6 +52,13 @@ const loginQueryErrors: ExactTextRecord<LoginQueryError, typeof auth.logIn.query
   auth.logIn.queryErrors;
 const careerLevelOptions: ExactTextRecord<CareerLevel, typeof forms.careerLevel.options> =
   forms.careerLevel.options;
+const scoreCategoryNames: ExactTextRecord<ScoreCategory, typeof signupWall.preview.categories> =
+  signupWall.preview.categories;
+
+/** The name of a General Analysis category, for example "Brevity & Style" (PRD Section 12.1). */
+export function scoreCategoryLabel(category: ScoreCategory): string {
+  return scoreCategoryNames[category];
+}
 
 /** The wording for an API error code. */
 export function errorMessage(code: ErrorCode): string {
