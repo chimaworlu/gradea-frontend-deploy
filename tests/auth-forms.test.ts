@@ -173,7 +173,7 @@ describe("browser storage", () => {
     }
   });
 
-  it("keeps only the waiting scan's id, guest token and expiry, in sessionStorage, under one key", () => {
+  it("keeps only the waiting scan's id, guest token, expiry and career level, in sessionStorage, under one key", () => {
     const source = readFileSync(WAITING_SCAN_FILE, "utf8");
     expect(source).not.toMatch(/localStorage|indexedDB|document\.cookie/);
     expect(source.match(/window.sessionStorage/g)).toHaveLength(1);
@@ -194,6 +194,7 @@ describe("browser storage", () => {
       scanSessionId: "scan1",
       guestToken: "guest-token",
       expiresAt: "2026-11-21T12:30:00.000Z",
+      careerLevel: "mid" as const,
       email: "someone@example.test",
       password: "hunter22",
       cvText: "My CV text",
@@ -202,6 +203,7 @@ describe("browser storage", () => {
     expect(stored.size).toBe(1);
     const [value] = [...stored.values()];
     expect(Object.keys(JSON.parse(value ?? "{}")).sort()).toEqual([
+      "careerLevel",
       "expiresAt",
       "guestToken",
       "scanSessionId",

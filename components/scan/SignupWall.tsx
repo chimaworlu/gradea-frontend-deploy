@@ -12,6 +12,8 @@ export type SignupWallProps = {
   fileSize: number;
   /** Claims the waiting scan once the account exists. */
   onSignedUp: () => void;
+  /** Keeps the chosen career level with the waiting scan, for the Google way. */
+  onCareerLevelChange: (level: string) => void;
 };
 
 /**
@@ -19,7 +21,12 @@ export type SignupWallProps = {
  * preview of the results with no real score, because the scan is scored only after it is
  * claimed. Right: the sign-up form with the wall's own words and the same checks as A4.
  */
-export function SignupWall({ fileName, fileSize, onSignedUp }: SignupWallProps) {
+export function SignupWall({
+  fileName,
+  fileSize,
+  onSignedUp,
+  onCareerLevelChange,
+}: SignupWallProps) {
   const text = getContent("app/signup-wall");
   const upload = getContent("app/upload");
 
@@ -65,6 +72,7 @@ export function SignupWall({ fileName, fileSize, onSignedUp }: SignupWallProps) 
             subline: text.form.subline,
             submit: text.form.submit,
             onSignedUp,
+            onCareerLevelChange,
           }}
         />
       </section>

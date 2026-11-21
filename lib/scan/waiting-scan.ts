@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CareerLevel } from "../api/shared";
 import { AFTER_AUTH_PATH } from "../auth/forms";
 import { UPLOAD_PATH } from "./upload";
 
@@ -8,7 +9,8 @@ import { UPLOAD_PATH } from "./upload";
 // Only sessionStorage: never the address, a cookie or lasting storage (security.md section 1). The
 // server stores only the token's hash and the token works once, within 30 minutes. Every read
 // and write is wrapped, so with storage blocked the page still works and those two ways simply
-// do not keep the scan.
+// do not keep the scan. The career level chosen on the wall rides in the same entry, so after
+// Google the account is created with it and the Finish page is not shown again (FR-23).
 
 const STORAGE_KEY = "gradea.waitingScan";
 
@@ -16,6 +18,7 @@ const WaitingScan = z.strictObject({
   scanSessionId: z.string().min(1),
   guestToken: z.string().min(1),
   expiresAt: z.iso.datetime(),
+  careerLevel: CareerLevel.optional(),
 });
 export type WaitingScan = z.infer<typeof WaitingScan>;
 
@@ -33,9 +36,12 @@ function browserStorage(): Storage | undefined {
 export function saveWaitingScan(scan: WaitingScan, storage = browserStorage()): boolean {
   if (storage === undefined) return false;
   try {
-    // Only these three fields, whatever the caller passes: never a password, email or CV text.
-    const { scanSessionId, guestToken, expiresAt } = scan;
-    storage.setItem(STORAGE_KEY, JSON.stringify({ scanSessionId, guestToken, expiresAt }));
+    // Only these fields, whatever the caller passes: never a password, email or CV text.
+    const { scanSessionId, guestToken, expiresAt, careerLevel } = scan;
+    storage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ scanSessionId, guestToken, expiresAt, careerLevel }),
+    );
     return true;
   } catch {
     // Not kept: the email form on the wall still claims the scan from memory.
@@ -75,6 +81,27 @@ export function readWaitingScan(
     return undefined;
   }
   return parsed.data;
+}
+
+/**
+ * Adds the career level chosen on the wall to the waiting scan, with the same expiry. Nothing is
+ * kept when no scan is waiting.
+ */
+export function rememberCareerLevel(
+  careerLevel: CareerLevel,
+  now: Date = new Date(),
+  storage = browserStorage(),
+): boolean {
+  const scan = readWaitingScan(now, storage);
+  return scan === undefined ? false : saveWaitingScan({ ...scan, careerLevel }, storage);
+}
+
+/** The career level chosen on the wall, while its scan is still waiting. */
+export function savedCareerLevel(
+  now: Date = new Date(),
+  storage = browserStorage(),
+): CareerLevel | undefined {
+  return readWaitingScan(now, storage)?.careerLevel;
 }
 
 /** Reads and clears in one step, so the scan is claimed at most once per page. */

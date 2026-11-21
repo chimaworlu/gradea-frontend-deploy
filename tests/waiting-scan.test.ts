@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
+import { googleFinishStep } from "../lib/auth/google";
 import { claimOutcome, claimScan } from "../lib/scan/upload";
 import {
   pathAfterLogin,
   readWaitingScan,
+  rememberCareerLevel,
+  savedCareerLevel,
   saveWaitingScan,
   takeWaitingScan,
   clearWaitingScan,
@@ -114,5 +117,44 @@ describe("the waiting guest scan in sessionStorage", () => {
     expect(pathAfterLogin(uploadedAt, storage)).toBe("/");
     // No sessionStorage at all, as on the server.
     expect(readWaitingScan(uploadedAt, undefined)).toBeUndefined();
+  });
+});
+
+describe("the career level chosen on the wall", () => {
+  it("is saved with the token, under the same entry and expiry", () => {
+    const storage = memoryStorage();
+    expect(rememberCareerLevel("senior", uploadedAt, storage)).toBe(false);
+    saveWaitingScan(scan, storage);
+    expect(rememberCareerLevel("senior", uploadedAt, storage)).toBe(true);
+    expect(storage.length).toBe(1);
+    expect(readWaitingScan(uploadedAt, storage)).toEqual({ ...scan, careerLevel: "senior" });
+    expect(savedCareerLevel(uploadedAt, storage)).toBe("senior");
+  });
+
+  it("after Google, creates the account with the saved level and skips the Finish page", () => {
+    const ready = { kind: "ready", email: "someone@example.test" };
+    expect(googleFinishStep(ready, "mid")).toEqual({
+      kind: "auto",
+      level: "mid",
+      body: { career_level: "mid", consent: true },
+    });
+    // No level chosen on the wall: the Finish page shows as before.
+    expect(googleFinishStep(ready, undefined)).toEqual({ kind: "form" });
+    // Nothing happens until the pending Google sign-in is known.
+    expect(googleFinishStep({ kind: "checking" }, "mid")).toEqual({ kind: "wait" });
+  });
+
+  it("is cleared with the token, and gone once it expires", () => {
+    const storage = memoryStorage();
+    saveWaitingScan({ ...scan, careerLevel: "entry" }, storage);
+    expect(savedCareerLevel(new Date("2026-11-21T12:30:00.000Z"), storage)).toBeUndefined();
+
+    saveWaitingScan({ ...scan, careerLevel: "entry" }, storage);
+    takeWaitingScan(uploadedAt, storage);
+    expect(savedCareerLevel(uploadedAt, storage)).toBeUndefined();
+
+    saveWaitingScan({ ...scan, careerLevel: "entry" }, storage);
+    clearWaitingScan(storage);
+    expect(savedCareerLevel(uploadedAt, storage)).toBeUndefined();
   });
 });

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import type { CareerLevel } from "../../lib/api/shared";
-import { LOGIN_PATH } from "../../lib/auth/forms";
+import { LOGIN_PATH, isCareerLevel } from "../../lib/auth/forms";
 import { fillPlaceholders, getContent } from "../../lib/content";
 import {
   ACCEPT_ATTRIBUTE,
@@ -21,7 +21,12 @@ import {
   viewerFrom,
   type Viewer,
 } from "../../lib/scan/upload";
-import { clearWaitingScan, saveWaitingScan, takeWaitingScan } from "../../lib/scan/waiting-scan";
+import {
+  clearWaitingScan,
+  rememberCareerLevel,
+  saveWaitingScan,
+  takeWaitingScan,
+} from "../../lib/scan/waiting-scan";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
@@ -241,6 +246,9 @@ export function UploadFlow() {
           fileName={wall.file.name}
           fileSize={wall.file.size}
           onSignedUp={() => void claimAfterSignup(wall)}
+          onCareerLevelChange={(level) => {
+            if (isCareerLevel(level)) rememberCareerLevel(level);
+          }}
         />
       </div>
     );

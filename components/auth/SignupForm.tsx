@@ -51,6 +51,8 @@ export type SignupWallOptions = {
   submit: { default: string; loading: string };
   /** Runs instead of the A4 redirect, for example to claim the guest's scan. */
   onSignedUp: () => void;
+  /** Hears each career level chosen, so it can be kept for the Google way (FR-23). */
+  onCareerLevelChange?: (level: string) => void;
 };
 
 /**
@@ -71,6 +73,7 @@ export function SignupForm({ wall }: { wall?: SignupWallOptions } = {}) {
   function update(place: keyof SignupValues, value: string) {
     setValues((current) => ({ ...current, [place]: value }));
     setProblems((current) => ({ ...current, [place]: undefined }));
+    if (place === "careerLevel") wall?.onCareerLevelChange?.(value);
   }
 
   function showResult(result: ApiResult<AuthUserResponse>) {
