@@ -530,12 +530,38 @@
   letter-spacing: var(--font-title-medium-letter-spacing);
 }
 
-/* The score ring is round (design-system-rules section 5); locked, so it shows no number. */
+/* The score ring as in the A3 design: a grey-blue arc of about three quarters from the top,
+   clockwise, on the light track, with a blurred value in the middle. It is a fixed picture,
+   not a score: the scan is scored only after it is claimed, so no number is shown. Round only
+   because it is the score ring (design-system-rules section 5). */
 .ring {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   width: var(--space-96);
   height: var(--space-96);
-  border: var(--space-12) solid var(--color-border-input);
   border-radius: var(--radius-full);
+  background: conic-gradient(var(--color-border-input) 0 75%, var(--color-border-card) 0);
+}
+
+/* The inside of the ring, leaving a 12px band. */
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: var(--space-12);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-lowest);
+}
+
+.ringValue {
+  position: relative;
+  width: var(--space-32);
+  height: var(--space-24);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-high);
+  filter: blur(var(--space-4));
 }
 
 .lock {

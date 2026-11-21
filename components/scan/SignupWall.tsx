@@ -28,7 +28,9 @@ export function SignupWall({ fileName, fileSize, onSignedUp }: SignupWallProps) 
       <section>
         <div className={styles.preview} aria-label={text.preview.locked}>
           <p className={styles.previewScore}>
-            <span className={styles.ring} aria-hidden="true" />
+            <span className={styles.ring} aria-hidden="true">
+              <span className={styles.ringValue} />
+            </span>
             <span>
               {text.preview.overallScore}
               <span className={styles.lock}>
