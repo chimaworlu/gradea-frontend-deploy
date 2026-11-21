@@ -147,7 +147,7 @@ export function claimScan(
 
 /** What the page shows after an upload answer. */
 export type UploadOutcome =
-  | { kind: "wall"; scanSessionId: string; guestToken: string }
+  | { kind: "wall"; scanSessionId: string; guestToken: string; expiresAt: string }
   | { kind: "processing"; path: string }
   | { kind: "limit"; resetAt: string }
   | { kind: "fileError"; message: string }
@@ -171,7 +171,7 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
     const { scan_session_id: scanSessionId, guest } = result.data;
     return guest === null
       ? { kind: "processing", path: processingPath(scanSessionId) }
-      : { kind: "wall", scanSessionId, guestToken: guest.token };
+      : { kind: "wall", scanSessionId, guestToken: guest.token, expiresAt: guest.expires_at };
   }
   if (result.kind === "network") {
     return { kind: "failed", message: getContent("app/upload").uploadBox.uploadFailed };
@@ -183,4 +183,30 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
     return { kind: "fileError", message: errorMessage(result.code) };
   }
   return { kind: "failed", message: errorMessage(result.code) };
+}
+
+/** What follows a claim: processing, the limit popup, or the normal upload page. */
+export type ClaimOutcome =
+  | { kind: "processing"; path: string }
+  | { kind: "limit"; resetAt: string }
+  | { kind: "uploadPage" };
+
+/**
+ * Claimed: scoring runs and the processing screen follows it. At the Free limit the scan stays
+ * attached and waiting, and the limit popup shows (SRS Section 4). Any other answer (for
+ * example an expired guest session) leaves the new Free user on the upload page.
+ */
+export function claimOutcome(
+  result: ApiResult<ClaimResponse>,
+  scanSessionId: string,
+): ClaimOutcome {
+  if (result.kind === "ok") return { kind: "processing", path: processingPath(scanSessionId) };
+  if (
+    result.kind === "error" &&
+    result.code === "scan_limit_reached" &&
+    result.resetAt !== undefined
+  ) {
+    return { kind: "limit", resetAt: result.resetAt };
+  }
+  return { kind: "uploadPage" };
 }

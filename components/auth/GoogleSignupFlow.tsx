@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { AFTER_SIGNUP_PATH, SIGNUP_PATH, isCareerLevel, problemMessage } from "../../lib/auth/forms";
+import {
+  AFTER_SIGNUP_PATH,
+  SIGNUP_PATH,
+  isCareerLevel,
+  problemMessage,
+} from "../../lib/auth/forms";
 import {
   cancelGoogle,
   completeBody,

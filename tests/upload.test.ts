@@ -56,6 +56,7 @@ describe("after the upload", () => {
       kind: "wall",
       scanSessionId: "scan1",
       guestToken: "guest-token",
+      expiresAt: "2026-11-21T12:30:00.000Z",
     });
 
     const signedIn = await uploadCv(

@@ -10,17 +10,18 @@ import {
   ACCEPT_ATTRIBUTE,
   UPLOAD_PATH,
   checkFiles,
+  claimOutcome,
   claimScan,
   fetchViewer,
   fileProblemMessage,
   fileSizeLabel,
-  processingPath,
   uploadCv,
   uploadHelperText,
   uploadOutcome,
   viewerFrom,
   type Viewer,
 } from "../../lib/scan/upload";
+import { clearWaitingScan, saveWaitingScan, takeWaitingScan } from "../../lib/scan/waiting-scan";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
@@ -63,17 +64,27 @@ export function UploadFlow() {
   const busy = status === "uploading" || viewer === undefined || wall !== undefined;
 
   // The session is checked once, when the page loads; nothing polls it (AGENTS.md section 5).
+  // A user back from Google or the log in page with a guest scan waiting in this tab gets it
+  // claimed once, then goes on to processing (or sees the limit popup).
   useEffect(() => {
-    let current = true;
-    void fetchViewer().then((result) => {
-      if (!current) return;
+    void fetchViewer().then(async (result) => {
       const found = viewerFrom(result);
+      // Taken (read and cleared) in one step, so the scan is claimed at most once.
+      const waiting = found.kind === "signedIn" ? takeWaitingScan() : undefined;
+      if (waiting !== undefined) {
+        const outcome = claimOutcome(
+          await claimScan(waiting.scanSessionId, waiting.guestToken),
+          waiting.scanSessionId,
+        );
+        if (outcome.kind === "processing") {
+          window.location.assign(outcome.path);
+          return;
+        }
+        if (outcome.kind === "limit") setLimitResetAt(outcome.resetAt);
+      }
       setViewer(found);
       if (found.kind === "signedIn") setCareerLevel(found.user.career_level);
     });
-    return () => {
-      current = false;
-    };
   }, []);
 
   async function upload(chosen: File, who: Viewer) {
@@ -92,6 +103,12 @@ export function UploadFlow() {
         return;
       case "wall":
         setStatus("idle");
+        // Kept for this tab while the wall is open, so Google or Log in do not lose the scan.
+        saveWaitingScan({
+          scanSessionId: outcome.scanSessionId,
+          guestToken: outcome.guestToken,
+          expiresAt: outcome.expiresAt,
+        });
         setWall({
           scanSessionId: outcome.scanSessionId,
           guestToken: outcome.guestToken,
@@ -179,18 +196,22 @@ export function UploadFlow() {
   }
 
   function removeFile() {
+    clearWaitingScan();
     setFile(undefined);
     setStatus("idle");
     setFailedMessage(undefined);
   }
 
   async function claimAfterSignup(waiting: WallState) {
-    const result = await claimScan(waiting.scanSessionId, waiting.guestToken);
-    // Claimed: scoring runs and the processing screen follows it. If the claim fails (for
-    // example the 30 minute guest session ran out), the new Free user starts again on A1.
-    window.location.assign(
-      result.kind === "ok" ? processingPath(waiting.scanSessionId) : UPLOAD_PATH,
+    // Signed up with the email form: the token is still in memory, so the kept copy goes.
+    clearWaitingScan();
+    const outcome = claimOutcome(
+      await claimScan(waiting.scanSessionId, waiting.guestToken),
+      waiting.scanSessionId,
     );
+    // Claimed: on to processing. Otherwise (for example the 30 minute guest session ran out,
+    // or the limit) the new Free user starts again on A1.
+    window.location.assign(outcome.kind === "processing" ? outcome.path : UPLOAD_PATH);
   }
 
   const topBar = (

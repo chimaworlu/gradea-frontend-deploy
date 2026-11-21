@@ -21,6 +21,7 @@ import {
   signupBody,
 } from "../lib/auth/forms";
 import { getContent } from "../lib/content";
+import { saveWaitingScan } from "../lib/scan/waiting-scan";
 
 const ROOT = join(__dirname, "..");
 const auth = getContent("app/auth");
@@ -160,11 +161,52 @@ describe("autofocus", () => {
 });
 
 describe("browser storage", () => {
+  // The one exception, agreed with the founder: the waiting guest scan is kept in
+  // sessionStorage while the A3 wall is open, so Google and Log in do not lose it.
+  const WAITING_SCAN_FILE = join(ROOT, "lib", "scan", "waiting-scan.ts");
+
   it("never stores anything, least of all a password, in browser storage or cookies", () => {
     for (const file of sourceFiles("app", "components", "lib")) {
+      if (file === WAITING_SCAN_FILE) continue;
       const source = readFileSync(file, "utf8");
       expect(source, file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie/);
     }
+  });
+
+  it("keeps only the waiting scan's id, guest token and expiry, in sessionStorage, under one key", () => {
+    const source = readFileSync(WAITING_SCAN_FILE, "utf8");
+    expect(source).not.toMatch(/localStorage|indexedDB|document\.cookie/);
+    expect(source.match(/window.sessionStorage/g)).toHaveLength(1);
+    expect(source.match(/setItem\(/g)).toHaveLength(1);
+    expect(source.match(/const STORAGE_KEY = "[^"]+";/g)).toHaveLength(1);
+
+    const stored = new Map<string, string>();
+    const storage = {
+      length: 0,
+      clear: () => stored.clear(),
+      getItem: (key: string) => stored.get(key) ?? null,
+      key: () => null,
+      removeItem: (key: string) => void stored.delete(key),
+      setItem: (key: string, value: string) => void stored.set(key, value),
+    };
+    // Extra fields passed by mistake are never written.
+    const scan = {
+      scanSessionId: "scan1",
+      guestToken: "guest-token",
+      expiresAt: "2026-11-21T12:30:00.000Z",
+      email: "someone@example.test",
+      password: "hunter22",
+      cvText: "My CV text",
+    };
+    expect(saveWaitingScan(scan, storage)).toBe(true);
+    expect(stored.size).toBe(1);
+    const [value] = [...stored.values()];
+    expect(Object.keys(JSON.parse(value ?? "{}")).sort()).toEqual([
+      "expiresAt",
+      "guestToken",
+      "scanSessionId",
+    ]);
+    expect(value).not.toMatch(/someone@example\.test|hunter22|My CV text/);
   });
 
   it("renders password fields empty and with the right autocomplete", () => {

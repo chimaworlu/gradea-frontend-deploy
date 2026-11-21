@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SocialLinks } from "../components/SocialLinks";
+import { WaitingScanRedirect } from "../components/scan/WaitingScanRedirect";
 import { fillPlaceholders, getContent } from "../lib/content";
 import { selectShownSocials, toSocialItems } from "../lib/socials";
 import styles from "./page.module.css";
@@ -47,6 +48,7 @@ export default function ComingSoonPage() {
           {fillPlaceholders(content.footer.copyright, { year: new Date().getFullYear() })}
         </p>
       </footer>
+      <WaitingScanRedirect />
     </div>
   );
 }

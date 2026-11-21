@@ -130,14 +130,10 @@ export function SignupForm({ wall }: { wall?: SignupWallOptions } = {}) {
   return (
     <>
       <FormIntro heading={wall?.heading ?? text.heading} subline={wall?.subline ?? text.subline} />
-      {/* Not on the wall yet: the Google round trip leaves the page, and the guest token lives
-          only in this page's memory, so the waiting scan could not be claimed afterwards. */}
-      {wall === undefined ? (
-        <>
-          <GoogleButton href={googleStartUrl()} text={text.google} />
-          <Divider text={text.divider} />
-        </>
-      ) : null}
+      {/* On the wall too: the waiting scan is kept in this tab while Google runs, and claimed
+          on /upload afterwards (lib/scan/waiting-scan.ts). */}
+      <GoogleButton href={googleStartUrl()} text={text.google} />
+      <Divider text={text.divider} />
       <form
         className={styles.form}
         onSubmit={submit}

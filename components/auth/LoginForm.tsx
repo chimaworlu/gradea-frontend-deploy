@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import {
-  AFTER_AUTH_PATH,
   afterFailedLogin,
   checkLogin,
   googleStartUrl,
@@ -16,6 +15,7 @@ import {
   type LoginValues,
 } from "../../lib/auth/forms";
 import { getContent } from "../../lib/content";
+import { pathAfterLogin } from "../../lib/scan/waiting-scan";
 import {
   Divider,
   FooterPrompt,
@@ -67,8 +67,9 @@ export function LoginForm({ queryError }: LoginFormProps) {
     inFlight.current = false;
 
     if (result.kind === "ok") {
-      // No app yet: go to the home page with the new session cookie (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      // Back to the upload page when a guest scan is waiting in this tab, so it is claimed;
+      // otherwise home, as there is no Dashboard yet.
+      window.location.assign(pathAfterLogin());
       return;
     }
 

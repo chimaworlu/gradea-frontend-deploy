@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
-import { AFTER_AUTH_PATH, LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
+import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
+import { pathAfterLogin } from "../../lib/scan/waiting-scan";
 import { cancelGoogle, linkBody, linkGoogle, submitOutcome } from "../../lib/auth/google";
 import { fillPlaceholders, getContent } from "../../lib/content";
 import { FormError, FormIntro, PasswordField, SubmitButton } from "./FormPieces";
@@ -41,8 +42,8 @@ export function LinkGoogleFlow() {
     setBusy("linking");
     const outcome = submitOutcome(await linkGoogle(linkBody(password)));
     if (outcome.kind === "done") {
-      // Linked and logged in: go where the person was headed. No app yet, so home (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      // Linked and logged in: back to a waiting guest scan if there is one, otherwise home.
+      window.location.assign(pathAfterLogin());
       return;
     }
     inFlight.current = false;
