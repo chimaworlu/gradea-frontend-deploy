@@ -158,3 +158,23 @@ describe("the career level chosen on the wall", () => {
     expect(savedCareerLevel(uploadedAt, storage)).toBeUndefined();
   });
 });
+
+describe("no career level chosen on the wall", () => {
+  it("after Google, a new user sees the Finish page: no level is assumed", () => {
+    const storage = memoryStorage();
+    // The wall opened (scan saved) but no level was picked.
+    saveWaitingScan(scan, storage);
+    const ready = { kind: "ready", email: "someone@example.test" };
+    expect(savedCareerLevel(uploadedAt, storage)).toBeUndefined();
+    expect(googleFinishStep(ready, savedCareerLevel(uploadedAt, storage))).toEqual({
+      kind: "form",
+    });
+  });
+
+  it("a new upload starts a fresh entry, so a level from an earlier wall never carries over", () => {
+    const storage = memoryStorage();
+    saveWaitingScan({ ...scan, careerLevel: "executive" }, storage);
+    saveWaitingScan({ ...scan, scanSessionId: "scan2", guestToken: "new-token" }, storage);
+    expect(savedCareerLevel(uploadedAt, storage)).toBeUndefined();
+  });
+});
