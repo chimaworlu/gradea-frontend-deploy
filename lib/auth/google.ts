@@ -96,6 +96,24 @@ export function pendingView(
   return { kind: "error", code: result.code };
 }
 
+/**
+ * What /signup/google does once the pending Google sign-in is ready: with a career level saved
+ * from the A3 wall it creates the account straight away (the Finish page is not shown again,
+ * FR-23); without one it shows the Finish page.
+ */
+export function googleFinishStep(
+  pending: { kind: string },
+  savedLevel: CareerLevel | undefined,
+):
+  | { kind: "auto"; level: CareerLevel; body: GoogleCompleteRequest }
+  | { kind: "form" }
+  | { kind: "wait" } {
+  if (pending.kind !== "ready") return { kind: "wait" };
+  return savedLevel === undefined
+    ? { kind: "form" }
+    : { kind: "auto", level: savedLevel, body: completeBody(savedLevel) };
+}
+
 /** Where an answer to link or complete puts the person. */
 export type SubmitOutcome =
   | { kind: "done" }

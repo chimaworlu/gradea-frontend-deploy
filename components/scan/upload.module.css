@@ -1,0 +1,617 @@
+/* A1 Upload and the A3 signup wall. Token variables only (design-system-rules). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-surface);
+}
+
+/* Spacing is set so every A1 state fits a 1366 x 768 laptop screen without scrolling; taller
+   screens get the design's roomier top gap and box (see the height query at the end). */
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--layout-max-width-text);
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-page-gutter);
+}
+
+/* 40px in the design (measured on the 1440 frame): display small. One line from 720 wide. */
+.heading {
+  color: var(--color-on-surface);
+  font: var(--font-display-small);
+  letter-spacing: var(--font-display-small-letter-spacing);
+  text-wrap: balance;
+}
+
+.subline {
+  margin-top: var(--space-12);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-large);
+  letter-spacing: var(--font-body-large-letter-spacing);
+  text-wrap: pretty;
+}
+
+/* ---- General / Job-specific switch ---- */
+
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-24);
+}
+
+.switchOption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  min-height: var(--size-button);
+  padding: 0 var(--space-12);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* Selected: light navy fill, navy text and outline; no change on hover (A1 dev notes). */
+.switchSelected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+}
+
+.switchOption:disabled {
+  cursor: not-allowed;
+}
+
+.switchOption:disabled > span:first-child {
+  opacity: var(--opacity-disabled);
+}
+
+.comingSoon {
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+  font: var(--font-label-small);
+  letter-spacing: var(--font-label-small-letter-spacing);
+}
+
+.switchHelper {
+  margin-top: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+/* ---- Upload box ---- */
+
+/* One height for every state, so choosing a file never makes the page jump. */
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  min-height: calc(var(--space-96) * 2 + var(--space-48));
+  margin-top: var(--space-16);
+  padding: var(--space-24) var(--space-card-padding);
+  border: var(--border-width) dashed var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  text-align: center;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.boxEmpty:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+/* A file is over the page: solid 2px navy, drawn inside (A1 dev notes). */
+.boxDragging,
+.boxDragging:hover {
+  border-color: transparent;
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 var(--border-width-selected) var(--color-primary);
+}
+
+.boxChosen {
+  border-style: solid;
+  border-color: var(--color-border-card);
+}
+
+.boxError,
+.boxError:hover {
+  border-style: solid;
+  border-color: var(--color-error);
+  background: var(--color-surface-container-lowest);
+}
+
+.boxIcon {
+  color: var(--color-primary);
+}
+
+.boxTitle {
+  color: var(--color-on-surface);
+  font: var(--font-title-medium);
+  letter-spacing: var(--font-title-medium-letter-spacing);
+  text-wrap: balance;
+}
+
+/* "my-cv.pdf, 412 KB": 16px in the design. */
+.fileName {
+  color: var(--color-on-surface);
+  font: var(--font-title-small);
+  letter-spacing: var(--font-title-small-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.boxOr,
+.boxHelper {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.fileInput {
+  position: absolute;
+  width: var(--border-width);
+  height: var(--border-width);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.chooseButton {
+  min-height: var(--size-button);
+  padding: 0 var(--space-24);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.chooseButton:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.chooseButton:active:not(:disabled) {
+  background: var(--color-primary-container);
+}
+
+.chooseButton:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+.fileActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-24);
+}
+
+/* Text buttons: navy, a 1px underline on hover and press (A1 dev notes). */
+.textButton {
+  min-height: var(--size-touch-target);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.textButton:hover:not(:disabled),
+.textButton:active:not(:disabled) {
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width);
+}
+
+.textButton:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* ---- Lines under the box ---- */
+
+.boxProblem,
+.failed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-16);
+  color: var(--color-error);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-wrap: pretty;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-24);
+  color: var(--color-on-surface-variant);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* A small spinner beside the words (about 16px), never a block of its own. */
+.spinner {
+  flex-shrink: 0;
+  width: var(--space-16);
+  height: var(--space-16);
+  animation: spin var(--duration-score) linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.careerLine {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-16);
+  margin-top: var(--space-16);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.careerLevel {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* The per-scan career level menu: 4px under "Change", the one soft shadow. */
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  left: 0;
+  z-index: 10;
+  min-width: calc(var(--layout-results-rail) + var(--space-24));
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  overflow-y: auto;
+  box-shadow: var(--shadow-floating);
+}
+
+/* Opens upward when there is not room below (set by CareerLevelMenu), so it is never cut off. */
+.menu[data-up="true"] {
+  top: auto;
+  bottom: calc(100% + var(--space-4));
+}
+
+.menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menuNote {
+  margin-top: var(--space-4);
+  padding: var(--space-12);
+  border-top: var(--border-width) solid var(--color-border-card);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.actions {
+  margin-top: var(--space-16);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+  /* 200 wide in the design. */
+  min-width: calc(var(--space-96) * 2 + var(--space-8));
+  min-height: var(--size-button);
+  padding: 0 var(--space-24);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.primary:active:not(:disabled) {
+  background: var(--color-primary-pressed);
+}
+
+.primary[aria-busy="true"] {
+  cursor: progress;
+}
+
+.footerNote {
+  margin-top: var(--space-24);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.footerLink {
+  margin-left: var(--space-8);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}
+
+/* ---- Limit popup (E7) ---- */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-page-gutter);
+}
+
+/* Ink at 40% (A1 dev notes): the disabled opacity is 0.6, so 1 minus it is 0.4. */
+.scrim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-on-surface);
+  opacity: calc(1 - var(--opacity-disabled));
+}
+
+.popup {
+  position: relative;
+  width: 100%;
+  /* About 440 wide in the design. */
+  max-width: calc(var(--layout-max-width-auth) - var(--space-48));
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  animation: fadeIn var(--duration-medium) var(--easing-standard);
+}
+
+.popupTitle {
+  padding-right: var(--space-48);
+  color: var(--color-on-surface);
+  font: var(--font-title-medium);
+  letter-spacing: var(--font-title-medium-letter-spacing);
+  text-wrap: balance;
+}
+
+.popupBody {
+  margin-top: var(--space-16);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.popupClose {
+  position: absolute;
+  top: var(--space-16);
+  right: var(--space-16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-touch-target);
+  height: var(--size-touch-target);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-on-surface);
+  cursor: pointer;
+}
+
+.popupClose:hover {
+  background: var(--color-primary-soft);
+}
+
+.popupClose:active {
+  background: var(--color-primary-container);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- A3 signup wall ---- */
+
+.wall {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-48);
+  width: 100%;
+  max-width: var(--layout-max-width-app);
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-page-gutter) var(--space-48);
+}
+
+.wallForm {
+  width: 100%;
+  max-width: var(--layout-max-width-auth);
+}
+
+.preview {
+  padding: var(--space-card-padding);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+}
+
+.previewScore {
+  display: flex;
+  align-items: center;
+  gap: var(--space-24);
+  margin-bottom: var(--space-24);
+  color: var(--color-on-surface);
+  font: var(--font-title-medium);
+  letter-spacing: var(--font-title-medium-letter-spacing);
+}
+
+/* The score ring as in the A3 design: a grey-blue arc of about three quarters from the top,
+   clockwise, on the light track, with a blurred value in the middle. It is a fixed picture,
+   not a score: the scan is scored only after it is claimed, so no number is shown. Round only
+   because it is the score ring (design-system-rules section 5). */
+.ring {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-96);
+  height: var(--space-96);
+  border-radius: var(--radius-full);
+  background: conic-gradient(var(--color-border-input) 0 75%, var(--color-border-card) 0);
+}
+
+/* The inside of the ring, leaving a 12px band. */
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: var(--space-12);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container-lowest);
+}
+
+.ringValue {
+  position: relative;
+  width: var(--space-32);
+  height: var(--space-24);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-high);
+  filter: blur(var(--space-4));
+}
+
+.lock {
+  display: inline-flex;
+  margin-left: var(--space-8);
+  color: var(--color-border-input);
+  vertical-align: middle;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+  padding: var(--space-16) 0;
+  border-top: var(--border-width) solid var(--color-border-card);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* A blurred bar where the score and issue count will be. No number is sent or shown. */
+.blurred {
+  width: var(--space-96);
+  height: var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-high);
+  filter: blur(var(--space-4));
+}
+
+.uploaded {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-16);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+.uploadedFile {
+  margin-top: var(--space-4);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.check {
+  color: var(--color-primary);
+}
+
+@media (width >= 1024px) {
+  .wall {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (width < 640px) {
+  .main,
+  .wall {
+    padding-top: var(--space-32);
+    padding-bottom: var(--space-48);
+  }
+
+  .primary {
+    width: 100%;
+  }
+}
+
+/* The error lines are flex rows, so the hidden attribute needs its own rule. */
+.boxProblem[hidden],
+.failed[hidden],
+.menu[hidden] {
+  display: none;
+}
+
+/* Taller screens (1440 x 900 and up): the roomier top gap and box height of the design. */
+@media (height >= 880px) and (width >= 640px) {
+  .main,
+  .wall {
+    padding-top: var(--space-64);
+  }
+
+  .subline {
+    margin-top: var(--space-24);
+  }
+
+  .box {
+    min-height: calc(var(--space-96) * 3);
+  }
+}

@@ -4,7 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import type { ApiResult } from "../../lib/api/client";
 import type { AuthUserResponse } from "../../lib/api/shared";
 import {
-  AFTER_AUTH_PATH,
+  AFTER_SIGNUP_PATH,
   checkSignup,
   googleStartUrl,
   hasProblems,
@@ -44,8 +44,22 @@ function focusFirstProblem(problems: FieldProblems) {
   if (first !== undefined) document.getElementById(FIELD_IDS[first])?.focus();
 }
 
-/** A4 Sign up. Values live in React state only and are kept on every error (A4 dev notes). */
-export function SignupForm() {
+/** The A3 signup wall's own words and what happens once the account exists. */
+export type SignupWallOptions = {
+  heading: string;
+  subline: string;
+  submit: { default: string; loading: string };
+  /** Runs instead of the A4 redirect, for example to claim the guest's scan. */
+  onSignedUp: () => void;
+  /** Hears each career level chosen, so it can be kept for the Google way (FR-23). */
+  onCareerLevelChange?: (level: string) => void;
+};
+
+/**
+ * A4 Sign up, and the form on the A3 signup wall when `wall` is given. Values live in React
+ * state only and are kept on every error (A4 dev notes).
+ */
+export function SignupForm({ wall }: { wall?: SignupWallOptions } = {}) {
   const text = getContent("app/auth").signUp;
   const [values, setValues] = useState<SignupValues>({ email: "", password: "", careerLevel: "" });
   const [problems, setProblems] = useState<FieldProblems>({});
@@ -59,12 +73,17 @@ export function SignupForm() {
   function update(place: keyof SignupValues, value: string) {
     setValues((current) => ({ ...current, [place]: value }));
     setProblems((current) => ({ ...current, [place]: undefined }));
+    if (place === "careerLevel") wall?.onCareerLevelChange?.(value);
   }
 
   function showResult(result: ApiResult<AuthUserResponse>) {
     if (result.kind === "ok") {
-      // No app yet: go to the home page with the new session cookie (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      if (wall !== undefined) {
+        wall.onSignedUp();
+        return;
+      }
+      // No scan waiting: the new Free user lands on the upload page (Build Plan Phase 2).
+      window.location.assign(AFTER_SIGNUP_PATH);
       return;
     }
     // A bot token works once, so get a fresh one for the next try.
@@ -113,7 +132,9 @@ export function SignupForm() {
 
   return (
     <>
-      <FormIntro heading={text.heading} subline={text.subline} />
+      <FormIntro heading={wall?.heading ?? text.heading} subline={wall?.subline ?? text.subline} />
+      {/* On the wall too: the waiting scan is kept in this tab while Google runs, and claimed
+          on /upload afterwards (lib/scan/waiting-scan.ts). */}
       <GoogleButton href={googleStartUrl()} text={text.google} />
       <Divider text={text.divider} />
       <form
@@ -152,7 +173,7 @@ export function SignupForm() {
         />
         <BotCheck onToken={setBotToken} resetKey={botResetKey} />
         <FormError id="signup-form-error" message={formError} />
-        <SubmitButton text={text.form.submit} loading={submitting} />
+        <SubmitButton text={wall?.submit ?? text.form.submit} loading={submitting} />
       </form>
       <ConsentLine text={text.form.consent} />
       <FooterPrompt prompt={text.footer.prompt} link={text.footer.link} href="/login" />

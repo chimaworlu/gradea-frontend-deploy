@@ -1,13 +1,20 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
-import { AFTER_AUTH_PATH, SIGNUP_PATH, isCareerLevel, problemMessage } from "../../lib/auth/forms";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  AFTER_SIGNUP_PATH,
+  SIGNUP_PATH,
+  isCareerLevel,
+  problemMessage,
+} from "../../lib/auth/forms";
 import {
   cancelGoogle,
   completeBody,
   completeGoogleSignup,
+  googleFinishStep,
   submitOutcome,
 } from "../../lib/auth/google";
+import { savedCareerLevel } from "../../lib/scan/waiting-scan";
 import type { ErrorCode } from "../../lib/api/shared";
 import { fillPlaceholders, getContent } from "../../lib/content";
 import { CareerLevelPicker } from "./CareerLevelPicker";
@@ -31,6 +38,34 @@ export function GoogleSignupFlow() {
   const [expired, setExpired] = useState(false);
   const [busy, setBusy] = useState<"creating" | "cancelling" | undefined>(undefined);
   const inFlight = useRef(false);
+  // True while the account is being created with the career level saved on the A3 wall.
+  const [auto, setAuto] = useState(false);
+  const autoStarted = useRef(false);
+
+  // From the A3 wall with a career level already chosen: create the account with it, once,
+  // without showing the Finish page again (FR-23). /upload then claims the waiting scan and
+  // goes on to processing. If it does not work, the Finish page shows with the level filled in.
+  useEffect(() => {
+    const step = googleFinishStep(pending, savedCareerLevel());
+    if (step.kind !== "auto" || autoStarted.current) return;
+    autoStarted.current = true;
+    inFlight.current = true;
+    setAuto(true);
+    setCareerLevel(step.level);
+    void completeGoogleSignup(step.body).then((result) => {
+      const outcome = submitOutcome(result);
+      if (outcome.kind === "done") {
+        window.location.assign(AFTER_SIGNUP_PATH);
+        return;
+      }
+      inFlight.current = false;
+      setAuto(false);
+      if (outcome.kind === "expired") setExpired(true);
+      else if (outcome.kind === "network") setFormError(errors.network);
+      else if (outcome.kind === "careerLevel") setLevelProblem(outcome.code);
+      else setFormError(problemMessage(outcome.code));
+    });
+  }, [pending, errors.network]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,8 +81,8 @@ export function GoogleSignupFlow() {
     setBusy("creating");
     const outcome = submitOutcome(await completeGoogleSignup(completeBody(careerLevel)));
     if (outcome.kind === "done") {
-      // No app yet: go to the home page with the new session cookie (Phase 1).
-      window.location.assign(AFTER_AUTH_PATH);
+      // A new account with no scan waiting lands on the upload page (Build Plan Phase 2).
+      window.location.assign(AFTER_SIGNUP_PATH);
       return;
     }
     inFlight.current = false;
@@ -72,7 +107,7 @@ export function GoogleSignupFlow() {
     setFormError(result.kind === "network" ? errors.network : problemMessage(result.code));
   }
 
-  if (pending.kind === "checking") return <PendingChecking text={text.checking.text} />;
+  if (pending.kind === "checking" || auto) return <PendingChecking text={text.checking.text} />;
   if (pending.kind === "expired" || expired) {
     return (
       <PendingExpired

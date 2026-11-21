@@ -1,0 +1,162 @@
+/* S2 App top bar and account menu. Token variables only (design-system-rules). */
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--layout-nav-height);
+  padding: 0 var(--space-page-gutter);
+  background: var(--color-surface-container-lowest);
+}
+
+/* Guests: "Log in" as the small secondary button (A1 dev notes). */
+.logIn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-button-small);
+  padding: 0 var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  text-decoration: none;
+}
+
+.logIn:hover {
+  background: var(--color-primary-soft);
+}
+
+.logIn:active {
+  background: var(--color-primary-container);
+}
+
+.account {
+  position: relative;
+}
+
+/* Round only because it is an avatar (design-system-rules section 5). */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-button-small);
+  height: var(--size-button-small);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.avatar:hover {
+  background: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-primary);
+}
+
+.avatar[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-primary);
+}
+
+/* 4px under the avatar, right edges lined up, the one soft shadow (S2 design). */
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  z-index: 30;
+  width: calc(var(--layout-results-rail) - var(--space-8));
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  animation: fadeIn var(--duration-medium) var(--easing-standard);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.email {
+  padding: var(--space-12);
+  border-bottom: var(--border-width) solid var(--color-border-card);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.items {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover:not(:disabled),
+.item:focus-visible {
+  background: var(--color-primary-soft);
+}
+
+.item:active:not(:disabled) {
+  background: var(--color-primary-container);
+}
+
+.item[aria-busy="true"] {
+  cursor: progress;
+}
+
+.error {
+  padding: var(--space-8) var(--space-12);
+  color: var(--color-error);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.error:empty {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Phones: the avatar is a full touch target. */
+@media (width < 640px) {
+  .avatar {
+    width: var(--size-touch-target);
+    height: var(--size-touch-target);
+  }
+}
+
+@media (width >= 1024px) {
+  .topBar {
+    padding: 0 var(--space-48);
+  }
+}

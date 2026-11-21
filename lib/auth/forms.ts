@@ -147,5 +147,11 @@ export function queryErrorWording(error: string | string[] | undefined): string 
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
 
-/** Where a signed-in user goes for now. The Dashboard does not exist yet. */
+/** Where a user who logs in goes for now. The Dashboard does not exist yet. */
 export const AFTER_AUTH_PATH = "/";
+
+/**
+ * Where a new account with no scan waiting lands: the upload page as a Free user (Build Plan
+ * Phase 2). A guest who signs up on the A3 wall goes on to their claimed scan instead.
+ */
+export const AFTER_SIGNUP_PATH = "/upload";
