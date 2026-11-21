@@ -45,6 +45,8 @@ export const ErrorCode = z.enum([
   "extraction_failed",
   // The Free monthly limit (SRS Section 7). The answer also carries `reset_at`.
   "scan_limit_reached",
+  // POST /api/scan/:id/retry-detail before the scan has its scores.
+  "scan_not_scored",
 ]);
 export type ErrorCode = z.infer<typeof ErrorCode>;
 
@@ -78,6 +80,7 @@ export const ERROR_STATUSES = {
   file_not_english: [422],
   extraction_failed: [503],
   scan_limit_reached: [403],
+  scan_not_scored: [409],
 } as const satisfies Record<ErrorCode, readonly number[]>;
 
 // Every error from every route has this body. `message` is safe to show, but the frontend
@@ -95,6 +98,77 @@ export type ErrorResponse = z.infer<typeof ErrorResponse>;
 
 export const CareerLevel = z.enum(["entry", "mid", "senior", "executive"]);
 export type CareerLevel = z.infer<typeof CareerLevel>;
+
+// The sections of a CV, the four General Analysis categories (PRD Section 12.1) and the issue
+// types a flagged line can have. Used by lib/ai/ and by the results answer.
+export const CvSection = z.enum([
+  "contact",
+  "summary",
+  "experience",
+  "education",
+  "skills",
+  "projects",
+  "certifications",
+  "other",
+]);
+export type CvSection = z.infer<typeof CvSection>;
+
+export const ScoreCategory = z.enum([
+  "impact_achievements",
+  "brevity_style",
+  "leadership_growth",
+  "ats_formatting",
+]);
+export type ScoreCategory = z.infer<typeof ScoreCategory>;
+
+// Every issue type a flagged line can have. Each belongs to exactly one category
+// (CATEGORY_ISSUES below), and a flagged line always uses a type of its own category.
+export const LineIssue = z.enum([
+  // impact_achievements
+  "no_numbers",
+  "weak_verb",
+  "duty_not_result",
+  "vague_claim",
+  // brevity_style
+  "too_long",
+  "filler_words",
+  "cliche",
+  "spelling_grammar",
+  "repetition",
+  // leadership_growth
+  "no_leadership_signal",
+  "no_growth_shown",
+  "no_ownership",
+  // ats_formatting
+  "date_format_inconsistent",
+  "unusual_symbols",
+  "contact_details_unclear",
+  "section_name_nonstandard",
+  "layout_not_machine_readable",
+  "role_details_missing",
+]);
+export type LineIssue = z.infer<typeof LineIssue>;
+
+// The issue types of each category (decided 21 Nov). A test checks these lists together are
+// exactly LineIssue, with no type in two categories.
+export const CATEGORY_ISSUES = {
+  impact_achievements: ["no_numbers", "weak_verb", "duty_not_result", "vague_claim"],
+  brevity_style: ["too_long", "filler_words", "cliche", "spelling_grammar", "repetition"],
+  leadership_growth: ["no_leadership_signal", "no_growth_shown", "no_ownership"],
+  ats_formatting: [
+    "date_format_inconsistent",
+    "unusual_symbols",
+    "contact_details_unclear",
+    "section_name_nonstandard",
+    "layout_not_machine_readable",
+    "role_details_missing",
+  ],
+} as const satisfies Record<ScoreCategory, readonly LineIssue[]>;
+
+export function issueBelongsTo(category: ScoreCategory, issue: LineIssue): boolean {
+  const allowed: readonly LineIssue[] = CATEGORY_ISSUES[category];
+  return allowed.includes(issue);
+}
 
 export const SubscriptionStatus = z.enum(["free", "pro", "grace"]);
 export type SubscriptionStatus = z.infer<typeof SubscriptionStatus>;
@@ -324,6 +398,54 @@ export const ScanStatusResponse = z.strictObject({
   failure: ScanFailure.nullable(),
 });
 export type ScanStatusResponse = z.infer<typeof ScanStatusResponse>;
+
+// GET /api/scan/:id/result, and the answer of POST /api/scan/:id/retry-detail. Signed-in owner
+// only. It answers as soon as the overview is scored; line detail (the flagged lines of the one
+// open category) follows, with its own status, so the screen polls this every retry_after
+// seconds until line_detail is done or failed. Tier gating is done here, never in the browser
+// (PRD Section 12.1): a locked category carries only its score and issue count, never a line.
+export const ResultCategory = z.strictObject({
+  category: ScoreCategory,
+  score: z.int().min(0).max(100),
+  flagged_count: z.int().min(0),
+  locked: z.boolean(),
+});
+export type ResultCategory = z.infer<typeof ResultCategory>;
+
+// A flagged line of the open category. index and index_in_section place it on the CV (from 0).
+export const FlaggedLine = z.strictObject({
+  line_id: z.string(),
+  section: CvSection,
+  index: z.int().min(0),
+  index_in_section: z.int().min(0),
+  text: z.string(),
+  issue: LineIssue,
+  reason: z.string(),
+});
+export type FlaggedLine = z.infer<typeof FlaggedLine>;
+
+export const ScanResultResponse = z.strictObject({
+  scan_session_id: z.string(),
+  // The scan's own status (scoring of the overview), as on GET /api/scan/:id/status.
+  status: ScanStatus,
+  failure: ScanFailure.nullable(),
+  career_level_used: CareerLevel.nullable(),
+  // Null and empty until the overview is scored.
+  overall_score: z.int().min(0).max(100).nullable(),
+  categories: z.array(ResultCategory),
+  line_detail: z.strictObject({
+    status: ScanStatus,
+    // The open category, once scored: the lowest scoring with at least one flagged issue (ties
+    // in the fixed category order), or the lowest scoring when none has one (zero lines).
+    category: ScoreCategory.nullable(),
+    // Only the open category's lines, only once line detail is done.
+    lines: z.array(FlaggedLine),
+  }),
+  // Seconds to wait before asking again while the overview or line detail is still running;
+  // null once both are settled. Also sent as the Retry-After header.
+  retry_after: z.int().min(1).nullable(),
+});
+export type ScanResultResponse = z.infer<typeof ScanResultResponse>;
 
 // POST /api/scan/general. A multipart form (not JSON) with exactly one file field and these
 // text fields. The file is a PDF or DOCX of at most CV_FILE_MAX_BYTES; the server decides the
