@@ -14,8 +14,7 @@
     "noIssues": "No issues",
     "pro": "PRO",
     "proLabel": "Locked. The lines unlock with PRO.",
-    "categoriesLabel": "Categories",
-    "scanAnother": "Scan another CV"
+    "categoriesLabel": "Categories"
   },
   "middleDetail": {
     "summary": "{score} out of 100",

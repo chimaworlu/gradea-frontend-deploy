@@ -232,7 +232,9 @@ export function Results({ result }: { result: ScanResultResponse }) {
         selected={current?.category}
         onSelect={setSelected}
       />
-      {current !== undefined ? <CategoryDetail key={current.category} row={current} result={result} /> : null}
+      {current !== undefined ? (
+        <CategoryDetail key={current.category} row={current} result={result} />
+      ) : null}
     </div>
   );
 }
@@ -301,9 +303,6 @@ function Rail({
         ))}
       </ul>
       {/* "Try AutoFix free" and Magic Write come with their features (Build Plan Phase 4). */}
-      <Link className={styles.scanAnother} href={UPLOAD_PATH}>
-        {text.scanAnother}
-      </Link>
     </aside>
   );
 }

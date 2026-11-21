@@ -95,6 +95,8 @@ describe("B3 results", () => {
     expect(html).toContain("says what you did, not what changed 0");
     expect(html).not.toContain("Responsible for the checkout flow 3.");
     expect(html).toContain("Show 3 more");
+    // No link back to the upload page under the categories: it is not in the B3 design.
+    expect(html).not.toContain('href="/upload"');
   });
 
   it("shows the locked categories' score and issue count with PRO, and No issues without a lock", () => {
