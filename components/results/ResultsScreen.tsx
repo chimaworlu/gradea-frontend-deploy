@@ -246,24 +246,27 @@ export function Results({ result }: { result: ScanResultResponse }) {
 
   return (
     <div className={styles.layout}>
-      <Rail
-        overallScore={result.overall_score ?? 0}
-        rows={rows}
-        selected={current?.category}
-        onSelect={(category) => {
-          setSelected(category);
-          setActiveLine(undefined);
-        }}
-      />
-      {current !== undefined ? (
-        <CategoryDetail
-          key={current.category}
-          row={current}
-          result={result}
-          activeLine={activeLine}
-          onLineSelect={setActiveLine}
+      {/* The rail and the middle panel scroll together; the CV panel scrolls on its own. */}
+      <div className={styles.mainColumns}>
+        <Rail
+          overallScore={result.overall_score ?? 0}
+          rows={rows}
+          selected={current?.category}
+          onSelect={(category) => {
+            setSelected(category);
+            setActiveLine(undefined);
+          }}
         />
-      ) : null}
+        {current !== undefined ? (
+          <CategoryDetail
+            key={current.category}
+            row={current}
+            result={result}
+            activeLine={activeLine}
+            onLineSelect={setActiveLine}
+          />
+        ) : null}
+      </div>
       {current !== undefined ? (
         <CvPanel result={result} row={current} activeLine={activeLine} />
       ) : null}
