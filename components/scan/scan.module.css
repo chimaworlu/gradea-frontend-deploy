@@ -17,19 +17,21 @@
   padding: var(--space-96) var(--space-page-gutter) var(--space-48);
 }
 
-/* 40px in the B1 and B2 designs, as the upload title: display small. Never cut oddly. */
+/* The same as the upload and log-in headings (founder's decision): headline medium, 32px.
+   Never cut oddly. */
 .heading {
   color: var(--color-on-surface);
-  font: var(--font-display-small);
-  letter-spacing: var(--font-display-small-letter-spacing);
+  font: var(--font-headline-medium);
+  letter-spacing: var(--font-headline-medium-letter-spacing);
   text-wrap: balance;
 }
 
+/* The same as "Welcome back." on the log-in page: 15px muted, 8 under the heading. */
 .subline {
-  margin-top: var(--space-12);
+  margin-top: var(--space-8);
   color: var(--color-on-surface-variant);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
   text-wrap: pretty;
 }
 
@@ -44,13 +46,14 @@
   list-style: none;
 }
 
+/* The steps are the same size as the subline, as in the B1 design (now 15px). */
 .step {
   display: flex;
   align-items: center;
   gap: var(--space-12);
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
 }
 
 .stepIcon {
@@ -205,11 +208,11 @@
   background: var(--color-surface-container-lowest);
 }
 
-/* 36px in the D1 design: headline large. */
+/* The same as the log-in heading, like the other flow pages: headline medium, 32px. */
 .cardHeading {
   color: var(--color-on-surface);
-  font: var(--font-headline-large);
-  letter-spacing: var(--font-headline-large-letter-spacing);
+  font: var(--font-headline-medium);
+  letter-spacing: var(--font-headline-medium-letter-spacing);
   text-wrap: balance;
 }
 

@@ -1,21 +1,38 @@
 /* B3 Results. Token variables only (design-system-rules). */
 
+/* Desktop: as tall as the window. The rail and the middle panel scroll together on the left,
+   and the CV panel scrolls on its own beside them. */
 .page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   background: var(--color-surface-container-lowest);
 }
 
-/* Desktop: the left rail (248) and the middle panel (440), as in the B3 Shell frame. The CV
-   panel on the right comes when the API sends the CV's extracted content. */
+/* The left rail (248) and the middle panel (440), then the CV panel filling the rest on its
+   grey surface, as in the B3 Shell frame. The rail and middle panel carry their own 24 padding
+   (measured on the 1440 frames: the rail's cards start at 24, the middle text at 272). */
 .layout {
   display: grid;
-  grid-template-columns: var(--layout-results-rail) minmax(0, var(--layout-results-detail));
-  gap: var(--space-48);
+  grid-template-columns:
+    calc(var(--layout-results-rail) + var(--layout-results-detail))
+    minmax(0, 1fr);
   flex: 1;
-  padding: var(--space-32) var(--space-48) var(--space-48);
+  min-height: 0;
+}
+
+.mainColumns {
+  display: grid;
+  grid-template-columns: var(--layout-results-rail) minmax(0, var(--layout-results-detail));
+  align-items: start;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.rail,
+.detail {
+  padding: var(--space-24) var(--space-24) var(--space-48);
 }
 
 /* ---- Left rail ---- */
@@ -34,10 +51,11 @@
   margin-bottom: var(--space-24);
 }
 
+/* 14px semibold in the design. */
 .overallLabel {
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 /* The score ring is round (design-system-rules section 5): the arc is the score, green from 75,
@@ -89,7 +107,7 @@
   flex-direction: column;
   gap: var(--space-4);
   width: 100%;
-  padding: var(--space-12) var(--space-16);
+  padding: var(--space-12);
   border: var(--border-width) solid var(--color-border-card);
   border-radius: var(--radius-md);
   background: var(--color-surface-container-lowest);
@@ -107,10 +125,11 @@
   background: var(--color-primary-container);
 }
 
+/* 14px semibold name and 14px meta, as measured on the design. */
 .categoryName {
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 .categoryCard[aria-current="true"] .categoryName {
@@ -123,8 +142,8 @@
   justify-content: space-between;
   gap: var(--space-8);
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   font-variant-numeric: tabular-nums;
 }
 
@@ -161,30 +180,33 @@
   text-wrap: balance;
 }
 
+/* "52 out of 100 · 6 issues": 14px. */
 .detailSummary {
   margin-top: var(--space-4);
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   font-variant-numeric: tabular-nums;
 }
 
+/* The category summary and the locked and clean lines: 15px on 24. */
 .detailBody {
   margin-top: var(--space-16);
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
   text-wrap: pretty;
 }
 
+/* "Flagged lines" and "Passed checks": 14px semibold. */
 .sectionTitle {
   display: flex;
   align-items: center;
   gap: var(--space-8);
   margin-top: var(--space-32);
   color: var(--color-on-surface);
-  font: var(--font-title-small);
-  letter-spacing: var(--font-title-small-letter-spacing);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
 }
 
 .lines {
@@ -196,54 +218,50 @@
   list-style: none;
 }
 
-/* A flagged line: the amber edge marks it as flagged, with the issue label as a second cue. */
+/* A flagged line: the amber edge marks it as flagged, and the reason says why in words. */
 .lineCard {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-16) var(--space-24);
+  width: 100%;
+  padding: var(--space-16);
   border: var(--border-width) solid var(--color-border-card);
   border-left: var(--border-width-selected) solid var(--color-warning);
   border-radius: var(--radius-md);
   background: var(--color-surface-container-lowest);
+  text-align: left;
+  cursor: pointer;
 }
 
+.lineCard:hover {
+  border-color: var(--color-border-input);
+  border-left-color: var(--color-warning);
+}
+
+/* The picked line: its CV line is highlighted too. */
+.lineCard[aria-pressed="true"] {
+  border-color: var(--color-warning);
+}
+
+/* Measured on the Open category frame: section and role 12px, the CV line 15px, the reason
+   14px. */
 .lineSection {
   color: var(--color-on-surface-variant);
-  font: var(--font-body-small);
-  letter-spacing: var(--font-body-small-letter-spacing);
+  font: var(--font-label-small);
+  letter-spacing: var(--font-label-small-letter-spacing);
 }
 
 .lineText {
   color: var(--color-on-surface);
-  font: var(--font-body-large);
-  letter-spacing: var(--font-body-large-letter-spacing);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
   overflow-wrap: anywhere;
-}
-
-/* Flagged: amber tint, warning text, flag icon (design tokens, "tags"). */
-.issueTag {
-  display: inline-flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: var(--space-4);
-  padding: 0 var(--space-8);
-  border-radius: var(--radius-sm);
-  background: var(--color-warning-container);
-  color: var(--color-on-warning-container);
-  font: var(--font-label-medium);
-  letter-spacing: var(--font-label-medium-letter-spacing);
-}
-
-.issueTag svg {
-  width: var(--space-12);
-  height: var(--space-12);
 }
 
 .lineReason {
   color: var(--color-on-surface-variant);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
   text-wrap: pretty;
 }
 
@@ -392,12 +410,218 @@
   padding: var(--space-96) var(--space-page-gutter) var(--space-48);
 }
 
-/* Tablet and phone: the rail, then the open category under it. */
+/* ---- Passed checks ---- */
+
+/* 15px rows, 44 apart, as in the design. */
+.passedChecks {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passedCheck {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: var(--size-touch-target);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* Green only means passed (design-system-rules section 2). */
+.passedIcon {
+  display: flex;
+  color: var(--color-success);
+}
+
+/* ---- CV panel ---- */
+
+/* Scrolls on its own; a 24 grey margin around the page. */
+.cvPanel {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--space-24) var(--space-48);
+  background: var(--color-surface);
+}
+
+/* "Flagged in …" stays fixed at the top of the panel while the CV scrolls under it. */
+.cvNote {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-32) 0 var(--space-16);
+  background: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* With no note (a clean category) the page keeps the same top gap. */
+.cvPanel > .cvPage:first-child {
+  margin-top: var(--space-32);
+}
+
+/* "Flagged in …": the flag is amber, as in the CV highlights frame (sampled from the PNG, it is
+   the warning colour); the text stays grey. A locked category's lock stays grey-blue. */
+.cvNote[data-kind="flagged"] svg {
+  color: var(--color-warning);
+}
+
+/* The CV page: radius 10 like popups (design-system-rules section 5), 760 at most. 48 top and
+   bottom, 40 at the sides so the text has room. */
+.cvPage {
+  max-width: var(--layout-results-cv-page);
+  padding: var(--space-48) calc(var(--space-32) + var(--space-8));
+  border: var(--border-width) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+}
+
+.cvSection + .cvSection {
+  margin-top: var(--space-32);
+}
+
+/* The CV page is compact, as in the CV highlights frame: 14px text on 22px lines. */
+.cvLine {
+  position: relative;
+  color: var(--color-on-surface);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.cvName {
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+}
+
+/* Section headings: 14px semibold with the divider under them. */
+.cvSectionHeading {
+  margin-bottom: var(--space-12);
+  padding-bottom: var(--space-8);
+  border-bottom: var(--border-width) solid var(--color-border-card);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* A clear gap before each entry (job, project, study). */
+.cvHeading {
+  margin-top: var(--space-16);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* An entry heading: the title on the left, its dates right-aligned in regular muted text. */
+.cvEntry {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.cvDates {
+  flex-shrink: 0;
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-regular);
+  font-variant-numeric: tabular-nums;
+}
+
+.cvText {
+  color: var(--color-on-surface-variant);
+}
+
+.cvBullet {
+  margin-top: var(--space-8);
+  padding-left: var(--space-16);
+}
+
+/* A small dot with a hanging indent: wrapped lines line up with the text, not the dot. */
+.cvBullet::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--font-body-small-line-height) / 2 - var(--border-width-selected));
+  left: var(--space-4);
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-on-surface-variant);
+}
+
+/* A flagged line: amber tint, a dashed amber underline and a flag in the margin, so colour is
+   never the only cue (FR-37, design tokens "tags"). */
+.cvLine[data-flagged="true"] .cvLineText {
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-container);
+  text-decoration: underline dashed var(--color-warning);
+  text-decoration-thickness: var(--border-width);
+  text-underline-offset: var(--space-4);
+}
+
+.cvLine[data-active="true"] .cvLineText {
+  outline: var(--border-width-selected) solid var(--color-warning);
+  outline-offset: var(--border-width-selected);
+}
+
+.cvFlag {
+  position: absolute;
+  top: 0;
+  left: calc(var(--space-32) * -1);
+  display: flex;
+  color: var(--color-warning);
+}
+
+.cvFlag svg {
+  width: var(--space-16);
+  height: var(--space-16);
+}
+
 @media (width < 1024px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-32);
-    padding: var(--space-24) var(--space-page-gutter) var(--space-48);
+    padding: 0;
+  }
+
+  /* Tablet and phone: everything stacks and the page scrolls as usual. */
+  .page {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .mainColumns {
+    display: block;
+    overflow: visible;
+  }
+
+  .rail,
+  .detail {
+    padding: var(--space-24) var(--space-page-gutter) 0;
+  }
+
+  .cvPanel {
+    overflow: visible;
+    padding: 0 var(--space-page-gutter) var(--space-48);
+  }
+
+  .cvNote {
+    position: static;
+    padding-top: var(--space-24);
+  }
+
+  /* 20 at the sides on phones and tablets. */
+  .cvPage {
+    padding: var(--space-24) calc(var(--space-12) + var(--space-8));
+  }
+
+  .cvFlag {
+    left: calc(var(--space-16) * -1);
   }
 }
 

@@ -90,11 +90,12 @@ describe("Details failed", () => {
 });
 
 describe("B3 results", () => {
-  it("shows the open category's lines: section, line, issue label and reason, three first", () => {
+  it("shows the open category's lines: section, line and reason, three first", () => {
     const html = renderToStaticMarkup(createElement(Results, { result: result("done") }));
     expect(html).toContain("Responsible for the checkout flow 0.");
     expect(html).toContain(text.sections.experience);
-    expect(html).toContain(text.issues.duty_not_result);
+    // No issue label chip: the B3 design shows only the section, the CV line and the reason.
+    expect(html).not.toContain("A duty, not a result");
     expect(html).toContain("says what you did, not what changed 0");
     expect(html).not.toContain("Responsible for the checkout flow 3.");
     expect(html).toContain("Show 3 more");

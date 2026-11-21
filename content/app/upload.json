@@ -53,5 +53,8 @@
       "body": "Your free scans reset on {date}. PRO gives you unlimited scans, full line-by-line feedback, AutoFix and Magic Write.",
       "close": "Close"
     }
+  },
+  "usage": {
+    "line": "{remaining} of {limit} General scans left this month. Resets on {date}."
   }
 }
