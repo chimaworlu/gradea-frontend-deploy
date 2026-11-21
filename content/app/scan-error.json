@@ -1,0 +1,28 @@
+{
+  "id": "B2",
+  "title": "Scan error",
+  "meta": {
+    "title": "We couldn't score your CV"
+  },
+  "scoringFailed": {
+    "heading": "We couldn't score your CV",
+    "body": "This was on our side. Your CV is safe, and this didn't use one of your scans."
+  },
+  "unreadableFile": {
+    "heading": "We couldn't read this file",
+    "body": "It looks like a scan or a photo. Upload a PDF or DOCX with selectable text."
+  },
+  "notEnglish": {
+    "heading": "We couldn't read this file"
+  },
+  "limitReached": {
+    "heading": "You've used your scans for this month"
+  },
+  "actions": {
+    "tryAgain": {
+      "default": "Try again",
+      "loading": "Trying again..."
+    },
+    "uploadAnother": "Upload another CV"
+  }
+}

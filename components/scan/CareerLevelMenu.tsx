@@ -64,24 +64,13 @@ export function CareerLevelMenu({
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
 
-  // The menu is never cut off: it opens upward when there is not room below, and if neither
-  // side has room it takes the larger one and scrolls inside.
+  // Always opens downward, under "Scoring as", as in the A1 Free "Career level menu" frame. If
+  // it would run past the bottom of the window, the page scrolls just enough to show all of it;
+  // the menu itself is never shrunk or scrolled inside. No smooth scroll with reduced motion.
   useLayoutEffect(() => {
     const list = menu.current;
-    const anchor = root.current;
-    if (!open || list === null || anchor === null) return;
-    delete list.dataset.up;
-    list.style.maxHeight = "";
-    const gap = list.offsetTop - anchor.offsetHeight;
-    const needed = list.offsetHeight + gap;
-    const box = anchor.getBoundingClientRect();
-    const below = window.innerHeight - box.bottom;
-    const above = box.top;
-    if (needed <= below) return;
-    const up = needed <= above || above > below;
-    if (up) list.dataset.up = "true";
-    const room = (up ? above : below) - gap * 2;
-    if (needed > room + gap) list.style.maxHeight = `${Math.max(room, 0)}px`;
+    if (!open || list === null) return;
+    list.scrollIntoView({ block: "nearest", behavior: menuScrollBehavior(prefersReducedMotion()) });
   }, [open]);
 
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
@@ -161,4 +150,14 @@ export function CareerLevelMenu({
       </div>
     </div>
   );
+}
+
+/** True when the person asked for less motion (design-system-rules section 7). */
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/** Smooth scrolling unless reduced motion is on. */
+export function menuScrollBehavior(reducedMotion: boolean): ScrollBehavior {
+  return reducedMotion ? "auto" : "smooth";
 }

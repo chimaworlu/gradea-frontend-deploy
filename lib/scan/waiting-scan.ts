@@ -67,20 +67,33 @@ export function readWaitingScan(
   now: Date = new Date(),
   storage = browserStorage(),
 ): WaitingScan | undefined {
-  if (storage === undefined) return undefined;
+  const state = waitingScanState(now, storage);
+  return state.kind === "ready" ? state.scan : undefined;
+}
+
+/** None kept, one kept but past its 30 minutes (cleared now), or one ready to claim. */
+export type WaitingScanState =
+  { kind: "none" } | { kind: "expired" } | { kind: "ready"; scan: WaitingScan };
+
+function waitingScanState(now: Date, storage: Storage | undefined): WaitingScanState {
+  if (storage === undefined) return { kind: "none" };
   let raw: string | null;
   try {
     raw = storage.getItem(STORAGE_KEY);
   } catch {
-    return undefined;
+    return { kind: "none" };
   }
-  if (raw === null) return undefined;
+  if (raw === null) return { kind: "none" };
   const parsed = WaitingScan.safeParse(parseJson(raw));
-  if (!parsed.success || Date.parse(parsed.data.expiresAt) <= now.getTime()) {
+  if (!parsed.success) {
     clearWaitingScan(storage);
-    return undefined;
+    return { kind: "none" };
   }
-  return parsed.data;
+  if (Date.parse(parsed.data.expiresAt) <= now.getTime()) {
+    clearWaitingScan(storage);
+    return { kind: "expired" };
+  }
+  return { kind: "ready", scan: parsed.data };
 }
 
 /**
@@ -102,6 +115,19 @@ export function savedCareerLevel(
   storage = browserStorage(),
 ): CareerLevel | undefined {
   return readWaitingScan(now, storage)?.careerLevel;
+}
+
+/**
+ * Like takeWaitingScan, but also says when a kept scan has run out, so the page can show D1
+ * "Your session has expired" instead of quietly dropping it. Always clears what it finds.
+ */
+export function takeWaitingScanState(
+  now: Date = new Date(),
+  storage = browserStorage(),
+): WaitingScanState {
+  const state = waitingScanState(now, storage);
+  if (state.kind === "ready") clearWaitingScan(storage);
+  return state;
 }
 
 /** Reads and clears in one step, so the scan is claimed at most once per page. */

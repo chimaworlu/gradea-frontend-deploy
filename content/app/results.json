@@ -1,0 +1,11 @@
+{
+  "id": "B3",
+  "title": "Results",
+  "meta": {
+    "title": "Your results"
+  },
+  "placeholder": {
+    "heading": "Your results",
+    "subline": "Your scores are ready."
+  }
+}

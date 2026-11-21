@@ -3,6 +3,9 @@ import auth from "../content/app/auth.json";
 import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
 import processing from "../content/app/processing.json";
+import results from "../content/app/results.json";
+import scanError from "../content/app/scan-error.json";
+import sessionExpired from "../content/app/session-expired.json";
 import signupWall from "../content/app/signup-wall.json";
 import upload from "../content/app/upload.json";
 import comingSoon from "../content/marketing/coming-soon.json";
@@ -23,6 +26,9 @@ const contentFiles = {
   "app/forgot-password": forgotPassword,
   "app/google-signup": googleSignup,
   "app/processing": processing,
+  "app/results": results,
+  "app/scan-error": scanError,
+  "app/session-expired": sessionExpired,
   "app/signup-wall": signupWall,
   "app/upload": upload,
   "marketing/coming-soon": comingSoon,

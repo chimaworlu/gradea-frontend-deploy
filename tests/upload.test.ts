@@ -64,7 +64,11 @@ describe("after the upload", () => {
       { careerLevel: "mid" },
       answer(201, { scan_session_id: "scan2", guest: null }),
     );
-    expect(uploadOutcome(signedIn)).toEqual({ kind: "processing", path: "/scan/scan2" });
+    expect(uploadOutcome(signedIn)).toEqual({
+      kind: "processing",
+      path: "/scan/scan2",
+      scanSessionId: "scan2",
+    });
   });
 
   it("uploads the file as a multipart form, never as JSON", async () => {
@@ -107,11 +111,11 @@ describe("limit reached", () => {
     const result = await uploadCv(
       new File(["x"], "my-cv.pdf"),
       {},
-      answer(400, { code: "file_unreadable", message: "x" }),
+      answer(400, { code: "file_too_large", message: "x" }),
     );
     expect(uploadOutcome(result)).toEqual({
       kind: "fileError",
-      message: errorMessage("file_unreadable"),
+      message: errorMessage("file_too_large"),
     });
   });
 });

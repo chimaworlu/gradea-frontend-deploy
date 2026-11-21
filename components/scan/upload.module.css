@@ -286,7 +286,8 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* The per-scan career level menu: 4px under "Change", the one soft shadow. */
+/* The per-scan career level menu: always 4px under the "Scoring as" line, the one soft shadow
+   (A1 Free "Career level menu"). Never flipped upward and never scrolled inside. */
 .menu {
   position: absolute;
   top: calc(100% + var(--space-4));
@@ -297,14 +298,7 @@
   border: var(--border-width) solid var(--color-border-card);
   border-radius: var(--radius-lg);
   background: var(--color-surface-container-lowest);
-  overflow-y: auto;
   box-shadow: var(--shadow-floating);
-}
-
-/* Opens upward when there is not room below (set by CareerLevelMenu), so it is never cut off. */
-.menu[data-up="true"] {
-  top: auto;
-  bottom: calc(100% + var(--space-4));
 }
 
 .menu ul {

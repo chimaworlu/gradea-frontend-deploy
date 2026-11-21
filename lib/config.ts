@@ -18,3 +18,16 @@ export const PASSWORD_RESET_RESEND_COOLDOWN_SECONDS = 30;
  * always sent when Sentry is on; this only limits tracing.
  */
 export const SENTRY_TRACES_SAMPLE_RATE = 0.1;
+
+/**
+ * B1: after this many seconds without a result, the "taking longer" line shows (Build Plan
+ * Phase 2, "a taking longer state past about 15 seconds").
+ */
+export const SCAN_TAKING_LONGER_SECONDS = 15;
+
+/**
+ * B1: a scan still waiting or working after this many seconds shows the failed screen. The
+ * server reports a scan working for 120 seconds as failed (SCORING_STALE_AFTER_SECONDS in
+ * gradea-backend); this adds room for three 5-second status checks.
+ */
+export const SCAN_GIVE_UP_SECONDS = 135;
