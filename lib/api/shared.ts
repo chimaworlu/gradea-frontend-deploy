@@ -135,6 +135,12 @@ export const LineIssue = z.enum([
   "cliche",
   "spelling_grammar",
   "repetition",
+  // brevity_style, set by Gradea's own code checks (22 Nov), never by the AI
+  "repeated_phrase",
+  "repeated_opener",
+  "bullet_too_long",
+  "first_person",
+  "mixed_tenses",
   // leadership_growth
   "no_leadership_signal",
   "no_growth_shown",
@@ -146,6 +152,9 @@ export const LineIssue = z.enum([
   "section_name_nonstandard",
   "layout_not_machine_readable",
   "role_details_missing",
+  // ats_formatting, set by Gradea's own code checks (22 Nov), never by the AI
+  "link_without_address",
+  "date_ambiguous",
 ]);
 export type LineIssue = z.infer<typeof LineIssue>;
 
@@ -153,7 +162,18 @@ export type LineIssue = z.infer<typeof LineIssue>;
 // exactly LineIssue, with no type in two categories.
 export const CATEGORY_ISSUES = {
   impact_achievements: ["no_numbers", "weak_verb", "duty_not_result", "vague_claim"],
-  brevity_style: ["too_long", "filler_words", "cliche", "spelling_grammar", "repetition"],
+  brevity_style: [
+    "too_long",
+    "filler_words",
+    "cliche",
+    "spelling_grammar",
+    "repetition",
+    "repeated_phrase",
+    "repeated_opener",
+    "bullet_too_long",
+    "first_person",
+    "mixed_tenses",
+  ],
   leadership_growth: ["no_leadership_signal", "no_growth_shown", "no_ownership"],
   ats_formatting: [
     "date_format_inconsistent",
@@ -162,8 +182,23 @@ export const CATEGORY_ISSUES = {
     "section_name_nonstandard",
     "layout_not_machine_readable",
     "role_details_missing",
+    "link_without_address",
+    "date_ambiguous",
   ],
 } as const satisfies Record<ScoreCategory, readonly LineIssue[]>;
+
+// The issue types only Gradea's own code checks set, exactly and with no AI (21 and 22 Nov).
+// The AI is never offered them, and a flag of one from the AI is dropped.
+export const CODE_CHECK_ISSUES: readonly LineIssue[] = [
+  "date_format_inconsistent",
+  "repeated_phrase",
+  "repeated_opener",
+  "bullet_too_long",
+  "first_person",
+  "mixed_tenses",
+  "link_without_address",
+  "date_ambiguous",
+];
 
 export function issueBelongsTo(category: ScoreCategory, issue: LineIssue): boolean {
   const allowed: readonly LineIssue[] = CATEGORY_ISSUES[category];
