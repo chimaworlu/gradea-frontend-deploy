@@ -17,6 +17,7 @@ import type {
   CareerLevel,
   CvSection,
   ErrorCode,
+  FileIssue,
   GOOGLE_FRONTEND_PATHS,
   PassedCheck,
   ScoreCategory,
@@ -76,6 +77,15 @@ const passedCheckLabels: ExactTextRecord<
   PassedCheck,
   typeof results.middleDetail.passedChecks.checks
 > = results.middleDetail.passedChecks.checks;
+
+// A file issue type added in gradea-backend fails here until it has a label.
+const fileIssueLabels: ExactTextRecord<FileIssue, typeof results.middleDetail.fileIssues> =
+  results.middleDetail.fileIssues;
+
+/** The label of an ATS issue in the file itself, for example "Tables" (B3 file issue cards). */
+export function fileIssueLabel(issue: FileIssue): string {
+  return fileIssueLabels[issue];
+}
 
 /** The line for a check the CV passes, for example "Every role has dates" (B3 Passed checks). */
 export function passedCheckLabel(check: PassedCheck): string {

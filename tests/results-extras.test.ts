@@ -208,3 +208,21 @@ describe("B3 CV panel display", () => {
     ).toBe("+234 700 · ada@example.test");
   });
 });
+
+describe("B3 file issue cards", () => {
+  it("show each file issue with its label and reason, and mark no CV line", () => {
+    const data = result(null);
+    const withFile = {
+      ...data,
+      line_detail: {
+        ...data.line_detail,
+        file_issues: [{ issue: "tables" as const, reason: "A table can scramble your text." }],
+      },
+    };
+    const html = renderToStaticMarkup(createElement(Results, { result: withFile }));
+    expect(html).toContain(text.middleDetail.fileIssues.tables);
+    expect(html).toContain("A table can scramble your text.");
+    // Still only the one flagged CV line is marked.
+    expect(html.match(/data-flagged="true"/g)).toHaveLength(1);
+  });
+});

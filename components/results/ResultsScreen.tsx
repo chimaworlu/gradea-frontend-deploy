@@ -13,6 +13,7 @@ import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
 import {
   fillPlaceholders,
   getContent,
+  fileIssueLabel,
   passedCheckLabel,
   scoreCategoryLabel,
 } from "../../lib/content";
@@ -436,6 +437,14 @@ function CategoryDetail({
                   <span className={styles.lineReason}>{line.reason}</span>
                 </button>
                 {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
+              </li>
+            ))}
+            {/* ATS issues in the file itself (only when ATS & Formatting is open): the same card,
+                with the issue's label and the server's reason, and no CV line to highlight. */}
+            {result.line_detail.file_issues.map((item) => (
+              <li key={item.issue} className={styles.lineCard}>
+                <span className={styles.lineSection}>{fileIssueLabel(item.issue)}</span>
+                <span className={styles.lineReason}>{item.reason}</span>
               </li>
             ))}
           </ul>
