@@ -45,6 +45,7 @@ function result(
       lines:
         lineDetail === "done" ? Array.from({ length: counts[0] }, (_, index) => line(index)) : [],
       summary: null,
+      file_issues: [],
     },
     cv: [],
     passed_checks: [],

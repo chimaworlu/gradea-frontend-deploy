@@ -38,6 +38,7 @@ function result(summary: string | null): ScanResultResponse {
         },
       ],
       summary,
+      file_issues: [],
     },
     cv: [
       {

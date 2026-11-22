@@ -191,6 +191,8 @@ export const CATEGORY_ISSUES = {
 // The AI is never offered them, and a flag of one from the AI is dropped.
 export const CODE_CHECK_ISSUES: readonly LineIssue[] = [
   "date_format_inconsistent",
+  // Section heading names are checked against a fixed list (22 Nov, src/config/section-headings.ts).
+  "section_name_nonstandard",
   "repeated_phrase",
   "repeated_opener",
   "bullet_too_long",
@@ -199,6 +201,25 @@ export const CODE_CHECK_ISSUES: readonly LineIssue[] = [
   "link_without_address",
   "date_ambiguous",
 ];
+
+// ATS issues in the uploaded file itself, found by Gradea's own code with no AI (22 Nov, PRD
+// Section 12.1). They belong to ats_formatting, are not tied to a CV line, and each counts as one
+// issue in that category's flagged_count and score.
+//   columns        text laid out in columns side by side
+//   tables         text in a table (a ruled grid, or many aligned cells)
+//   images         a picture or graphic bigger than an icon
+//   text_boxes     text in a text box (DOCX)
+//   header_footer  contact details in the page header or footer (PDF), or any text there (DOCX)
+//   fonts          many font families, or a decorative one (PDF)
+export const FileIssue = z.enum([
+  "columns",
+  "tables",
+  "images",
+  "text_boxes",
+  "header_footer",
+  "fonts",
+]);
+export type FileIssue = z.infer<typeof FileIssue>;
 
 export function issueBelongsTo(category: ScoreCategory, issue: LineIssue): boolean {
   const allowed: readonly LineIssue[] = CATEGORY_ISSUES[category];
@@ -466,6 +487,14 @@ export const FlaggedLine = z.strictObject({
 });
 export type FlaggedLine = z.infer<typeof FlaggedLine>;
 
+// An ATS issue in the file itself, sent only when ats_formatting is the open category. It marks
+// no CV line.
+export const FlaggedFileIssue = z.strictObject({
+  issue: FileIssue,
+  reason: z.string(),
+});
+export type FlaggedFileIssue = z.infer<typeof FlaggedFileIssue>;
+
 // One line of the CV panel, in document order. It is the person's own CV, so every line is sent
 // on every tier, with its personal details as written. `flagged` is true only for a flagged line
 // of the open category once line detail is done; a line flagged only in a locked category is
@@ -494,7 +523,8 @@ export type CvPanelSection = z.infer<typeof CvPanelSection>;
 // Ids only: the wording is in the frontend. A check that cannot be verified, or that a kept
 // flagged line contradicts, is never listed.
 //   contact_details_present    an email and a phone number in the contact lines
-//   standard_section_headings  every section after the contact lines opens with a standard name
+//   standard_section_headings  every section after the contact lines opens with a heading on the
+//                              standard list (src/config/section-headings.ts)
 //   consistent_date_format     two or more dated roles, all in one date style
 //   every_role_has_dates       every job in experience has a start date
 export const PassedCheck = z.enum([
@@ -521,6 +551,9 @@ export const ScanResultResponse = z.strictObject({
     category: ScoreCategory.nullable(),
     // Only the open category's lines, only once line detail is done.
     lines: z.array(FlaggedLine),
+    // The file's own ATS issues (22 Nov), only when ats_formatting is the open category and line
+    // detail is done; empty otherwise. Each one also counts in that category's flagged_count.
+    file_issues: z.array(FlaggedFileIssue),
     // One short plain sentence about the open category's flagged lines, from the same line
     // detail answer, once line detail is done. Null when that category has no flagged line or
     // the server's checks dropped it. A locked category never has one.
