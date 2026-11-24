@@ -239,4 +239,23 @@ describe("the wording for each kind of scan", () => {
     expect(wall("smart_target")).toContain(text.rail.relevancyScore);
     expect(wall("general")).toContain(getContent("app/signup-wall").preview.overallScore);
   });
+
+  it("gives the wall its own heading and line for each kind of scan", () => {
+    const generalWords = [
+      "Your CV grade is one step away",
+      "Create a free account to see your grade. It takes a few seconds.",
+    ];
+    const jobWords = [
+      "Your job match is one step away",
+      "Create a free account to see how your CV matches the job. It takes a few seconds.",
+    ];
+    for (const words of generalWords) {
+      expect(wall("general")).toContain(words);
+      expect(wall("smart_target")).not.toContain(words);
+    }
+    for (const words of jobWords) {
+      expect(wall("smart_target")).toContain(words);
+      expect(wall("general")).not.toContain(words);
+    }
+  });
 });

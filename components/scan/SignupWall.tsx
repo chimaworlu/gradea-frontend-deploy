@@ -37,6 +37,7 @@ export function SignupWall({
 }: SignupWallProps) {
   const text = getContent("app/signup-wall");
   const upload = getContent("app/upload");
+  const words = scanType === "smart_target" ? text.form.jobSpecific : text.form;
   const preview =
     scanType === "smart_target"
       ? {
@@ -86,8 +87,8 @@ export function SignupWall({
       <section className={styles.wallForm}>
         <SignupForm
           wall={{
-            heading: text.form.heading,
-            subline: text.form.subline,
+            heading: words.heading,
+            subline: words.subline,
             submit: text.form.submit,
             onSignedUp,
             onCareerLevelChange,

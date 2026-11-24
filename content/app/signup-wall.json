@@ -15,6 +15,10 @@
   "form": {
     "heading": "Your CV grade is one step away",
     "subline": "Create a free account to see your grade. It takes a few seconds.",
+    "jobSpecific": {
+      "heading": "Your job match is one step away",
+      "subline": "Create a free account to see how your CV matches the job. It takes a few seconds."
+    },
     "submit": {
       "default": "Create my account",
       "loading": "Creating your account..."
