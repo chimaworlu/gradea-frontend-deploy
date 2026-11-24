@@ -10,6 +10,7 @@ import {
   type AuthUser,
   type CareerLevel,
   type ErrorCode,
+  type ScanType,
 } from "../api/shared";
 import { errorMessage, fillPlaceholders, getContent } from "../content";
 
@@ -17,8 +18,8 @@ import { errorMessage, fillPlaceholders, getContent } from "../content";
 // Phases 2 and 3). The browser checks the file and the job description first for speed only; the
 // server checks them again and its answer always wins (SRS Section 8).
 
-/** The two kinds of scan, as the SRS names them (scan_type). smart_target is Job-specific. */
-export type ScanType = "general" | "smart_target";
+/** The two kinds of scan, from the shared API file. smart_target is Job-specific. */
+export type { ScanType };
 
 /** The job description codes of POST /api/scan/smart-target, shown under the text area. */
 export const JOB_DESCRIPTION_CODES = [

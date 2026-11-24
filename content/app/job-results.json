@@ -1,0 +1,34 @@
+{
+  "id": "C1",
+  "title": "Job-specific results",
+  "rail": {
+    "relevancyScore": "Relevancy score",
+    "percent": "{score}%",
+    "scoreLabel": "Relevancy score, {score} percent"
+  },
+  "keywordMatch": {
+    "heading": "Keyword match",
+    "headline": {
+      "one": "You match {matched} of {total} keyword from this job description.",
+      "other": "You match {matched} of {total} keywords from this job description."
+    },
+    "groups": {
+      "hard_skills": "Hard skills",
+      "soft_skills": "Soft skills",
+      "titles_certifications_tools": "Job titles, certifications and tools",
+      "industry_language": "Industry language"
+    },
+    "groupCount": "{matched} of {total}",
+    "matchedLabel": "Matched keywords in {group}",
+    "missing": "{count} missing"
+  },
+  "missingKeywords": {
+    "heading": "Missing keywords",
+    "body": {
+      "one": "{count} keyword from the job is missing from your CV. Unlock PRO to see it and add it with Magic Write.",
+      "other": "{count} keywords from the job are missing from your CV. Unlock PRO to see them and add them with Magic Write."
+    },
+    "pro": "PRO",
+    "proLabel": "Locked. The missing keywords unlock with PRO."
+  }
+}

@@ -1,13 +1,19 @@
 "use client";
 
-import { ScoreCategory } from "../../lib/api/shared";
-import { fillPlaceholders, getContent, scoreCategoryLabel } from "../../lib/content";
+import { KeywordGroup, ScoreCategory, type ScanType } from "../../lib/api/shared";
+import {
+  fillPlaceholders,
+  getContent,
+  keywordGroupLabel,
+  scoreCategoryLabel,
+} from "../../lib/content";
 import { fileSizeLabel } from "../../lib/scan/upload";
 import { SignupForm } from "../auth/SignupForm";
 import { FieldIcon } from "../icons/FieldIcon";
 import styles from "./upload.module.css";
 
 export type SignupWallProps = {
+  scanType: ScanType;
   fileName: string;
   fileSize: number;
   /** Claims the waiting scan once the account exists. */
@@ -19,9 +25,11 @@ export type SignupWallProps = {
 /**
  * A3 Signup wall, after a guest's CV is uploaded (Build Plan Phase 2, FR-23). Left: a blurred
  * preview of the results with no real score, because the scan is scored only after it is
- * claimed. Right: the sign-up form with the wall's own words and the same checks as A4.
+ * claimed. Right: the sign-up form with the wall's own words and the same checks as A4. For a
+ * Job-specific scan the preview names what it gives: the Relevancy score and the keyword groups.
  */
 export function SignupWall({
+  scanType,
   fileName,
   fileSize,
   onSignedUp,
@@ -29,6 +37,16 @@ export function SignupWall({
 }: SignupWallProps) {
   const text = getContent("app/signup-wall");
   const upload = getContent("app/upload");
+  const preview =
+    scanType === "smart_target"
+      ? {
+          score: getContent("app/job-results").rail.relevancyScore,
+          rows: KeywordGroup.options.map(keywordGroupLabel),
+        }
+      : {
+          score: text.preview.overallScore,
+          rows: ScoreCategory.options.map(scoreCategoryLabel),
+        };
 
   return (
     <main className={styles.wall}>
@@ -39,15 +57,15 @@ export function SignupWall({
               <span className={styles.ringValue} />
             </span>
             <span>
-              {text.preview.overallScore}
+              {preview.score}
               <span className={styles.lock}>
                 <FieldIcon name="lock" />
               </span>
             </span>
           </p>
-          {ScoreCategory.options.map((category) => (
-            <p key={category} className={styles.previewRow}>
-              <span>{scoreCategoryLabel(category)}</span>
+          {preview.rows.map((row) => (
+            <p key={row} className={styles.previewRow}>
+              <span>{row}</span>
               <span className={styles.blurred} aria-hidden="true" />
             </p>
           ))}

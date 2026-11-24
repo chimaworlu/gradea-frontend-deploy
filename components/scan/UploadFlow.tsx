@@ -27,6 +27,7 @@ import {
 } from "../../lib/scan/upload";
 import { fetchUsage, limitedScanType, usageLine } from "../../lib/scan/usage";
 import { saveScanFileInfo } from "../../lib/scan/scan-file-info";
+import { rememberScanType } from "../../lib/scan/scan-type";
 import {
   clearWaitingScan,
   rememberCareerLevel,
@@ -47,7 +48,7 @@ import { SignupWall } from "./SignupWall";
 import styles from "./upload.module.css";
 
 type Status = "idle" | "uploading" | "failed";
-type WallState = { scanSessionId: string; guestToken: string; file: File };
+type WallState = { scanType: ScanType; scanSessionId: string; guestToken: string; file: File };
 type LimitState = { resetAt: string; scanType: ScanType };
 
 /** True when a drag carries files, not text or a link from the page. */
@@ -168,8 +169,10 @@ export function UploadFlow() {
     // A bot token works once, so a guest gets a fresh one for any next try.
     if (who.kind === "guest") setBotResetKey((key) => key + 1);
     const outcome = uploadOutcome(result);
+    const sentType: ScanType = jobDescription === undefined ? "general" : "smart_target";
     switch (outcome.kind) {
       case "processing":
+        rememberScanType(outcome.scanSessionId, sentType);
         // The name and size only, for the line on B1 (lib/scan/scan-file-info.ts).
         saveScanFileInfo(outcome.scanSessionId, { name: chosen.name, size: chosen.size });
         router.push(outcome.path);
@@ -189,7 +192,9 @@ export function UploadFlow() {
           guestToken: outcome.guestToken,
           expiresAt: outcome.expiresAt,
         });
+        rememberScanType(outcome.scanSessionId, sentType);
         setWall({
+          scanType: sentType,
           scanSessionId: outcome.scanSessionId,
           guestToken: outcome.guestToken,
           file: chosen,
@@ -197,10 +202,7 @@ export function UploadFlow() {
         return;
       case "limit":
         setStatus("idle");
-        setLimit({
-          resetAt: outcome.resetAt,
-          scanType: jobDescription === undefined ? "general" : "smart_target",
-        });
+        setLimit({ resetAt: outcome.resetAt, scanType: sentType });
         return;
       case "jobDescriptionError":
         // The server's check won: the same line under the text area.
@@ -356,6 +358,7 @@ export function UploadFlow() {
       <div className={styles.page}>
         {topBar}
         <SignupWall
+          scanType={wall.scanType}
           fileName={wall.file.name}
           fileSize={wall.file.size}
           onSignedUp={() => void claimAfterSignup(wall)}
