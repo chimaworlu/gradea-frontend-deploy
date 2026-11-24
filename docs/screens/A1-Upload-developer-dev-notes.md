@@ -1,7 +1,7 @@
 # A1 Upload: developer notes
 
 - **How a guest gets here (19 Nov):** from "Get started" in the marketing nav and other buttons that are not an upload box. The upload boxes on the marketing pages skip this page.
-- **No scan button for guests on the General tab:** choosing or dropping a CV goes straight to the signup wall. The guest "File chosen" frame was removed. While the file uploads, "Uploading..." shows as a plain status line with a spinner (no button). If the upload fails, the error shows with a "Try again" button.
+- **No scan button for guests on the General tab:** choosing or dropping a CV goes straight to the signup wall. The guest "File chosen" frame was removed. While the file uploads, "Uploading..." shows as a plain status line with a spinner (no button). If the upload fails, the error shows with a "Try again" button. One exception (24 Nov): a guest who chose a CV on the Job-specific tab and then switches to General sees a "Scan my CV" button, which opens the signup wall (nothing is sent until they tap it). With no CV chosen there is still no button.
 - **Guest Job-specific frames** ("A1 / Upload / Guest / Job-specific ...", same seven states as the Free ones): guest top bar ("Log in" only), no career level line (guests choose it on the signup wall), no scans-left line, and the "Match my CV" button stays, because the job description is needed first. The button is the trigger to go to the signup wall.
 - **Signed-in Free and PRO frames** keep "Scan my CV", because there is no wall.
 
