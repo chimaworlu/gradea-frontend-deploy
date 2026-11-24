@@ -78,7 +78,13 @@ describe("the file line on B1", () => {
     const done = statusView(
       {
         kind: "ok",
-        data: { scan_session_id: "scan1", status: "done", retry_after: null, failure: null },
+        data: {
+          scan_session_id: "scan1",
+          scan_type: "general",
+          status: "done",
+          retry_after: null,
+          failure: null,
+        },
       },
       "scan1",
       3,
@@ -86,7 +92,13 @@ describe("the file line on B1", () => {
     const working = statusView(
       {
         kind: "ok",
-        data: { scan_session_id: "scan1", status: "working", retry_after: 2, failure: null },
+        data: {
+          scan_session_id: "scan1",
+          scan_type: "general",
+          status: "working",
+          retry_after: 2,
+          failure: null,
+        },
       },
       "scan1",
       3,
