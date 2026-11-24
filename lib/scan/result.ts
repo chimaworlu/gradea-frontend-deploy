@@ -1,9 +1,13 @@
 import { apiRequest, type ApiResult } from "../api/client";
+import { z } from "zod";
 import {
+  JobResultResponse,
   ScanResultResponse,
   type CvPanelLine,
   type FlaggedLine,
+  type JobKeywordGroup,
   type ResultCategory,
+  type ScanType,
   type ScoreCategory,
 } from "../api/shared";
 import { cvSectionName, fillPlaceholders, getContent } from "../content";
@@ -16,16 +20,29 @@ import { pollDelayMs } from "./status";
 // (PRD 12.1), so showing them earlier would make the numbers change in front of the person.
 // Tier gating is done by the server: a locked category arrives with no lines at all.
 
+// The same endpoint answers a Job-specific scan with its own shape, told apart by scan_type (SRS
+// Section 4).
+const AnyResult = z.union([JobResultResponse, ScanResultResponse]);
+export type AnyResult = z.infer<typeof AnyResult>;
+
+/** A Job-specific result that is scored, so it has its score. */
+export type ScoredJobResult = JobResultResponse & { relevancy_score: number };
+
 export function getScanResult(
   scanSessionId: string,
   fetchFn?: typeof fetch,
-): Promise<ApiResult<ScanResultResponse>> {
+): Promise<ApiResult<AnyResult>> {
   return apiRequest({
     method: "GET",
     path: `/api/scan/${encodeURIComponent(scanSessionId)}/result`,
-    response: ScanResultResponse,
+    response: AnyResult,
     fetchFn,
   });
+}
+
+/** Only a Job-specific result carries scan_type. */
+export function resultScanType(result: AnyResult): ScanType {
+  return "scan_type" in result ? result.scan_type : "general";
 }
 
 /**
@@ -47,6 +64,7 @@ export function retryLineDetail(
 /** What the results page shows after an answer. */
 export type ResultView =
   | { kind: "ready"; result: ScanResultResponse }
+  | { kind: "jobReady"; result: ScoredJobResult }
   | { kind: "preparing"; delayMs: number }
   | { kind: "detailsFailed" }
   | { kind: "notScored"; path: string }
@@ -54,10 +72,7 @@ export type ResultView =
   | { kind: "signedOut" }
   | { kind: "retryLater"; delayMs: number };
 
-export function resultView(
-  answer: ApiResult<ScanResultResponse>,
-  scanSessionId: string,
-): ResultView {
+export function resultView(answer: ApiResult<AnyResult>, scanSessionId: string): ResultView {
   if (answer.kind === "network") return { kind: "retryLater", delayMs: pollDelayMs(5) };
   if (answer.kind === "error") {
     if (answer.code === "not_signed_in") return { kind: "signedOut" };
@@ -67,6 +82,13 @@ export function resultView(
   const result = answer.data;
   // The overview is not scored (yet, or it failed): the processing page handles that.
   if (result.status !== "done") return { kind: "notScored", path: processingPath(scanSessionId) };
+  if ("scan_type" in result) {
+    // A Job-specific result has no line detail: done is done. Its score is never made up.
+    const { relevancy_score: score } = result;
+    return score === null
+      ? { kind: "retryLater", delayMs: pollDelayMs(5) }
+      : { kind: "jobReady", result: { ...result, relevancy_score: score } };
+  }
   switch (result.line_detail.status) {
     case "done":
       return { kind: "ready", result };
@@ -126,6 +148,39 @@ export const STRONG_SCORE_FROM = 75;
 
 export function scoreTone(score: number): "strong" | "flagged" {
   return score >= STRONG_SCORE_FROM ? "strong" : "flagged";
+}
+
+/** A C1 keyword group as shown: its counts and the matched keywords, never a missing one. */
+export type KeywordRow = {
+  group: JobKeywordGroup["group"];
+  matchedCount: number;
+  missingCount: number;
+  total: number;
+  matched: readonly string[];
+};
+
+/** The groups to show. A group the job asks nothing of is left out. */
+export function keywordRows(groups: readonly JobKeywordGroup[]): KeywordRow[] {
+  return groups
+    .map((item) => ({
+      group: item.group,
+      matchedCount: item.matched_count,
+      missingCount: item.missing_count,
+      total: item.matched_count + item.missing_count,
+      matched: item.matched,
+    }))
+    .filter((row) => row.total > 0);
+}
+
+/** The whole job's counts, for the headline and the locked card. */
+export function keywordTotals(rows: readonly KeywordRow[]): {
+  matched: number;
+  missing: number;
+  total: number;
+} {
+  const matched = rows.reduce((sum, row) => sum + row.matchedCount, 0);
+  const missing = rows.reduce((sum, row) => sum + row.missingCount, 0);
+  return { matched, missing, total: matched + missing };
 }
 
 /** "Experience, Product Designer at Acme", or just "Experience" when the line has no role. */

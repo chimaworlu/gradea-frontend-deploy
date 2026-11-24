@@ -11,7 +11,11 @@
   "steps": {
     "label": "Progress",
     "reading": "Reading your CV",
-    "checking": "Checking the four categories",
+    "checking": {
+      "general": "Checking the four categories",
+      "smart_target": "Matching your CV to the job",
+      "unknown": "Checking your CV"
+    },
     "preparing": "Preparing your results",
     "done": "Done",
     "current": "In progress",

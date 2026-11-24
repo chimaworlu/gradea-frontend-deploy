@@ -2,6 +2,7 @@ import accountLink from "../content/app/account-link.json";
 import auth from "../content/app/auth.json";
 import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
+import jobResults from "../content/app/job-results.json";
 import processing from "../content/app/processing.json";
 import results from "../content/app/results.json";
 import scanError from "../content/app/scan-error.json";
@@ -19,7 +20,9 @@ import type {
   ErrorCode,
   FileIssue,
   GOOGLE_FRONTEND_PATHS,
+  KeywordGroup,
   PassedCheck,
+  ScanType,
   ScoreCategory,
 } from "./api/shared";
 
@@ -33,6 +36,7 @@ const contentFiles = {
   "app/auth": auth,
   "app/forgot-password": forgotPassword,
   "app/google-signup": googleSignup,
+  "app/job-results": jobResults,
   "app/processing": processing,
   "app/results": results,
   "app/scan-error": scanError,
@@ -81,6 +85,22 @@ const passedCheckLabels: ExactTextRecord<
 // A file issue type added in gradea-backend fails here until it has a label.
 const fileIssueLabels: ExactTextRecord<FileIssue, typeof results.middleDetail.fileIssues> =
   results.middleDetail.fileIssues;
+
+const keywordGroupNames: ExactTextRecord<KeywordGroup, typeof jobResults.keywordMatch.groups> =
+  jobResults.keywordMatch.groups;
+
+const checkingSteps: ExactTextRecord<ScanType | "unknown", typeof processing.steps.checking> =
+  processing.steps.checking;
+
+/** The name of a keyword group, for example "Hard skills" (C1 and the Job-specific wall). */
+export function keywordGroupLabel(group: KeywordGroup): string {
+  return keywordGroupNames[group];
+}
+
+/** The B1 middle step for a kind of scan, or a line true of both until the server says which. */
+export function checkingStepLabel(scanType: ScanType | undefined): string {
+  return checkingSteps[scanType ?? "unknown"];
+}
 
 /** The label of an ATS issue in the file itself, for example "Tables" (B3 file issue cards). */
 export function fileIssueLabel(issue: FileIssue): string {

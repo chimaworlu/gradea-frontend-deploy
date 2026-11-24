@@ -2,14 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { ScanStatus } from "../../lib/api/shared";
+import type { ScanStatus, ScanType } from "../../lib/api/shared";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
-import { getContent } from "../../lib/content";
+import { checkingStepLabel, getContent } from "../../lib/content";
 import {
   clearScanFileInfo,
   readScanFileInfo,
   type ScanFileInfo,
 } from "../../lib/scan/scan-file-info";
+import { knownScanType, rememberScanType } from "../../lib/scan/scan-type";
 import {
   getScanStatus,
   isTakingLonger,
@@ -42,6 +43,10 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
   const errors = getContent("shared/errors");
   const router = useRouter();
   const [view, setView] = useState<View>({ kind: "processing", status: "waiting" });
+  // From the status answer itself, so no extra request; known at once after an upload here.
+  const [scanType, setScanType] = useState<ScanType | undefined>(() =>
+    knownScanType(scanSessionId),
+  );
   const [takingLonger, setTakingLonger] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | undefined>(undefined);
@@ -76,6 +81,10 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
       const elapsed = (Date.now() - startedAt) / 1000;
       const next = statusView(result, scanSessionId, elapsed);
       setTakingLonger(isTakingLonger(elapsed));
+      if (result.kind === "ok") {
+        rememberScanType(scanSessionId, result.data.scan_type);
+        setScanType(result.data.scan_type);
+      }
       if (!fileRead) {
         fileRead = true;
         const kept = readScanFileInfo(scanSessionId);
@@ -174,21 +183,29 @@ export function ScanProcessing({ scanSessionId }: { scanSessionId: string }) {
   return (
     <div className={styles.page}>
       <ViewerTopBar />
-      <ProcessingMain status={view.status} file={file} takingLonger={takingLonger} />
+      <ProcessingMain
+        status={view.status}
+        scanType={scanType}
+        file={file}
+        takingLonger={takingLonger}
+      />
     </div>
   );
 }
 
 /**
  * The B1 body: heading, the three steps for a status, the file line and the "taking longer"
- * line. Also used by B3 while line detail is still running ("Preparing your results").
+ * line. Also used by B3 while line detail is still running ("Preparing your results"). The
+ * middle step follows the kind of scan; undefined is until the first answer.
  */
 export function ProcessingMain({
   status,
+  scanType,
   file,
   takingLonger,
 }: {
   status: ScanStatus;
+  scanType: ScanType | undefined;
   file: ScanFileInfo | undefined;
   takingLonger: boolean;
 }) {
@@ -196,7 +213,7 @@ export function ProcessingMain({
   const steps = processingSteps(status);
   const rows: Array<{ key: keyof typeof steps; label: string }> = [
     { key: "reading", label: text.steps.reading },
-    { key: "checking", label: text.steps.checking },
+    { key: "checking", label: checkingStepLabel(scanType) },
     { key: "preparing", label: text.steps.preparing },
   ];
   return (

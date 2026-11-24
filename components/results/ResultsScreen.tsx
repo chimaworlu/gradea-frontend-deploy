@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import type {
-  CvPanelLine,
   PassedCheck,
   ScanResultResponse,
+  ScanType,
   ScoreCategory,
 } from "../../lib/api/shared";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
@@ -20,19 +20,18 @@ import {
 import {
   LINES_SHOWN_FIRST,
   categoryRows,
-  cvDisplayText,
   cvPanelNote,
   getScanResult,
-  hasDatedEntries,
-  splitEntryHeading,
   issuesLabel,
   lineMeta,
   openLines,
+  resultScanType,
   resultView,
   retryLineDetail,
-  scoreTone,
   type CategoryRow,
+  type ScoredJobResult,
 } from "../../lib/scan/result";
+import { knownScanType, rememberScanType } from "../../lib/scan/scan-type";
 import { isTakingLonger } from "../../lib/scan/status";
 import { readScanFileInfo, type ScanFileInfo } from "../../lib/scan/scan-file-info";
 import { UPLOAD_PATH } from "../../lib/scan/upload";
@@ -42,17 +41,21 @@ import { FieldIcon } from "../icons/FieldIcon";
 import { ProcessingMain } from "../scan/ScanProcessing";
 import { SessionExpired } from "../scan/SessionExpired";
 import scanStyles from "../scan/scan.module.css";
+import { CvPage, cvLineId } from "./CvPage";
+import { JobResults } from "./JobResults";
+import { ScoreRing } from "./ScoreRing";
 import styles from "./results.module.css";
 
 type View =
   | { kind: "preparing" }
   | { kind: "ready"; result: ScanResultResponse }
+  | { kind: "jobReady"; result: ScoredJobResult }
   | { kind: "detailsFailed" }
   | { kind: "expired" };
 
 /**
- * B3 Results for one scan (Build Plan Phase 2, PRD Section 12.1). The result is asked once, and
- * again only while line detail runs, waiting the server's retry_after (never under 2 seconds,
+ * B3 Results for one scan, or C1 when the result is Job-specific (Build Plan Phases 2 and 3, PRD
+ * Sections 12.1 and 12.2). The result is asked once, and again only while line detail runs, waiting the server's retry_after (never under 2 seconds,
  * paused while the tab is hidden). Until line detail is done the page keeps the processing
  * look, so the scores shown never change in front of the person.
  */
@@ -60,6 +63,9 @@ export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
   const errors = getContent("shared/errors");
   const router = useRouter();
   const [view, setView] = useState<View>({ kind: "preparing" });
+  const [scanType, setScanType] = useState<ScanType | undefined>(() =>
+    knownScanType(scanSessionId),
+  );
   const [takingLonger, setTakingLonger] = useState(false);
   const [file, setFile] = useState<ScanFileInfo | undefined>(undefined);
   const [round, setRound] = useState(0);
@@ -93,10 +99,18 @@ export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
         if (kept !== undefined) setFile(kept);
       }
       setTakingLonger(isTakingLonger((Date.now() - startedAt) / 1000));
+      if (answer.kind === "ok") {
+        const type = resultScanType(answer.data);
+        rememberScanType(scanSessionId, type);
+        setScanType(type);
+      }
       const next = resultView(answer, scanSessionId);
       switch (next.kind) {
         case "ready":
           setView({ kind: "ready", result: next.result });
+          return;
+        case "jobReady":
+          setView({ kind: "jobReady", result: next.result });
           return;
         case "preparing":
           setView({ kind: "preparing" });
@@ -163,7 +177,7 @@ export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
     return (
       <div className={scanStyles.page}>
         <ViewerTopBar />
-        <ProcessingMain status="done" file={file} takingLonger={takingLonger} />
+        <ProcessingMain status="done" scanType={scanType} file={file} takingLonger={takingLonger} />
       </div>
     );
   }
@@ -180,7 +194,11 @@ export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
   return (
     <div className={styles.page}>
       <ViewerTopBar />
-      <Results result={view.result} />
+      {view.kind === "jobReady" ? (
+        <JobResults result={view.result} />
+      ) : (
+        <Results result={view.result} />
+      )}
     </div>
   );
 }
@@ -275,29 +293,6 @@ export function Results({ result }: { result: ScanResultResponse }) {
   );
 }
 
-/** The id of a line in the CV panel, so a line card can scroll to it. */
-function cvLineId(lineId: string): string {
-  return `cv-line-${lineId}`;
-}
-
-function ScoreRing({ score }: { score: number }) {
-  const text = getContent("app/results").leftRail;
-  // The arc's length is the score; the custom property feeds the CSS conic gradient.
-  const ringStyle: CSSProperties & Record<"--score", number> = { "--score": score };
-  return (
-    <div
-      className={`${styles.ring} ${scoreTone(score) === "strong" ? styles.ringStrong : ""}`}
-      style={ringStyle}
-      role="img"
-      aria-label={fillPlaceholders(text.scoreOutOf, { score })}
-    >
-      <span className={styles.ringNumber} aria-hidden="true">
-        {score}
-      </span>
-    </div>
-  );
-}
-
 function Rail({
   overallScore,
   rows,
@@ -313,7 +308,11 @@ function Rail({
   return (
     <aside className={styles.rail}>
       <div className={styles.overall}>
-        <ScoreRing score={overallScore} />
+        <ScoreRing
+          score={overallScore}
+          shown={String(overallScore)}
+          label={fillPlaceholders(text.scoreOutOf, { score: overallScore })}
+        />
         <p className={styles.overallLabel}>{text.overallScore}</p>
       </div>
       <ul className={styles.categories} aria-label={text.categoriesLabel}>
@@ -525,91 +524,7 @@ export function CvPanel({
           {note.text}
         </p>
       ) : null}
-      <div className={styles.cvPage}>
-        {result.cv.map((group, groupIndex) => (
-          <div key={`${group.section}-${groupIndex}`} className={styles.cvSection}>
-            {group.lines.map((line, index) => (
-              <CvLine
-                key={line.line_id}
-                line={line}
-                isName={group.section === "contact" && groupIndex === 0 && index === 0}
-                isSectionHeading={
-                  group.section !== "contact" && index === 0 && line.kind === "heading"
-                }
-                flagged={marking && line.flagged}
-                active={marking && line.line_id === activeLine}
-                flaggedLabel={text.flaggedLine}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+      <CvPage cv={result.cv} marking={marking} activeLine={activeLine} />
     </section>
-  );
-}
-
-function CvLine({
-  line,
-  isName,
-  isSectionHeading,
-  flagged,
-  active,
-  flaggedLabel,
-}: {
-  line: CvPanelLine;
-  isName: boolean;
-  isSectionHeading: boolean;
-  flagged: boolean;
-  active: boolean;
-  flaggedLabel: string;
-}) {
-  const kindClass = isName
-    ? styles.cvName
-    : isSectionHeading
-      ? styles.cvSectionHeading
-      : line.kind === "heading"
-        ? styles.cvHeading
-        : line.kind === "bullet"
-          ? styles.cvBullet
-          : styles.cvText;
-  // A job, project or study heading: the title bold on the left, its dates on the right.
-  const entry =
-    !isName && !isSectionHeading && line.kind === "heading" && hasDatedEntries(line.section)
-      ? splitEntryHeading(line.text)
-      : undefined;
-  if (entry !== undefined) {
-    return (
-      <p
-        id={cvLineId(line.line_id)}
-        className={`${styles.cvLine} ${styles.cvHeading} ${styles.cvEntry}`}
-        data-flagged={flagged ? "true" : undefined}
-        data-active={active ? "true" : undefined}
-      >
-        {flagged ? (
-          <span className={styles.cvFlag}>
-            <FieldIcon name="flag" />
-            <span className={scanStyles.visuallyHidden}>{flaggedLabel}</span>
-          </span>
-        ) : null}
-        <span className={styles.cvLineText}>{entry.title}</span>
-        <span className={styles.cvDates}>{entry.dates}</span>
-      </p>
-    );
-  }
-  return (
-    <p
-      id={cvLineId(line.line_id)}
-      className={`${styles.cvLine} ${kindClass}`}
-      data-flagged={flagged ? "true" : undefined}
-      data-active={active ? "true" : undefined}
-    >
-      {flagged ? (
-        <span className={styles.cvFlag}>
-          <FieldIcon name="flag" />
-          <span className={scanStyles.visuallyHidden}>{flaggedLabel}</span>
-        </span>
-      ) : null}
-      <span className={styles.cvLineText}>{cvDisplayText(line, isSectionHeading)}</span>
-    </p>
   );
 }
