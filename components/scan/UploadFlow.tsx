@@ -336,6 +336,11 @@ export function UploadFlow() {
         <ScanErrorView
           reason={scanError}
           file={file}
+          onUploadAnother={() => {
+            // The job description is kept; only the CV is chosen again.
+            setScanError(undefined);
+            removeFile();
+          }}
           onTryAgain={() => {
             // extraction_failed only: the same file is sent once more.
             setScanError(undefined);
