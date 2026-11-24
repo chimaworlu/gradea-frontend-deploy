@@ -2,8 +2,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { CvPanel, PassedChecks, Results } from "../components/results/ResultsScreen";
-import type { ScanResultResponse, UsageResponse } from "../lib/api/shared";
-import { getContent } from "../lib/content";
+import { FileIssue, type ScanResultResponse, type UsageResponse } from "../lib/api/shared";
+import { fileIssueLabel, getContent } from "../lib/content";
 import { categoryRows, cvDisplayText, lineMeta, splitEntryHeading } from "../lib/scan/result";
 import { usageLine } from "../lib/scan/usage";
 
@@ -210,19 +210,42 @@ describe("B3 CV panel display", () => {
 });
 
 describe("B3 file issue cards", () => {
-  it("show each file issue with its label and reason, and mark no CV line", () => {
+  /** A result with every file issue, and the given category open with no flagged line. */
+  function withFileIssues(open: "ats_formatting" | "impact_achievements"): ScanResultResponse {
     const data = result(null);
-    const withFile = {
+    return {
       ...data,
       line_detail: {
         ...data.line_detail,
-        file_issues: [{ issue: "tables" as const, reason: "A table can scramble your text." }],
+        category: open,
+        lines: [],
+        file_issues: FileIssue.options.map((issue) => ({ issue, reason: `Reason for ${issue}.` })),
       },
+      cv: data.cv.map((group) => ({
+        ...group,
+        lines: group.lines.map((line) => ({ ...line, flagged: false })),
+      })),
     };
-    const html = renderToStaticMarkup(createElement(Results, { result: withFile }));
-    expect(html).toContain(text.middleDetail.fileIssues.tables);
-    expect(html).toContain("A table can scramble your text.");
-    // Still only the one flagged CV line is marked.
-    expect(html.match(/data-flagged="true"/g)).toHaveLength(1);
+  }
+
+  it("show every file issue's label and reason on a card that cannot be pressed", () => {
+    const html = renderToStaticMarkup(
+      createElement(Results, { result: withFileIssues("ats_formatting") }),
+    );
+    for (const issue of FileIssue.options) {
+      expect(fileIssueLabel(issue)).not.toMatch(/—|^$/);
+      expect(html).toContain(`>${fileIssueLabel(issue)}<`);
+      expect(html).toContain(`Reason for ${issue}.`);
+    }
+    // No card picks a CV line, and no CV line is highlighted.
+    expect(html).not.toContain("aria-pressed");
+    expect(html).not.toContain('data-flagged="true"');
+  });
+
+  it("show only when ATS & Formatting is the open category", () => {
+    const html = renderToStaticMarkup(
+      createElement(Results, { result: withFileIssues("impact_achievements") }),
+    );
+    expect(html).not.toContain("Reason for tables.");
   });
 });

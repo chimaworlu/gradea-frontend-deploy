@@ -439,14 +439,17 @@ function CategoryDetail({
                 {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
               </li>
             ))}
-            {/* ATS issues in the file itself (only when ATS & Formatting is open): the same card,
-                with the issue's label and the server's reason, and no CV line to highlight. */}
-            {result.line_detail.file_issues.map((item) => (
-              <li key={item.issue} className={styles.lineCard}>
-                <span className={styles.lineSection}>{fileIssueLabel(item.issue)}</span>
-                <span className={styles.lineReason}>{item.reason}</span>
-              </li>
-            ))}
+            {/* ATS issues in the file itself, only when ATS & Formatting is open: the same card,
+                with the issue's label and the server's reason. Not a button, as there is no CV
+                line to highlight. */}
+            {row.category === "ats_formatting"
+              ? result.line_detail.file_issues.map((item) => (
+                  <li key={item.issue} className={styles.lineCard}>
+                    <span className={styles.lineSection}>{fileIssueLabel(item.issue)}</span>
+                    <span className={styles.lineReason}>{item.reason}</span>
+                  </li>
+                ))
+              : null}
           </ul>
           <span id="show-on-cv" className={scanStyles.visuallyHidden}>
             {text.showOnCv}
