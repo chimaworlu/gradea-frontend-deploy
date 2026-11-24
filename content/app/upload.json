@@ -12,8 +12,8 @@
     "label": "Type of scan",
     "general": "General",
     "jobSpecific": "Job-specific",
-    "comingSoon": "Coming soon",
-    "generalHelper": "Score your CV for any job."
+    "generalHelper": "Score your CV for any job.",
+    "jobSpecificHelper": "Score your CV against one job description."
   },
   "uploadBox": {
     "label": "Upload your CV",
@@ -34,6 +34,16 @@
     "kb": "{value} KB",
     "mb": "{value} MB"
   },
+  "jobDescription": {
+    "label": "Job description",
+    "waysLabel": "How to add the job description",
+    "pasteText": "Paste text",
+    "fromLink": "From a link",
+    "comingSoon": "Coming soon",
+    "placeholder": "Paste the job description here",
+    "helper": "We keep this with your scan so AutoFix can use it.",
+    "missing": "Add a job description to continue"
+  },
   "careerLevel": {
     "scoringAs": "Scoring as {level}",
     "change": "Change",
@@ -41,6 +51,7 @@
   },
   "scanButton": {
     "default": "Scan my CV",
+    "guestJobSpecific": "Match my CV",
     "loading": "Scanning..."
   },
   "footerNote": {
@@ -52,9 +63,17 @@
       "title": "You've used your scans for this month",
       "body": "Your free scans reset on {date}. PRO gives you unlimited scans, full line-by-line feedback, AutoFix and Magic Write.",
       "close": "Close"
+    },
+    "jobSpecificLimitReached": {
+      "title": "You've used your Job-specific scan for this month",
+      "body": "Your free Job-specific scan resets on {date}. PRO gives you unlimited scans, full line-by-line feedback, AutoFix and Magic Write."
     }
   },
   "usage": {
-    "line": "{remaining} of {limit} General scans left this month. Resets on {date}."
+    "line": "{remaining} of {limit} General scans left this month. Resets on {date}.",
+    "jobSpecific": {
+      "one": "{remaining} of {limit} Job-specific scan left this month. Resets on {date}.",
+      "other": "{remaining} of {limit} Job-specific scans left this month. Resets on {date}."
+    }
   }
 }

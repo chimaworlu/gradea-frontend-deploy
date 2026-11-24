@@ -3,6 +3,7 @@ import {
   ClaimResponse,
   CV_FILE_MAX_BYTES,
   GUEST_TOKEN_HEADER,
+  JobDescription,
   MeResponse,
   SCAN_UPLOAD_FILE_FIELD,
   ScanUploadResponse,
@@ -12,9 +13,44 @@ import {
 } from "../api/shared";
 import { errorMessage, fillPlaceholders, getContent } from "../content";
 
-// Rules for the A1 upload page, General analysis (PRD 9.2 and 9.3, Build Plan Phase 2). The
-// browser checks the file first for speed only; the server checks it again by its content and
-// its answer always wins (SRS Section 8).
+// Rules for the A1 upload page, General and Job-specific (PRD 9.2, 9.3 and 12.2, Build Plan
+// Phases 2 and 3). The browser checks the file and the job description first for speed only; the
+// server checks them again and its answer always wins (SRS Section 8).
+
+/** The two kinds of scan, as the SRS names them (scan_type). smart_target is Job-specific. */
+export type ScanType = "general" | "smart_target";
+
+/** The job description codes of POST /api/scan/smart-target, shown under the text area. */
+export const JOB_DESCRIPTION_CODES = [
+  "job_description_required",
+  "job_description_too_short",
+  "job_description_too_long",
+] as const;
+export type JobDescriptionCode = (typeof JOB_DESCRIPTION_CODES)[number];
+
+/**
+ * The pasted text checked with the API's own schema, so the limits (100 to 15,000 characters,
+ * PRD 12.2) are never written twice. The text lives in the page's memory and in this one request
+ * only: never in browser storage, a log, an event or the address (PRD FR-54).
+ */
+export function checkJobDescription(
+  text: string,
+): { kind: "ok"; text: string } | { kind: "problem"; code: JobDescriptionCode } {
+  const parsed = JobDescription.safeParse(text);
+  if (parsed.success) return { kind: "ok", text: parsed.data };
+  const found = parsed.error.issues[0]?.message;
+  const code = JOB_DESCRIPTION_CODES.find((known) => known === found);
+  if (code === undefined) throw new Error("Unknown job description problem.");
+  return { kind: "problem", code };
+}
+
+/** "Match my CV" for a guest on Job-specific, otherwise "Scan my CV" (A1 dev notes). */
+export function scanButtonLabel(viewer: Viewer, scanType: ScanType): string {
+  const text = getContent("app/upload").scanButton;
+  return viewer.kind === "guest" && scanType === "smart_target"
+    ? text.guestJobSpecific
+    : text.default;
+}
 
 /** Where the processing screen lives for one scan (B1, built in Part 2). */
 export function processingPath(scanSessionId: string): string {
@@ -108,19 +144,23 @@ export function fetchViewer(fetchFn?: typeof fetch): Promise<ApiResult<MeRespons
   return apiRequest({ method: "GET", path: "/api/auth/me", response: MeResponse, fetchFn });
 }
 
-/** POST /api/scan/general: one file and the optional career level and bot token. */
+/**
+ * POST /api/scan/general: one file and the optional career level and bot token. With a job
+ * description it is POST /api/scan/smart-target: the same form with that one text field more.
+ */
 export function uploadCv(
   file: Blob & { name: string },
-  fields: { careerLevel?: CareerLevel; botToken?: string },
+  fields: { careerLevel?: CareerLevel; botToken?: string; jobDescription?: string },
   fetchFn?: typeof fetch,
 ): Promise<ApiResult<ScanUploadResponse>> {
   const form = new FormData();
   form.append(SCAN_UPLOAD_FILE_FIELD, file, file.name);
   if (fields.careerLevel !== undefined) form.append("career_level", fields.careerLevel);
   if (fields.botToken !== undefined) form.append("bot_token", fields.botToken);
+  if (fields.jobDescription !== undefined) form.append("job_description", fields.jobDescription);
   return apiRequest({
     method: "POST",
-    path: "/api/scan/general",
+    path: fields.jobDescription === undefined ? "/api/scan/general" : "/api/scan/smart-target",
     form,
     response: ScanUploadResponse,
     fetchFn,
@@ -151,6 +191,7 @@ export type UploadOutcome =
   | { kind: "processing"; path: string; scanSessionId: string }
   | { kind: "limit"; resetAt: string }
   | { kind: "fileError"; message: string }
+  | { kind: "jobDescriptionError"; code: JobDescriptionCode }
   | { kind: "scanError"; code: ScanErrorCode }
   | { kind: "failed"; message: string };
 
@@ -198,6 +239,8 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
   if (FILE_CODES.includes(result.code)) {
     return { kind: "fileError", message: errorMessage(result.code) };
   }
+  const jobCode = JOB_DESCRIPTION_CODES.find((known) => known === result.code);
+  if (jobCode !== undefined) return { kind: "jobDescriptionError", code: jobCode };
   return { kind: "failed", message: errorMessage(result.code) };
 }
 

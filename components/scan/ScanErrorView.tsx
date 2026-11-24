@@ -13,6 +13,8 @@ export type ScanErrorViewProps = {
   /** The uploaded file, when this tab still knows it. */
   file?: { name: string; size: number } | undefined;
   onTryAgain?: () => void;
+  /** On A1 itself the link's address is the page already open, so the page resets instead. */
+  onUploadAnother?: () => void;
   retrying?: boolean;
   /** A problem with "Try again" itself, for example no connection. */
   error?: string | undefined;
@@ -23,7 +25,14 @@ export type ScanErrorViewProps = {
  * "Upload another CV" always goes back to A1, as a text link beside "Try again" or as the main
  * button when it is the only way on.
  */
-export function ScanErrorView({ reason, file, onTryAgain, retrying, error }: ScanErrorViewProps) {
+export function ScanErrorView({
+  reason,
+  file,
+  onTryAgain,
+  onUploadAnother,
+  retrying,
+  error,
+}: ScanErrorViewProps) {
   const text = getContent("app/scan-error");
   const wording = scanErrorWording(reason);
   const tryAgain = canTryAgain(reason) && onTryAgain !== undefined;
@@ -48,12 +57,12 @@ export function ScanErrorView({ reason, file, onTryAgain, retrying, error }: Sca
             >
               {retrying ? text.actions.tryAgain.loading : text.actions.tryAgain.default}
             </button>
-            <Link className={styles.textLink} href={UPLOAD_PATH}>
+            <Link className={styles.textLink} href={UPLOAD_PATH} onClick={onUploadAnother}>
               {text.actions.uploadAnother}
             </Link>
           </>
         ) : (
-          <Link className={styles.primary} href={UPLOAD_PATH}>
+          <Link className={styles.primary} href={UPLOAD_PATH} onClick={onUploadAnother}>
             {text.actions.uploadAnother}
           </Link>
         )}

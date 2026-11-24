@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import type { CareerLevel } from "../../lib/api/shared";
+import type { CareerLevel, UsageResponse } from "../../lib/api/shared";
 import { isCareerLevel } from "../../lib/auth/forms";
 import { fillPlaceholders, getContent } from "../../lib/content";
 import {
   ACCEPT_ATTRIBUTE,
   UPLOAD_PATH,
   checkFiles,
+  checkJobDescription,
   claimOutcome,
   claimScan,
   fetchViewer,
@@ -19,10 +20,12 @@ import {
   uploadHelperText,
   uploadOutcome,
   viewerFrom,
+  type JobDescriptionCode,
   type ScanErrorCode,
+  type ScanType,
   type Viewer,
 } from "../../lib/scan/upload";
-import { fetchUsage, usageLine } from "../../lib/scan/usage";
+import { fetchUsage, limitedScanType, usageLine } from "../../lib/scan/usage";
 import { saveScanFileInfo } from "../../lib/scan/scan-file-info";
 import {
   clearWaitingScan,
@@ -35,7 +38,9 @@ import { AppTopBar } from "../app/AppTopBar";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
+import { JobDescriptionField } from "./JobDescriptionField";
 import { LimitPopup } from "./LimitPopup";
+import { ScanAction } from "./ScanAction";
 import { ScanErrorView } from "./ScanErrorView";
 import { SessionExpired } from "./SessionExpired";
 import { SignupWall } from "./SignupWall";
@@ -43,6 +48,7 @@ import styles from "./upload.module.css";
 
 type Status = "idle" | "uploading" | "failed";
 type WallState = { scanSessionId: string; guestToken: string; file: File };
+type LimitState = { resetAt: string; scanType: ScanType };
 
 /** True when a drag carries files, not text or a link from the page. */
 function carriesFiles(event: DragEvent): boolean {
@@ -50,9 +56,10 @@ function carriesFiles(event: DragEvent): boolean {
 }
 
 /**
- * A1 Upload, General analysis only (Build Plan Phase 2, PRD 9.2 and 9.3). The Job-specific tab
- * is left out until its phase. Guests: a chosen or dropped CV uploads straight away and the A3
- * wall follows. Signed-in users: "Scan my CV", then the processing screen.
+ * A1 Upload, General and Job-specific (Build Plan Phases 2 and 3, PRD 9.2, 9.3 and 12.2). Guests
+ * on General: a chosen or dropped CV uploads straight away and the A3 wall follows. Guests on
+ * Job-specific: the job description is needed first, so "Match my CV" goes to the wall.
+ * Signed-in users: "Scan my CV", then the processing screen.
  */
 export function UploadFlow() {
   const text = getContent("app/upload");
@@ -62,7 +69,11 @@ export function UploadFlow() {
   const [status, setStatus] = useState<Status>("idle");
   const [failedMessage, setFailedMessage] = useState<string | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
-  const [limitResetAt, setLimitResetAt] = useState<string | undefined>(undefined);
+  const [scanType, setScanType] = useState<ScanType>("general");
+  // In memory only, never stored or logged (PRD FR-54). Kept when the tab is switched.
+  const [jobText, setJobText] = useState("");
+  const [jobProblem, setJobProblem] = useState<JobDescriptionCode | undefined>(undefined);
+  const [limit, setLimit] = useState<LimitState | undefined>(undefined);
   const [careerLevel, setCareerLevel] = useState<CareerLevel | undefined>(undefined);
   const [wall, setWall] = useState<WallState | undefined>(undefined);
   const [botToken, setBotToken] = useState<string | undefined>(undefined);
@@ -70,9 +81,10 @@ export function UploadFlow() {
   // B2 for a file the server read but could not use; D1 for a guest scan gone or out of time.
   const [scanError, setScanError] = useState<ScanErrorCode | undefined>(undefined);
   const [expired, setExpired] = useState(false);
-  const [usageText, setUsageText] = useState<string | undefined>(undefined);
+  const [usage, setUsage] = useState<UsageResponse | undefined>(undefined);
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
+  const jobTextArea = useRef<HTMLTextAreaElement>(null);
   const scanButton = useRef<HTMLButtonElement>(null);
   // A ref as well as state, so a double click or a second drop never sends two uploads.
   const inFlight = useRef(false);
@@ -91,6 +103,7 @@ export function UploadFlow() {
       const waiting: WaitingScanState =
         found.kind === "signedIn" ? takeWaitingScanState() : { kind: "none" };
       if (waiting.kind === "expired") setExpired(true);
+      let claimLimitResetAt: string | undefined;
       if (waiting.kind === "ready") {
         const outcome = claimOutcome(
           await claimScan(waiting.scan.scanSessionId, waiting.scan.guestToken),
@@ -100,25 +113,57 @@ export function UploadFlow() {
           router.push(outcome.path);
           return;
         }
-        if (outcome.kind === "limit") setLimitResetAt(outcome.resetAt);
+        if (outcome.kind === "limit") claimLimitResetAt = outcome.resetAt;
         if (outcome.kind === "expired") setExpired(true);
       }
       setViewer(found);
       if (found.kind === "signedIn") {
         setCareerLevel(found.user.career_level);
         // The usage line, asked once for a signed-in user (SRS Section 7). Hidden on failure.
-        const usage = await fetchUsage();
-        if (usage.kind === "ok") setUsageText(usageLine(usage.data));
+        const answer = await fetchUsage();
+        if (answer.kind === "ok") setUsage(answer.data);
+        if (claimLimitResetAt !== undefined) {
+          setLimit({
+            resetAt: claimLimitResetAt,
+            scanType: answer.kind === "ok" ? limitedScanType(answer.data) : "general",
+          });
+        }
       }
     });
   }, [router]);
 
-  async function upload(chosen: File, who: Viewer) {
+  function switchTo(next: ScanType) {
+    if (next === scanType) return;
+    // The chosen CV and the pasted text are kept (A1 dev notes); an old failure is not.
+    setScanType(next);
+    setStatus("idle");
+    setFailedMessage(undefined);
+  }
+
+  /** The button: General goes straight up; Job-specific checks the pasted text first. */
+  function scan(chosen: File, who: Viewer) {
+    if (scanType === "general") {
+      void upload(chosen, who, undefined);
+      return;
+    }
+    const checked = checkJobDescription(jobText);
+    if (checked.kind === "problem") {
+      setJobProblem(checked.code);
+      jobTextArea.current?.focus();
+      return;
+    }
+    void upload(chosen, who, checked.text);
+  }
+
+  async function upload(chosen: File, who: Viewer, jobDescription: string | undefined) {
     if (inFlight.current) return;
     inFlight.current = true;
     setStatus("uploading");
     setFailedMessage(undefined);
-    const result = await uploadCv(chosen, who.kind === "signedIn" ? { careerLevel } : { botToken });
+    const result = await uploadCv(chosen, {
+      ...(who.kind === "signedIn" ? { careerLevel } : { botToken }),
+      jobDescription,
+    });
     inFlight.current = false;
     // A bot token works once, so a guest gets a fresh one for any next try.
     if (who.kind === "guest") setBotResetKey((key) => key + 1);
@@ -152,7 +197,16 @@ export function UploadFlow() {
         return;
       case "limit":
         setStatus("idle");
-        setLimitResetAt(outcome.resetAt);
+        setLimit({
+          resetAt: outcome.resetAt,
+          scanType: jobDescription === undefined ? "general" : "smart_target",
+        });
+        return;
+      case "jobDescriptionError":
+        // The server's check won: the same line under the text area.
+        setStatus("idle");
+        setJobProblem(outcome.code);
+        jobTextArea.current?.focus();
         return;
       case "fileError":
         setStatus("idle");
@@ -178,8 +232,11 @@ export function UploadFlow() {
     }
     setBoxProblem(undefined);
     setFile(checked.file);
-    // No scan button for guests: choosing a CV uploads it and the wall follows (A1 dev notes).
-    if (viewer.kind === "guest") void upload(checked.file, viewer);
+    // No scan button for guests on General: choosing a CV uploads it and the wall follows (A1
+    // dev notes). Job-specific waits for the job description and "Match my CV".
+    if (viewer.kind === "guest" && scanType === "general") {
+      void upload(checked.file, viewer, undefined);
+    }
   }
 
   // Latest version for the page-wide listeners below, which are added once.
@@ -279,10 +336,15 @@ export function UploadFlow() {
         <ScanErrorView
           reason={scanError}
           file={file}
+          onUploadAnother={() => {
+            // The job description is kept; only the CV is chosen again.
+            setScanError(undefined);
+            removeFile();
+          }}
           onTryAgain={() => {
             // extraction_failed only: the same file is sent once more.
             setScanError(undefined);
-            if (file !== undefined && viewer !== undefined) void upload(file, viewer);
+            if (file !== undefined && viewer !== undefined) scan(file, viewer);
           }}
         />
       </div>
@@ -314,6 +376,12 @@ export function UploadFlow() {
   ].join(" ");
 
   const showFile = file !== undefined && !dragging;
+  const uploading = status === "uploading";
+  const jobSpecific = scanType === "smart_target";
+  const usageText = usage === undefined ? undefined : usageLine(usage, scanType);
+  const checkedJob = jobSpecific ? checkJobDescription(jobText) : undefined;
+  const jobDescriptionMissing =
+    checkedJob?.kind === "problem" && checkedJob.code === "job_description_required";
 
   return (
     <div className={styles.page}>
@@ -322,21 +390,29 @@ export function UploadFlow() {
         <h1 className={styles.heading}>{text.hero.heading}</h1>
         <p className={styles.subline}>{text.hero.subline}</p>
 
-        {/* Job-specific is shown but switched off until its phase (Build Plan Phase 3). */}
         <div className={styles.switch} role="group" aria-label={text.modeSwitch.label}>
           <button
             type="button"
-            className={`${styles.switchOption} ${styles.switchSelected}`}
-            aria-pressed="true"
+            className={`${styles.switchOption} ${jobSpecific ? "" : styles.switchSelected}`}
+            aria-pressed={!jobSpecific}
+            onClick={() => switchTo("general")}
+            disabled={uploading}
           >
             <span>{text.modeSwitch.general}</span>
           </button>
-          <button type="button" className={styles.switchOption} aria-pressed="false" disabled>
+          <button
+            type="button"
+            className={`${styles.switchOption} ${jobSpecific ? styles.switchSelected : ""}`}
+            aria-pressed={jobSpecific}
+            onClick={() => switchTo("smart_target")}
+            disabled={uploading}
+          >
             <span>{text.modeSwitch.jobSpecific}</span>
-            <span className={styles.comingSoon}>{text.modeSwitch.comingSoon}</span>
           </button>
         </div>
-        <p className={styles.switchHelper}>{text.modeSwitch.generalHelper}</p>
+        <p className={styles.switchHelper}>
+          {jobSpecific ? text.modeSwitch.jobSpecificHelper : text.modeSwitch.generalHelper}
+        </p>
 
         <section className={boxClass} aria-label={text.uploadBox.label}>
           <input
@@ -411,51 +487,55 @@ export function UploadFlow() {
           {boxProblem ?? ""}
         </p>
 
+        {jobSpecific ? (
+          <JobDescriptionField
+            value={jobText}
+            onValueChange={(value) => {
+              setJobText(value);
+              setJobProblem(undefined);
+            }}
+            problem={jobProblem}
+            readOnly={uploading}
+            textArea={jobTextArea}
+          />
+        ) : null}
+
         {viewer?.kind === "signedIn" && careerLevel !== undefined && file !== undefined ? (
           <>
             <CareerLevelMenu
               value={careerLevel}
               onValueChange={setCareerLevel}
-              disabled={status === "uploading"}
+              disabled={uploading}
             />
             {/* Free only: PRO has no monthly limit, so no line (A1 dev notes, neutral grey). */}
             {usageText !== undefined ? <p className={styles.usage}>{usageText}</p> : null}
-            <div className={styles.actions}>
-              <button
-                ref={scanButton}
-                type="button"
-                className={styles.primary}
-                onClick={() => void upload(file, viewer)}
-                disabled={status === "uploading"}
-                aria-busy={status === "uploading" ? true : undefined}
-              >
-                {status === "uploading" ? (
-                  <>
-                    <FieldIcon name="loader" className={styles.spinner} />
-                    {text.scanButton.loading}
-                  </>
-                ) : (
-                  text.scanButton.default
-                )}
-              </button>
-            </div>
           </>
         ) : null}
 
-        {viewer?.kind === "guest" && status === "uploading" ? (
+        {viewer !== undefined ? (
+          <ScanAction
+            viewer={viewer}
+            scanType={scanType}
+            hasFile={file !== undefined}
+            status={status}
+            jobDescriptionMissing={jobDescriptionMissing}
+            onScan={() => {
+              if (file !== undefined) scan(file, viewer);
+            }}
+            button={scanButton}
+          />
+        ) : null}
+
+        {viewer?.kind === "guest" && !jobSpecific && uploading ? (
           <p className={styles.status} role="status">
             <FieldIcon name="loader" className={styles.spinner} />
             {text.uploadBox.uploading}
           </p>
         ) : null}
 
-        {viewer?.kind === "guest" && status === "failed" && file !== undefined ? (
+        {viewer?.kind === "guest" && !jobSpecific && status === "failed" && file !== undefined ? (
           <div className={styles.actions}>
-            <button
-              type="button"
-              className={styles.primary}
-              onClick={() => void upload(file, viewer)}
-            >
+            <button type="button" className={styles.primary} onClick={() => scan(file, viewer)}>
               {text.uploadBox.tryAgain}
             </button>
           </div>
@@ -478,11 +558,12 @@ export function UploadFlow() {
         </p>
       </main>
 
-      {limitResetAt !== undefined ? (
+      {limit !== undefined ? (
         <LimitPopup
-          resetAt={limitResetAt}
+          resetAt={limit.resetAt}
+          scanType={limit.scanType}
           onClose={() => {
-            setLimitResetAt(undefined);
+            setLimit(undefined);
             scanButton.current?.focus();
           }}
         />
