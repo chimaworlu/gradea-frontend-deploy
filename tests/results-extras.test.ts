@@ -2,8 +2,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { CvPanel, PassedChecks, Results } from "../components/results/ResultsScreen";
-import type { ScanResultResponse, UsageResponse } from "../lib/api/shared";
-import { getContent } from "../lib/content";
+import { FileIssue, type ScanResultResponse, type UsageResponse } from "../lib/api/shared";
+import { fileIssueLabel, getContent } from "../lib/content";
 import { categoryRows, cvDisplayText, lineMeta, splitEntryHeading } from "../lib/scan/result";
 import { usageLine } from "../lib/scan/usage";
 
@@ -206,5 +206,46 @@ describe("B3 CV panel display", () => {
         false,
       ),
     ).toBe("+234 700 · ada@example.test");
+  });
+});
+
+describe("B3 file issue cards", () => {
+  /** A result with every file issue, and the given category open with no flagged line. */
+  function withFileIssues(open: "ats_formatting" | "impact_achievements"): ScanResultResponse {
+    const data = result(null);
+    return {
+      ...data,
+      line_detail: {
+        ...data.line_detail,
+        category: open,
+        lines: [],
+        file_issues: FileIssue.options.map((issue) => ({ issue, reason: `Reason for ${issue}.` })),
+      },
+      cv: data.cv.map((group) => ({
+        ...group,
+        lines: group.lines.map((line) => ({ ...line, flagged: false })),
+      })),
+    };
+  }
+
+  it("show every file issue's label and reason on a card that cannot be pressed", () => {
+    const html = renderToStaticMarkup(
+      createElement(Results, { result: withFileIssues("ats_formatting") }),
+    );
+    for (const issue of FileIssue.options) {
+      expect(fileIssueLabel(issue)).not.toMatch(/—|^$/);
+      expect(html).toContain(`>${fileIssueLabel(issue)}<`);
+      expect(html).toContain(`Reason for ${issue}.`);
+    }
+    // No card picks a CV line, and no CV line is highlighted.
+    expect(html).not.toContain("aria-pressed");
+    expect(html).not.toContain('data-flagged="true"');
+  });
+
+  it("show only when ATS & Formatting is the open category", () => {
+    const html = renderToStaticMarkup(
+      createElement(Results, { result: withFileIssues("impact_achievements") }),
+    );
+    expect(html).not.toContain("Reason for tables.");
   });
 });

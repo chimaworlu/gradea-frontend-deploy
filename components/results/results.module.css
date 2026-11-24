@@ -230,10 +230,14 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-container-lowest);
   text-align: left;
+}
+
+/* Only a card with a CV line to show is pressable; a file issue card is not a button. */
+button.lineCard {
   cursor: pointer;
 }
 
-.lineCard:hover {
+button.lineCard:hover {
   border-color: var(--color-border-input);
   border-left-color: var(--color-warning);
 }
