@@ -58,10 +58,20 @@
   color: var(--color-on-surface);
   font: var(--font-label-large);
   letter-spacing: var(--font-label-large-letter-spacing);
+  cursor: pointer;
+}
+
+.switchOption:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.switchOption:active:not(:disabled) {
+  background: var(--color-primary-container);
 }
 
 /* Selected: light navy fill, navy text and outline; no change on hover (A1 dev notes). */
-.switchSelected {
+.switchSelected,
+.switchSelected:hover:not(:disabled) {
   border-color: var(--color-primary);
   background: var(--color-primary-container);
   color: var(--color-primary);
@@ -227,6 +237,83 @@
   cursor: not-allowed;
 }
 
+/* ---- Job description (A1 "Job-specific paste") ---- */
+
+.job {
+  margin-top: var(--space-24);
+}
+
+.jobLabel {
+  display: block;
+  color: var(--color-on-surface);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+.jobWays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+/* 36 tall on desktop, the small button size; 44 on phones (see the phone query). */
+.jobWay {
+  min-height: var(--size-button-small);
+  padding: 0 var(--space-16);
+}
+
+/* 160 tall in the design, and it can be pulled taller. */
+.jobText {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--space-96) + var(--space-64));
+  margin-top: var(--space-12);
+  padding: var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  resize: vertical;
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.jobText::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 1;
+}
+
+.jobText:hover,
+.jobText:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.jobTextInvalid,
+.jobTextInvalid:hover,
+.jobTextInvalid:focus-visible {
+  border-color: var(--color-error);
+}
+
+.jobProblem,
+.jobHelper {
+  margin-top: var(--space-8);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.jobProblem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--color-error);
+}
+
+.jobHelper {
+  color: var(--color-on-surface-variant);
+}
+
 /* ---- Lines under the box ---- */
 
 .boxProblem,
@@ -326,7 +413,23 @@
 }
 
 .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-12);
   margin-top: var(--space-16);
+}
+
+/* Guests have no career level or usage line between the two. */
+.job + .actions {
+  margin-top: var(--space-24);
+}
+
+/* Beside the button that is off, why it is off ("Add a job description to continue"). */
+.actionNote {
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
 }
 
 .primary {
@@ -357,6 +460,12 @@
 
 .primary[aria-busy="true"] {
   cursor: progress;
+}
+
+/* Off: the same shape at 40% strength (A1 dev notes), and the disabled token is 0.6. */
+.primary:disabled:not([aria-busy="true"]) {
+  opacity: calc(1 - var(--opacity-disabled));
+  cursor: not-allowed;
 }
 
 .footerNote {
@@ -594,10 +703,19 @@
   .primary {
     width: 100%;
   }
+
+  .jobWay {
+    min-height: var(--size-touch-target);
+  }
+
+  .jobText {
+    font-size: var(--font-text-input-size-phone);
+  }
 }
 
 /* The error lines are flex rows, so the hidden attribute needs its own rule. */
 .boxProblem[hidden],
+.jobProblem[hidden],
 .failed[hidden],
 .menu[hidden] {
   display: none;

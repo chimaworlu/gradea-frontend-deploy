@@ -31,8 +31,8 @@
     "scan_limit_reached": "You've used your free scans for this month.",
     "scan_not_scored": "Your scores aren't ready yet. Wait a moment and try again.",
     "job_description_required": "Paste the job description to match your CV against.",
-    "job_description_too_short": "That job description is too short to match. Paste the full text from the job advert.",
-    "job_description_too_long": "That job description is too long. Paste only the part about the role and what it asks for."
+    "job_description_too_short": "That looks too short to be a job description. Paste the full post.",
+    "job_description_too_long": "That's too long. Paste only the job description."
   },
   "network": "We couldn't reach Gradea. Check your connection and try again.",
   "screen": {

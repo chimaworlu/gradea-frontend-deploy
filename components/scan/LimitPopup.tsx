@@ -2,18 +2,28 @@
 
 import { useEffect, useRef, type KeyboardEvent } from "react";
 import { fillPlaceholders, getContent } from "../../lib/content";
-import { resetDateLabel } from "../../lib/scan/upload";
+import { resetDateLabel, type ScanType } from "../../lib/scan/upload";
 import { FieldIcon } from "../icons/FieldIcon";
 import styles from "./upload.module.css";
 
 /**
- * E7 Limit reached ("A1 / Upload / Free / Limit reached"). Shown only when POST
- * /api/scan/general answers scan_limit_reached, with the reset date from its reset_at in Lagos
- * time (SRS Section 7). A dim layer covers the page, focus moves in and stays in, and Escape or
- * the close button closes it; the page puts focus back on "Scan my CV" (A1 dev notes).
+ * E7 Limit reached ("A1 / Upload / Free / Limit reached"). Shown only when the API answers
+ * scan_limit_reached, with the reset date from its reset_at in Lagos time (SRS Section 7). The
+ * Job-specific popup is the same with its own words (A1 dev notes). A dim layer covers the page,
+ * focus moves in and stays in, and Escape or the close button closes it; the page puts focus back
+ * on "Scan my CV".
  */
-export function LimitPopup({ resetAt, onClose }: { resetAt: string; onClose: () => void }) {
-  const text = getContent("app/upload").popups.limitReached;
+export function LimitPopup({
+  resetAt,
+  scanType = "general",
+  onClose,
+}: {
+  resetAt: string;
+  scanType?: ScanType;
+  onClose: () => void;
+}) {
+  const { limitReached, jobSpecificLimitReached } = getContent("app/upload").popups;
+  const text = scanType === "general" ? limitReached : jobSpecificLimitReached;
   const closeButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -53,7 +63,7 @@ export function LimitPopup({ resetAt, onClose }: { resetAt: string; onClose: () 
           type="button"
           className={styles.popupClose}
           onClick={onClose}
-          aria-label={text.close}
+          aria-label={limitReached.close}
         >
           <FieldIcon name="close" />
         </button>
