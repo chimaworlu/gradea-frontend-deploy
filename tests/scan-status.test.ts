@@ -22,6 +22,7 @@ function answer(status: number, body: unknown) {
 
 const statusBody = (status: string, retryAfter: number | null, failure: string | null = null) => ({
   scan_session_id: "scan1",
+  scan_type: "general",
   status,
   retry_after: retryAfter,
   failure,

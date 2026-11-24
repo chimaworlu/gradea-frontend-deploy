@@ -468,8 +468,13 @@ export type ScanFailure = z.infer<typeof ScanFailure>;
 // GET /api/scan/:id/status, and the answer of POST /api/scan/:id/retry. retry_after (seconds,
 // also sent as the Retry-After header) is how long to wait before asking again; null once the
 // scan is done or failed. Signed-in owner only.
+// scan_type is there from the upload on, so the processing screen and the result view can be chosen
+// before scoring ends.
+export const ScanType = z.enum(["general", "smart_target"]);
+export type ScanType = z.infer<typeof ScanType>;
 export const ScanStatusResponse = z.strictObject({
   scan_session_id: z.string(),
+  scan_type: ScanType,
   status: ScanStatus,
   retry_after: z.int().min(1).nullable(),
   failure: ScanFailure.nullable(),
@@ -623,6 +628,9 @@ export const JobResultResponse = z.strictObject({
   // Every group, in the fixed order of KeywordGroup, once scored.
   keyword_groups: z.array(JobKeywordGroup),
   missing_locked: z.boolean(),
+  // The whole CV for the CV panel, once the scan is scored (empty before), built as for General.
+  // Nothing is flagged in a Job-specific result, so every line has flagged false.
+  cv: z.array(CvPanelSection),
   retry_after: z.int().min(1).nullable(),
 });
 export type JobResultResponse = z.infer<typeof JobResultResponse>;
