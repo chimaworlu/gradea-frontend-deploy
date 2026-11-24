@@ -102,7 +102,8 @@ describe("the button", () => {
       createElement(ScanAction, {
         viewer,
         scanType,
-        uploading: false,
+        hasFile: true,
+        status: "idle",
         jobDescriptionMissing,
         onScan: () => undefined,
       }),
@@ -113,8 +114,26 @@ describe("the button", () => {
     expect(button(free, "smart_target")).toContain(">Scan my CV<");
     expect(button(pro, "smart_target")).toContain(">Scan my CV<");
     expect(button(free, "general")).toContain(">Scan my CV<");
-    // Choosing a CV is the guest's way on General: no button there.
-    expect(button(guest, "general")).toBe("");
+  });
+
+  it("shows a guest Scan my CV on General only when a CV is chosen and waiting", () => {
+    const guestGeneral = (hasFile: boolean, status: "idle" | "uploading" | "failed") =>
+      renderToStaticMarkup(
+        createElement(ScanAction, {
+          viewer: guest,
+          scanType: "general",
+          hasFile,
+          status,
+          jobDescriptionMissing: false,
+          onScan: () => undefined,
+        }),
+      );
+    // Chosen on Job-specific, then switched to General.
+    expect(guestGeneral(true, "idle")).toContain(">Scan my CV<");
+    // Otherwise as before: choosing a CV uploads it, with the status line or Try again.
+    expect(guestGeneral(false, "idle")).toBe("");
+    expect(guestGeneral(true, "uploading")).toBe("");
+    expect(guestGeneral(true, "failed")).toBe("");
   });
 
   it("is off with its reason until a job description is added", () => {
@@ -200,10 +219,12 @@ describe("the Job-specific limit", () => {
 
   it("has its own usage line, hidden on PRO", () => {
     const data: UsageResponse = usage(4, 1);
-    expect(usageLine(data, "smart_target")).toBe("1 of 1 Job-specific scan left this month");
-    expect(usageLine(usage(4, 0), "smart_target")).toBe("0 of 1 Job-specific scan left this month");
+    // reset_at is 23:00 UTC on 30 Nov, which is 1 Dec in Lagos.
+    expect(usageLine(data, "smart_target")).toBe(
+      "1 of 1 Job-specific scan left this month. Resets on 1 Dec.",
+    );
     expect(usageLine(usage(4, 2, 3), "smart_target")).toBe(
-      "2 of 3 Job-specific scans left this month",
+      "2 of 3 Job-specific scans left this month. Resets on 1 Dec.",
     );
     expect(usageLine(usage(null, null), "smart_target")).toBeUndefined();
     // General keeps its own.

@@ -512,13 +512,16 @@ export function UploadFlow() {
           </>
         ) : null}
 
-        {viewer !== undefined && file !== undefined ? (
+        {viewer !== undefined ? (
           <ScanAction
             viewer={viewer}
             scanType={scanType}
-            uploading={uploading}
+            hasFile={file !== undefined}
+            status={status}
             jobDescriptionMissing={jobDescriptionMissing}
-            onScan={() => scan(file, viewer)}
+            onScan={() => {
+              if (file !== undefined) scan(file, viewer);
+            }}
             button={scanButton}
           />
         ) : null}

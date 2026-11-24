@@ -9,7 +9,9 @@ import styles from "./upload.module.css";
 export type ScanActionProps = {
   viewer: Viewer;
   scanType: ScanType;
-  uploading: boolean;
+  /** A CV is chosen. Without one there is no button. */
+  hasFile: boolean;
+  status: "idle" | "uploading" | "failed";
   /** Job-specific with nothing pasted yet: the button is off, with the reason beside it. */
   jobDescriptionMissing: boolean;
   onScan: () => void;
@@ -18,18 +20,24 @@ export type ScanActionProps = {
 
 /**
  * "Scan my CV", or "Match my CV" for a guest on Job-specific, where it is the way to the signup
- * wall. A guest on General has no button: choosing a CV uploads it (A1 dev notes).
+ * wall. A guest on General has no button, because choosing a CV uploads it (A1 dev notes), except
+ * when the CV was chosen on Job-specific and is still waiting after the switch (founder's
+ * decision, 24 Nov): the upload then starts here. While it runs or after it failed, the status
+ * line or "Try again" shows instead.
  */
 export function ScanAction({
   viewer,
   scanType,
-  uploading,
+  hasFile,
+  status,
   jobDescriptionMissing,
   onScan,
   button,
 }: ScanActionProps) {
   const text = getContent("app/upload");
-  if (viewer.kind === "guest" && scanType === "general") return null;
+  const uploading = status === "uploading";
+  const guestGeneral = viewer.kind === "guest" && scanType === "general";
+  if (!hasFile || (guestGeneral && status !== "idle")) return null;
 
   return (
     <div className={styles.actions}>

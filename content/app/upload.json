@@ -72,8 +72,8 @@
   "usage": {
     "line": "{remaining} of {limit} General scans left this month. Resets on {date}.",
     "jobSpecific": {
-      "one": "{remaining} of {limit} Job-specific scan left this month",
-      "other": "{remaining} of {limit} Job-specific scans left this month"
+      "one": "{remaining} of {limit} Job-specific scan left this month. Resets on {date}.",
+      "other": "{remaining} of {limit} Job-specific scans left this month. Resets on {date}."
     }
   }
 }

@@ -11,9 +11,9 @@ export function fetchUsage(fetchFn?: typeof fetch): Promise<ApiResult<UsageRespo
 }
 
 /**
- * "4 of 5 General scans left this month. Resets on 1 Dec.", with the date in Lagos time, or "1 of
- * 1 Job-specific scan left this month": each kind of scan has its own allowance (SRS Section 7).
- * None for an active PRO plan, which has no monthly limit (limit is null).
+ * "4 of 5 General scans left this month. Resets on 1 Dec.", with the date in Lagos time, and the
+ * same for Job-specific: each kind of scan has its own allowance (SRS Section 7). None for an
+ * active PRO plan, which has no monthly limit (limit is null).
  */
 export function usageLine(
   usage: UsageResponse,
@@ -22,11 +22,9 @@ export function usageLine(
   const text = getContent("app/upload").usage;
   const { limit, remaining } = scanType === "general" ? usage.general : usage.job_specific;
   if (limit === null || remaining === null) return undefined;
-  if (scanType === "smart_target") {
-    const line = limit === 1 ? text.jobSpecific.one : text.jobSpecific.other;
-    return fillPlaceholders(line, { remaining, limit });
-  }
-  return fillPlaceholders(text.line, { remaining, limit, date: resetDateLabel(usage.reset_at) });
+  const jobSpecificLine = limit === 1 ? text.jobSpecific.one : text.jobSpecific.other;
+  const line = scanType === "general" ? text.line : jobSpecificLine;
+  return fillPlaceholders(line, { remaining, limit, date: resetDateLabel(usage.reset_at) });
 }
 
 /**
