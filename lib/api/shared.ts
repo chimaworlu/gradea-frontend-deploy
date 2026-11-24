@@ -43,6 +43,10 @@ export const ErrorCode = z.enum([
   "file_unreadable",
   "file_not_english",
   "extraction_failed",
+  // The job description of a Job-specific scan (PRD Section 12.2).
+  "job_description_required",
+  "job_description_too_short",
+  "job_description_too_long",
   // The Free monthly limit (SRS Section 7). The answer also carries `reset_at`.
   "scan_limit_reached",
   // POST /api/scan/:id/retry-detail before the scan has its scores.
@@ -79,6 +83,9 @@ export const ERROR_STATUSES = {
   file_unreadable: [422],
   file_not_english: [422],
   extraction_failed: [503],
+  job_description_required: [400],
+  job_description_too_short: [400],
+  job_description_too_long: [400],
   scan_limit_reached: [403],
   scan_not_scored: [409],
 } as const satisfies Record<ErrorCode, readonly number[]>;
@@ -98,6 +105,15 @@ export type ErrorResponse = z.infer<typeof ErrorResponse>;
 
 export const CareerLevel = z.enum(["entry", "mid", "senior", "executive"]);
 export type CareerLevel = z.infer<typeof CareerLevel>;
+
+// The four Keyword Gap groups of a Job-specific scan (PRD Section 12.2).
+export const KeywordGroup = z.enum([
+  "hard_skills",
+  "soft_skills",
+  "titles_certifications_tools",
+  "industry_language",
+]);
+export type KeywordGroup = z.infer<typeof KeywordGroup>;
 
 // The sections of a CV, the four General Analysis categories (PRD Section 12.1) and the issue
 // types a flagged line can have. Used by lib/ai/ and by the results answer.
@@ -575,6 +591,42 @@ export const ScanResultResponse = z.strictObject({
 });
 export type ScanResultResponse = z.infer<typeof ScanResultResponse>;
 
+// GET /api/scan/:id/result for a Job-specific scan (PRD Section 12.2). Signed-in owner only. The
+// Relevancy Score, and what the job asks for in four groups, matched or missing. Tier gating is
+// done here, never in the browser: Free gets the counts and the matched keywords, and `missing` is
+// empty with missing_locked true, so a missing keyword's name or reason is never sent.
+export const MissingKeyword = z.strictObject({
+  keyword: z.string().min(1),
+  // Two short plain sentences: what the job asks for, and how to show it if the person has it.
+  reason: z.string().min(1),
+});
+export type MissingKeyword = z.infer<typeof MissingKeyword>;
+export const JobKeywordGroup = z.strictObject({
+  group: KeywordGroup,
+  matched_count: z.int().min(0),
+  missing_count: z.int().min(0),
+  matched: z.array(z.string().min(1)),
+  missing: z.array(MissingKeyword),
+});
+export type JobKeywordGroup = z.infer<typeof JobKeywordGroup>;
+export const JobResultResponse = z.strictObject({
+  // Only a Job-specific result has this field, so the two result shapes are told apart by it.
+  scan_type: z.literal("smart_target"),
+  scan_session_id: z.string(),
+  status: ScanStatus,
+  failure: ScanFailure.nullable(),
+  career_level_used: CareerLevel.nullable(),
+  // Null and empty until the scan is scored.
+  relevancy_score: z.int().min(0).max(100).nullable(),
+  // One short plain sentence beside the score. It never names a missing keyword.
+  summary: z.string().min(1).nullable(),
+  // Every group, in the fixed order of KeywordGroup, once scored.
+  keyword_groups: z.array(JobKeywordGroup),
+  missing_locked: z.boolean(),
+  retry_after: z.int().min(1).nullable(),
+});
+export type JobResultResponse = z.infer<typeof JobResultResponse>;
+
 // POST /api/scan/general. A multipart form (not JSON) with exactly one file field and these
 // text fields. The file is a PDF or DOCX of at most CV_FILE_MAX_BYTES; the server decides the
 // type from the file's content, not its name.
@@ -588,6 +640,31 @@ export const ScanUploadFields = z.strictObject({
   bot_token: BotToken,
 });
 export type ScanUploadFields = z.input<typeof ScanUploadFields>;
+
+// POST /api/scan/smart-target (Job-specific scan). The same form and the same one file, with the
+// pasted job description as one more text field. Line ends are made plain, control characters and
+// the space around the text are removed, and then its length is checked.
+export const JOB_DESCRIPTION_MIN_LENGTH = 100;
+export const JOB_DESCRIPTION_MAX_LENGTH = 15_000;
+export const JobDescription = z
+  .string({ error: "job_description_required" })
+  .transform((text) =>
+    text
+      .replace(/\r\n?/g, "\n")
+      .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "")
+      .trim(),
+  )
+  .pipe(
+    z
+      .string()
+      .min(1, { error: "job_description_required", abort: true })
+      .min(JOB_DESCRIPTION_MIN_LENGTH, { error: "job_description_too_short" })
+      .max(JOB_DESCRIPTION_MAX_LENGTH, { error: "job_description_too_long" }),
+  );
+export const SmartTargetUploadFields = ScanUploadFields.extend({
+  job_description: JobDescription,
+});
+export type SmartTargetUploadFields = z.input<typeof SmartTargetUploadFields>;
 
 // 201. `guest` is set only for an upload without a login: the token is shown this once and is
 // sent back in GUEST_TOKEN_HEADER to claim the scan after signup, before `expires_at`.
