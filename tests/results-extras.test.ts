@@ -242,6 +242,35 @@ describe("B3 file issue cards", () => {
     expect(html).not.toContain('data-flagged="true"');
   });
 
+  it("show thin_cv as a message that changes no count, even with no counted issue", () => {
+    const data = withFileIssues("ats_formatting");
+    const thin = (flagged: number): string =>
+      renderToStaticMarkup(
+        createElement(Results, {
+          result: {
+            ...data,
+            categories: data.categories.map((item) =>
+              item.category === "ats_formatting" ? { ...item, flagged_count: flagged } : item,
+            ),
+            line_detail: {
+              ...data.line_detail,
+              file_issues: [{ issue: "thin_cv", reason: "Your CV is short for your level." }],
+            },
+          },
+        }),
+      );
+    for (const flagged of [0, 2]) {
+      const html = thin(flagged);
+      expect(html).toContain(`>${text.middleDetail.fileIssues.thin_cv}<`);
+      expect(html).toContain("Your CV is short for your level.");
+      expect(html).not.toContain('data-flagged="true"');
+      expect(html).not.toContain(text.middleDetail.noIssues.body);
+    }
+    // The server's count, with nothing added for the card.
+    expect(thin(0)).toContain(`74 · ${text.leftRail.noIssues}`);
+    expect(thin(2)).toContain("74 · 2 issues");
+  });
+
   it("show only when ATS & Formatting is the open category", () => {
     const html = renderToStaticMarkup(
       createElement(Results, { result: withFileIssues("impact_achievements") }),

@@ -47,7 +47,8 @@
       "images": "Images",
       "text_boxes": "Text boxes",
       "header_footer": "Details in the header or footer",
-      "fonts": "Fonts"
+      "fonts": "Fonts",
+      "thin_cv": "Short CV"
     },
     "passedChecks": {
       "heading": "Passed checks",
