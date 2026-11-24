@@ -364,6 +364,20 @@ function CategoryDetail({
   const lines = row.state === "open" ? openLines(result) : [];
   const shown = showAll ? lines : lines.slice(0, LINES_SHOWN_FIRST);
   const hidden = lines.length - shown.length;
+  // ATS issues in the file itself, only when ATS & Formatting is the open category. They never
+  // change a count here: the server's flagged_count is shown as it is, and thin_cv is not in it.
+  const fileIssues =
+    row.category === "ats_formatting" && row.category === result.line_detail.category
+      ? result.line_detail.file_issues
+      : [];
+  // The same card as a flagged line, with the issue's label and the server's reason. Not a
+  // button, as there is no CV line to highlight.
+  const fileIssueCards = fileIssues.map((item) => (
+    <li key={item.issue} className={styles.lineCard}>
+      <span className={styles.lineSection}>{fileIssueLabel(item.issue)}</span>
+      <span className={styles.lineReason}>{item.reason}</span>
+    </li>
+  ));
 
   return (
     <section className={styles.detail} aria-labelledby="category-heading">
@@ -382,7 +396,14 @@ function CategoryDetail({
         <p className={styles.detailBody}>{result.line_detail.summary}</p>
       ) : null}
 
-      {row.state === "noIssues" ? <p className={styles.detailBody}>{text.noIssues.body}</p> : null}
+      {/* No counted issue, but the file can still carry a message (thin_cv): its card shows in
+          place of "Nothing in this category needs work". */}
+      {row.state === "noIssues" && fileIssues.length === 0 ? (
+        <p className={styles.detailBody}>{text.noIssues.body}</p>
+      ) : null}
+      {row.state === "noIssues" && fileIssues.length > 0 ? (
+        <ul className={styles.lines}>{fileIssueCards}</ul>
+      ) : null}
 
       {row.state === "locked" ? (
         <>
@@ -439,17 +460,7 @@ function CategoryDetail({
                 {/* "AutoFix this line" comes with AutoFix (Build Plan Phase 4). */}
               </li>
             ))}
-            {/* ATS issues in the file itself, only when ATS & Formatting is open: the same card,
-                with the issue's label and the server's reason. Not a button, as there is no CV
-                line to highlight. */}
-            {row.category === "ats_formatting"
-              ? result.line_detail.file_issues.map((item) => (
-                  <li key={item.issue} className={styles.lineCard}>
-                    <span className={styles.lineSection}>{fileIssueLabel(item.issue)}</span>
-                    <span className={styles.lineReason}>{item.reason}</span>
-                  </li>
-                ))
-              : null}
+            {fileIssueCards}
           </ul>
           <span id="show-on-cv" className={scanStyles.visuallyHidden}>
             {text.showOnCv}

@@ -135,7 +135,8 @@ export const LineIssue = z.enum([
   "cliche",
   "spelling_grammar",
   "repetition",
-  // brevity_style, set by Gradea's own code checks (22 Nov), never by the AI
+  // brevity_style, set by Gradea's own code checks (22 Nov), never by the AI. too_long above is
+  // code only too (24 Nov); bullet_too_long is no longer set and stays for stored results.
   "repeated_phrase",
   "repeated_opener",
   "bullet_too_long",
@@ -191,6 +192,7 @@ export const CATEGORY_ISSUES = {
 // The AI is never offered them, and a flag of one from the AI is dropped.
 export const CODE_CHECK_ISSUES: readonly LineIssue[] = [
   "date_format_inconsistent",
+  "too_long",
   // Section heading names are checked against a fixed list (22 Nov, src/config/section-headings.ts).
   "section_name_nonstandard",
   "repeated_phrase",
@@ -204,13 +206,15 @@ export const CODE_CHECK_ISSUES: readonly LineIssue[] = [
 
 // ATS issues in the uploaded file itself, found by Gradea's own code with no AI (22 Nov, PRD
 // Section 12.1). They belong to ats_formatting, are not tied to a CV line, and each counts as one
-// issue in that category's flagged_count and score.
+// issue in that category's flagged_count and score, except thin_cv, which is a message only.
 //   columns        text laid out in columns side by side
 //   tables         text in a table (a ruled grid, or many aligned cells)
 //   images         a picture or graphic bigger than an icon
 //   text_boxes     text in a text box (DOCX)
 //   header_footer  contact details in the page header or footer (PDF), or any text there (DOCX)
 //   fonts          many font families, or a decorative one (PDF)
+//   thin_cv        too little text or too few bullets for the career level (24 Nov); it changes
+//                  no count and no score
 export const FileIssue = z.enum([
   "columns",
   "tables",
@@ -218,6 +222,7 @@ export const FileIssue = z.enum([
   "text_boxes",
   "header_footer",
   "fonts",
+  "thin_cv",
 ]);
 export type FileIssue = z.infer<typeof FileIssue>;
 
@@ -552,7 +557,8 @@ export const ScanResultResponse = z.strictObject({
     // Only the open category's lines, only once line detail is done.
     lines: z.array(FlaggedLine),
     // The file's own ATS issues (22 Nov), only when ats_formatting is the open category and line
-    // detail is done; empty otherwise. Each one also counts in that category's flagged_count.
+    // detail is done; empty otherwise. Each one also counts in that category's flagged_count,
+    // except thin_cv, a message only.
     file_issues: z.array(FlaggedFileIssue),
     // One short plain sentence about the open category's flagged lines, from the same line
     // detail answer, once line detail is done. Null when that category has no flagged line or
