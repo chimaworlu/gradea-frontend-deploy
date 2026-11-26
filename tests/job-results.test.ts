@@ -17,7 +17,7 @@ import {
   keywordGroupLabel,
   scoreCategoryLabel,
 } from "../lib/content";
-import { getScanResult, resultView, type ScoredJobResult } from "../lib/scan/result";
+import { getScanResult, resultView, tailorView, type ScoredJobResult } from "../lib/scan/result";
 
 const text = getContent("app/job-results");
 
@@ -258,5 +258,96 @@ describe("the wording for each kind of scan", () => {
       expect(wall("smart_target")).toContain(words);
       expect(wall("general")).not.toContain(words);
     }
+  });
+});
+
+describe("C1 lines to tailor", () => {
+  const bullets = Array.from({ length: 5 }, (_, index) => ({
+    line_id: `e${index}`,
+    section: "experience" as const,
+    index_in_section: index + 1,
+    kind: "bullet" as const,
+    text: `Bullet number ${index} from the CV.`,
+    role: "Product Designer at Acme",
+    flagged: false,
+  }));
+  const cv: ScoredJobResult["cv"] = [...job().cv, { section: "experience", lines: bullets }];
+  const lines = (ids: number[]) =>
+    ids.map((id) => ({ line_id: `e${id}`, reason: `Reason for line ${id}.` }));
+  const free = job({
+    cv,
+    tailor_groups: [
+      { group: "hard_skills", line_count: 4, locked: false, lines: lines([0, 1, 2, 3]) },
+      { group: "soft_skills", line_count: 2, locked: true, lines: [] },
+      { group: "titles_certifications_tools", line_count: 0, locked: true, lines: [] },
+      { group: "industry_language", line_count: 1, locked: true, lines: [] },
+    ],
+  });
+
+  it("Free: shows the open group's lines, three first, and only the counts of the locked ones", () => {
+    const html = render(free);
+    expect(html).toContain(text.tailor.heading);
+    // The card: section and role, the CV's own words, then the reason. No AutoFix button.
+    expect(html).toContain("Experience, Product Designer at Acme");
+    expect(html).toContain("Bullet number 0 from the CV.");
+    expect(html).toContain("Reason for line 0.");
+    // Three cards first (the fourth line is still in the CV panel), then "Show 1 more".
+    expect(html.match(/aria-describedby="tailor-show-on-cv"/g)).toHaveLength(3);
+    expect(html).not.toContain("Reason for line 3.");
+    expect(html).toContain("Show 1 more");
+    expect(html).not.toContain("AutoFix");
+    expect(html).toContain("3 more lines to tailor unlock with PRO.");
+    expect(html).toContain("2 lines in Soft skills");
+    expect(html).toContain("1 line in Industry language");
+    expect(html).not.toContain("0 lines in");
+    // One group open on Free: a plain list, with no group names over it.
+    expect(html).not.toContain("<h3");
+  });
+
+  it("PRO: shows every group under its name, with no lock", () => {
+    const pro = job({
+      cv,
+      missing_locked: false,
+      tailor_groups: [
+        { group: "hard_skills", line_count: 2, locked: false, lines: lines([0, 1]) },
+        { group: "soft_skills", line_count: 1, locked: false, lines: lines([4]) },
+        { group: "titles_certifications_tools", line_count: 0, locked: false, lines: [] },
+        { group: "industry_language", line_count: 0, locked: false, lines: [] },
+      ],
+    });
+    const html = render(pro);
+    expect(html).toContain(`>${keywordGroupLabel("hard_skills")}</h3>`);
+    expect(html).toContain(`>${keywordGroupLabel("soft_skills")}</h3>`);
+    expect(html).toContain("Bullet number 4 from the CV.");
+    expect(html).not.toContain("unlock with PRO");
+    expect(html).not.toContain(text.missingKeywords.pro);
+  });
+
+  it("is hidden with no lines, and never shows a reason without its CV line", () => {
+    const empty = job({
+      cv,
+      tailor_groups: KeywordGroup.options.map((group) => ({
+        group,
+        line_count: 0,
+        locked: group !== "hard_skills",
+        lines: [],
+      })),
+    });
+    expect(tailorView(empty)).toBeUndefined();
+    expect(render(empty)).not.toContain(text.tailor.heading);
+    expect(render(job())).not.toContain(text.tailor.heading);
+
+    const unknown = job({
+      cv,
+      tailor_groups: [
+        {
+          group: "hard_skills",
+          line_count: 1,
+          locked: false,
+          lines: [{ line_id: "gone", reason: "A reason with no line." }],
+        },
+      ],
+    });
+    expect(render(unknown)).not.toContain("A reason with no line.");
   });
 });

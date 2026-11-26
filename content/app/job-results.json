@@ -30,5 +30,21 @@
     },
     "pro": "PRO",
     "proLabel": "Locked. The missing keywords unlock with PRO."
+  },
+  "tailor": {
+    "heading": "Lines to tailor for this job",
+    "showMore": "Show {count} more",
+    "showOnCv": "Show this line on your CV",
+    "locked": {
+      "body": {
+        "one": "{count} more line to tailor unlocks with PRO.",
+        "other": "{count} more lines to tailor unlock with PRO."
+      },
+      "group": {
+        "one": "{count} line in {group}",
+        "other": "{count} lines in {group}"
+      },
+      "proLabel": "Locked. These lines unlock with PRO."
+    }
   }
 }

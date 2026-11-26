@@ -425,6 +425,19 @@ button.lineCard:hover {
   font-variant-numeric: tabular-nums;
 }
 
+/* PRO sees every tailor group under its name: 14px semibold, like the section title. */
+.tailorGroupName {
+  margin-top: var(--space-24);
+  color: var(--color-on-surface-variant);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* A locked tailor group's count, one per row under the note. */
+.tailorLocked {
+  margin-top: var(--space-8);
+}
+
 /* The same locked card with one even outline, as drawn on C1. */
 .missingCard {
   margin-top: var(--space-12);
