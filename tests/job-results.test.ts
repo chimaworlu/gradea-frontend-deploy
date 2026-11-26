@@ -61,6 +61,7 @@ function job(changes: Partial<ScoredJobResult> = {}): ScoredJobResult {
       },
     ],
     missing_locked: true,
+    tailor_groups: [],
     cv: [
       {
         section: "contact",
