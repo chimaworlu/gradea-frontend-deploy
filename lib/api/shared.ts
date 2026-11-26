@@ -51,6 +51,9 @@ export const ErrorCode = z.enum([
   "scan_limit_reached",
   // POST /api/scan/:id/retry-detail before the scan has its scores.
   "scan_not_scored",
+  // The feedback form (D4).
+  "feedback_message_required",
+  "feedback_message_too_long",
 ]);
 export type ErrorCode = z.infer<typeof ErrorCode>;
 
@@ -88,6 +91,8 @@ export const ERROR_STATUSES = {
   job_description_too_long: [400],
   scan_limit_reached: [403],
   scan_not_scored: [409],
+  feedback_message_required: [400],
+  feedback_message_too_long: [400],
 } as const satisfies Record<ErrorCode, readonly number[]>;
 
 // Every error from every route has this body. `message` is safe to show, but the frontend
@@ -661,6 +666,11 @@ export const ScanUploadFields = z.strictObject({
   career_level: z.preprocess(trim, CareerLevel).optional(),
   // Required for guests when the bot check is on. Signed-in users skip it.
   bot_token: BotToken,
+  // In place of the file (26 Nov, FR-28, the General / Job-specific switch): the
+  // scan_session_id of an earlier scan by the same person, whose stored CV is used again.
+  // Exactly one of the file and this. A guest also sends that scan's token in
+  // GUEST_TOKEN_HEADER. Another person's scan, an expired one or an unknown id is 404 not_found.
+  scan_session_id: z.preprocess(trim, ScanIdParams.shape.id).optional(),
 });
 export type ScanUploadFields = z.input<typeof ScanUploadFields>;
 
@@ -696,6 +706,43 @@ export const ScanUploadResponse = z.strictObject({
   guest: z.strictObject({ token: z.string(), expires_at: z.iso.datetime() }).nullable(),
 });
 export type ScanUploadResponse = z.infer<typeof ScanUploadResponse>;
+
+// ---- Feedback (D4, SRS Section 4) -----------------------------------------------------------
+
+// POST /api/feedback. Guests and signed-in users. `message` is required; the server also refuses
+// one longer than its limit (FEEDBACK_MESSAGE_MAX_LENGTH, about 2,000 characters) with
+// feedback_message_too_long. `page` is the screen it was sent from, from a fixed list. The
+// message is never logged and never sent back. Answers 201 { ok: true }.
+export const FeedbackPage = z.enum([
+  "upload",
+  "processing",
+  "results_general",
+  "results_job_specific",
+  "dashboard",
+  "history",
+  "billing",
+  "profile",
+  "other",
+]);
+export type FeedbackPage = z.infer<typeof FeedbackPage>;
+export const FeedbackMessage = z
+  .string({ error: "feedback_message_required" })
+  .transform((text) =>
+    text
+      .replace(/\r\n?/g, "\n")
+      .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "")
+      .trim(),
+  )
+  .pipe(z.string().min(1, { error: "feedback_message_required" }));
+export const FeedbackRequest = z.strictObject({
+  message: FeedbackMessage,
+  page: FeedbackPage.optional(),
+  // Required for guests when the bot check is on. Signed-in users skip it.
+  bot_token: BotToken,
+});
+export type FeedbackRequest = z.input<typeof FeedbackRequest>;
+export const FeedbackResponse = OkResponse;
+export type FeedbackResponse = z.infer<typeof FeedbackResponse>;
 
 // ---- Usage (SRS Section 7) ------------------------------------------------------------------
 
