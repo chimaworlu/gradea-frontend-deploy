@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { CvPage, type CvHighlight } from "../components/results/CvPage";
 import { JobResults } from "../components/results/JobResults";
 import { ProcessingMain } from "../components/scan/ScanProcessing";
 import { SignupWall } from "../components/scan/SignupWall";
@@ -321,6 +322,30 @@ describe("C1 lines to tailor", () => {
     expect(html).toContain("Bullet number 4 from the CV.");
     expect(html).not.toContain("unlock with PRO");
     expect(html).not.toContain(text.missingKeywords.pro);
+  });
+
+  it("marks the picked line with the General highlight on C1, and leaves B3 as it was", () => {
+    const flaggedCv = cv.map((group) => ({
+      ...group,
+      lines: group.lines.map((line) => ({ ...line, flagged: line.line_id === "e0" })),
+    }));
+    const page = (highlight: CvHighlight, activeLine: string | undefined) =>
+      renderToStaticMarkup(createElement(CvPage, { cv: flaggedCv, highlight, activeLine }));
+    const flaggedLabel = getContent("app/results").cvPanel.flaggedLine;
+
+    // C1: nothing marked until a card is picked; then only that line, flag included, no outline.
+    expect(page("picked", undefined)).not.toContain("data-flagged");
+    const picked = page("picked", "e2");
+    expect(picked.match(/data-flagged="true"/g)).toHaveLength(1);
+    expect(picked).toMatch(/id="cv-line-e2"[^>]*data-flagged="true"/);
+    expect(picked).toContain(flaggedLabel);
+    expect(picked).not.toContain("data-active");
+
+    // B3 open category: the server's flagged lines, and the picked line outlined.
+    const general = page("flagged", "e0");
+    expect(general.match(/data-flagged="true"/g)).toHaveLength(1);
+    expect(general).toMatch(/id="cv-line-e0"[^>]*data-flagged="true" data-active="true"/);
+    expect(page("none", "e0")).not.toContain("data-flagged");
   });
 
   it("is hidden with no lines, and never shows a reason without its CV line", () => {

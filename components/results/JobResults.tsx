@@ -106,8 +106,8 @@ export function JobResults({ result }: { result: ScoredJobResult }) {
       {result.cv.length > 0 ? (
         <section className={styles.cvPanel} aria-label={getContent("app/results").cvPanel.label}>
           {/* Plain: highlights would need the locked breakdown (C1 dev notes). Only the line
-              picked from a tailor card is outlined. */}
-          <CvPage cv={result.cv} marking={false} activeLine={activeLine} />
+              picked from a tailor card gets the General highlight. */}
+          <CvPage cv={result.cv} highlight="picked" activeLine={activeLine} />
         </section>
       ) : null}
     </div>

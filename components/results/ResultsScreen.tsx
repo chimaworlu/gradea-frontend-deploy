@@ -515,7 +515,7 @@ export function CvPanel({
   const text = getContent("app/results").cvPanel;
   if (result.cv.length === 0) return null;
   const note = cvPanelNote(row.state, scoreCategoryLabel(row.category));
-  const marking = row.state === "open";
+  const highlight = row.state === "open" ? "flagged" : "none";
   return (
     <section className={styles.cvPanel} aria-label={text.label}>
       {note !== undefined ? (
@@ -524,7 +524,7 @@ export function CvPanel({
           {note.text}
         </p>
       ) : null}
-      <CvPage cv={result.cv} marking={marking} activeLine={activeLine} />
+      <CvPage cv={result.cv} highlight={highlight} activeLine={activeLine} />
     </section>
   );
 }
