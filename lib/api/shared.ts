@@ -614,6 +614,19 @@ export const JobKeywordGroup = z.strictObject({
   missing: z.array(MissingKeyword),
 });
 export type JobKeywordGroup = z.infer<typeof JobKeywordGroup>;
+// Lines to tailor for this job (26 Nov, FR-36), in the four keyword groups. A line is named by its
+// id in `cv`, with a reason of two short plain sentences. Free sees the lines of the first group, in
+// the fixed order, that has any; the others are locked and carry only their count, like the missing
+// keywords. A reason Free sees never names a missing keyword.
+export const TailorLine = z.strictObject({ line_id: z.string(), reason: z.string().min(1) });
+export type TailorLine = z.infer<typeof TailorLine>;
+export const JobTailorGroup = z.strictObject({
+  group: KeywordGroup,
+  line_count: z.int().min(0),
+  locked: z.boolean(),
+  lines: z.array(TailorLine),
+});
+export type JobTailorGroup = z.infer<typeof JobTailorGroup>;
 export const JobResultResponse = z.strictObject({
   // Only a Job-specific result has this field, so the two result shapes are told apart by it.
   scan_type: z.literal("smart_target"),
@@ -628,6 +641,8 @@ export const JobResultResponse = z.strictObject({
   // Every group, in the fixed order of KeywordGroup, once scored.
   keyword_groups: z.array(JobKeywordGroup),
   missing_locked: z.boolean(),
+  // Every group, in the fixed order of KeywordGroup, once scored (empty before).
+  tailor_groups: z.array(JobTailorGroup),
   // The whole CV for the CV panel, once the scan is scored (empty before), built as for General.
   // Nothing is flagged in a Job-specific result, so every line has flagged false.
   cv: z.array(CvPanelSection),
