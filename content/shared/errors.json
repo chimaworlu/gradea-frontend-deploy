@@ -32,7 +32,9 @@
     "scan_not_scored": "Your scores aren't ready yet. Wait a moment and try again.",
     "job_description_required": "Paste the job description to match your CV against.",
     "job_description_too_short": "That looks too short to be a job description. Paste the full post.",
-    "job_description_too_long": "That's too long. Paste only the job description."
+    "job_description_too_long": "That's too long. Paste only the job description.",
+    "feedback_message_required": "Write a message before you send it.",
+    "feedback_message_too_long": "Keep your message to 2,000 characters or fewer."
   },
   "network": "We couldn't reach Gradea. Check your connection and try again.",
   "screen": {
