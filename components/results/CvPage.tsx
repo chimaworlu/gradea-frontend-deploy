@@ -11,8 +11,9 @@ export function cvLineId(lineId: string): string {
 }
 
 /**
- * The CV page inside the CV panel, section by section (B3 and C1). Lines are highlighted only
- * when `marking` is on; C1 is always plain (C1 dev notes).
+ * The CV page inside the CV panel, section by section (B3 and C1). Flagged lines are highlighted
+ * only when `marking` is on; C1 is plain (C1 dev notes). The line picked from a card is outlined
+ * on both pages.
  */
 export function CvPage({
   cv,
@@ -37,7 +38,7 @@ export function CvPage({
                 group.section !== "contact" && index === 0 && line.kind === "heading"
               }
               flagged={marking && line.flagged}
-              active={marking && line.line_id === activeLine}
+              active={line.line_id === activeLine}
               flaggedLabel={text.flaggedLine}
             />
           ))}

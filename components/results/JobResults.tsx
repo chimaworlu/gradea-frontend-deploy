@@ -1,20 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { fillPlaceholders, getContent, keywordGroupLabel } from "../../lib/content";
 import {
+  LINES_SHOWN_FIRST,
   keywordRows,
   keywordTotals,
+  tailorView,
   type KeywordRow,
   type ScoredJobResult,
+  type TailorCard,
+  type TailorView,
 } from "../../lib/scan/result";
 import { FieldIcon } from "../icons/FieldIcon";
 import scanStyles from "../scan/scan.module.css";
-import { CvPage } from "./CvPage";
+import { CvPage, cvLineId } from "./CvPage";
 import { ScoreRing } from "./ScoreRing";
 import styles from "./results.module.css";
 
 /**
  * C1 Job-specific results, Free (Build Plan Phase 3, PRD FR-36). The server sends a Free user no
  * missing keyword, only counts. A PRO answer does carry them; they are not rendered until C2 is
- * built. "Lines to tailor", AutoFix, Magic Write, Re-score and "Unlock with PRO" come later.
+ * built. AutoFix, Magic Write, Re-score and "Unlock with PRO" come later.
  */
 export function JobResults({ result }: { result: ScoredJobResult }) {
   const text = getContent("app/job-results");
@@ -22,6 +29,18 @@ export function JobResults({ result }: { result: ScoredJobResult }) {
   const totals = keywordTotals(rows);
   const score = result.relevancy_score;
   const missing = text.missingKeywords;
+  const tailor = tailorView(result);
+  // The line picked from a tailor card, outlined and scrolled to in the CV panel, as on B3.
+  const [activeLine, setActiveLine] = useState<string | undefined>(undefined);
+
+  // Scrolls the CV panel to the picked line (instant with reduced motion).
+  useEffect(() => {
+    if (activeLine === undefined) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document
+      .getElementById(cvLineId(activeLine))
+      ?.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  }, [activeLine]);
 
   return (
     <div className={styles.layout}>
@@ -55,6 +74,10 @@ export function JobResults({ result }: { result: ScoredJobResult }) {
             ))}
           </ul>
 
+          {tailor !== undefined ? (
+            <TailorSection view={tailor} activeLine={activeLine} onLineSelect={setActiveLine} />
+          ) : null}
+
           {result.missing_locked && totals.missing > 0 ? (
             <>
               <h2 className={styles.sectionTitle}>
@@ -82,8 +105,9 @@ export function JobResults({ result }: { result: ScoredJobResult }) {
       </div>
       {result.cv.length > 0 ? (
         <section className={styles.cvPanel} aria-label={getContent("app/results").cvPanel.label}>
-          {/* Plain: highlights would need the locked breakdown (C1 dev notes). */}
-          <CvPage cv={result.cv} marking={false} activeLine={undefined} />
+          {/* Plain: highlights would need the locked breakdown (C1 dev notes). Only the line
+              picked from a tailor card is outlined. */}
+          <CvPage cv={result.cv} marking={false} activeLine={activeLine} />
         </section>
       ) : null}
     </div>
@@ -128,13 +152,117 @@ function KeywordGroupRow({ row, locked }: { row: KeywordRow; locked: boolean }) 
   );
 }
 
-function ProTag() {
+/**
+ * "Lines to tailor for this job" (PRD FR-36). Free sees the lines of one group and the counts of
+ * the locked ones; PRO sees every group, each under its name. "AutoFix this line" comes with
+ * AutoFix (Build Plan Phase 4). The line text is shown only, never logged or stored.
+ */
+function TailorSection({
+  view,
+  activeLine,
+  onLineSelect,
+}: {
+  view: TailorView;
+  activeLine: string | undefined;
+  onLineSelect: (lineId: string) => void;
+}) {
+  const text = getContent("app/job-results").tailor;
+  const lockedTotal = view.locked.reduce((sum, item) => sum + item.count, 0);
+  // Group names only when more than one group shows; the Free design is one plain list.
+  const named = view.open.length > 1;
+  return (
+    <>
+      <h2 className={styles.sectionTitle}>{text.heading}</h2>
+      {view.open.map((item) => (
+        <TailorGroup
+          key={item.group}
+          name={named ? keywordGroupLabel(item.group) : undefined}
+          cards={item.cards}
+          activeLine={activeLine}
+          onLineSelect={onLineSelect}
+        />
+      ))}
+      <span id="tailor-show-on-cv" className={scanStyles.visuallyHidden}>
+        {text.showOnCv}
+      </span>
+      {lockedTotal > 0 ? (
+        <>
+          <p className={styles.detailBody}>
+            {fillPlaceholders(lockedTotal === 1 ? text.locked.body.one : text.locked.body.other, {
+              count: lockedTotal,
+            })}
+          </p>
+          {view.locked.map((item) => (
+            <p key={item.group} className={`${styles.missingRow} ${styles.tailorLocked}`}>
+              <FieldIcon name="lock" />
+              {fillPlaceholders(
+                item.count === 1 ? text.locked.group.one : text.locked.group.other,
+                {
+                  count: item.count,
+                  group: keywordGroupLabel(item.group),
+                },
+              )}
+              <ProTag label={text.locked.proLabel} />
+            </p>
+          ))}
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function TailorGroup({
+  name,
+  cards,
+  activeLine,
+  onLineSelect,
+}: {
+  name: string | undefined;
+  cards: readonly TailorCard[];
+  activeLine: string | undefined;
+  onLineSelect: (lineId: string) => void;
+}) {
+  const text = getContent("app/job-results").tailor;
+  const [showAll, setShowAll] = useState(false);
+  const shown = showAll ? cards : cards.slice(0, LINES_SHOWN_FIRST);
+  const hidden = cards.length - shown.length;
+  return (
+    <>
+      {name !== undefined ? <h3 className={styles.tailorGroupName}>{name}</h3> : null}
+      <ul className={styles.lines}>
+        {shown.map((card) => (
+          <li key={card.lineId}>
+            {/* The whole card picks the line: the CV panel scrolls to it and outlines it. */}
+            <button
+              type="button"
+              className={styles.lineCard}
+              aria-pressed={activeLine === card.lineId}
+              aria-describedby="tailor-show-on-cv"
+              onClick={() => onLineSelect(card.lineId)}
+            >
+              <span className={styles.lineSection}>{card.meta}</span>
+              <span className={styles.lineText}>{card.text}</span>
+              <span className={styles.lineReason}>{card.reason}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {hidden > 0 ? (
+        <button type="button" className={styles.showMore} onClick={() => setShowAll(true)}>
+          {fillPlaceholders(text.showMore, { count: hidden })}
+        </button>
+      ) : null}
+    </>
+  );
+}
+
+function ProTag({ label }: { label?: string }) {
   const text = getContent("app/job-results").missingKeywords;
   return (
     <span className={styles.proTag}>
       <FieldIcon name="lock" />
       <span aria-hidden="true">{text.pro}</span>
-      <span className={scanStyles.visuallyHidden}>{text.proLabel}</span>
+      <span className={scanStyles.visuallyHidden}>{label ?? text.proLabel}</span>
     </span>
   );
 }
