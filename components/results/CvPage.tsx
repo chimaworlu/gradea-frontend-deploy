@@ -11,17 +11,23 @@ export function cvLineId(lineId: string): string {
 }
 
 /**
- * The CV page inside the CV panel, section by section (B3 and C1). Flagged lines are highlighted
- * only when `marking` is on; C1 is plain (C1 dev notes). The line picked from a card is outlined
- * on both pages.
+ * Which lines get the flagged highlight (amber tint, dashed underline and flag):
+ * - "flagged" (B3, open category): the lines the server flagged; the line picked from a card is
+ *   outlined on top.
+ * - "none" (B3, other categories): no highlight; the picked line is still outlined.
+ * - "picked" (C1): only the line picked from a tailor card, with the same highlight as B3 and no
+ *   outline. The rest of the CV is plain (C1 dev notes).
  */
+export type CvHighlight = "flagged" | "none" | "picked";
+
+/** The CV page inside the CV panel, section by section (B3 and C1). */
 export function CvPage({
   cv,
-  marking,
+  highlight,
   activeLine,
 }: {
   cv: readonly CvPanelSection[];
-  marking: boolean;
+  highlight: CvHighlight;
   activeLine: string | undefined;
 }) {
   const text = getContent("app/results").cvPanel;
@@ -37,8 +43,12 @@ export function CvPage({
               isSectionHeading={
                 group.section !== "contact" && index === 0 && line.kind === "heading"
               }
-              flagged={marking && line.flagged}
-              active={line.line_id === activeLine}
+              flagged={
+                highlight === "flagged"
+                  ? line.flagged
+                  : highlight === "picked" && line.line_id === activeLine
+              }
+              active={highlight !== "picked" && line.line_id === activeLine}
               flaggedLabel={text.flaggedLine}
             />
           ))}
