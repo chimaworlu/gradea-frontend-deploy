@@ -1,28 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { getContent } from "../../lib/content";
-import { FieldIcon, type FieldIconName } from "../icons/FieldIcon";
+import { MenuPanel, type MenuEntry } from "../app/MenuPanel";
+import { FieldIcon } from "../icons/FieldIcon";
 import uploadStyles from "../scan/upload.module.css";
 import styles from "./more.module.css";
 
-type Item = { key: "dashboard" | "download" | "feedback"; icon: FieldIconName; enabled: boolean };
-
 /**
- * The menu's items in the B8 "More menu" order. Dashboard and Download CV are shown switched off
- * until their pages exist (Build Plan Phases 5 and 7): they can be reached with the arrow keys but
- * do nothing.
- */
-export const MORE_MENU_ITEMS: readonly Item[] = [
-  { key: "dashboard", icon: "layoutDashboard", enabled: false },
-  { key: "download", icon: "download", enabled: false },
-  { key: "feedback", icon: "messageSquare", enabled: true },
-];
-
-/**
- * The "..." button in the results top bar and its menu (B8 "More menu", PRD FR-28). Arrow keys,
- * Home and End move between the items; Escape or a press outside closes it and puts focus back
- * on the button; Tab closes it and carries on.
+ * The "..." button in the results top bar and its menu (B8 "More menu", PRD FR-28), on the menu
+ * shared with the avatar menu. Dashboard and Download CV are shown switched off until their
+ * pages exist (Build Plan Phases 5 and 7); Feedback opens D4.
  */
 export function MoreMenu({
   onFeedback,
@@ -37,7 +25,6 @@ export function MoreMenu({
   const text = getContent("app/rescore").topBar.more;
   const [open, setOpen] = useState(initiallyOpen);
   const root = useRef<HTMLDivElement>(null);
-  const items = useRef<Array<HTMLButtonElement | null>>([]);
   const menuId = "more-menu";
 
   // A press anywhere else closes it.
@@ -50,51 +37,20 @@ export function MoreMenu({
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
 
-  // Opening moves focus to the first item, so the keyboard carries on inside the menu.
-  useEffect(() => {
-    if (open) items.current[0]?.focus();
-  }, [open]);
-
-  function focusItem(index: number) {
-    const count = MORE_MENU_ITEMS.length;
-    items.current[((index % count) + count) % count]?.focus();
-  }
-
-  function onMenuKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const current = items.current.findIndex((item) => item === document.activeElement);
-    switch (event.key) {
-      case "ArrowDown":
-        event.preventDefault();
-        focusItem(current + 1);
-        return;
-      case "ArrowUp":
-        event.preventDefault();
-        focusItem(current - 1);
-        return;
-      case "Home":
-        event.preventDefault();
-        focusItem(0);
-        return;
-      case "End":
-        event.preventDefault();
-        focusItem(MORE_MENU_ITEMS.length - 1);
-        return;
-      case "Escape":
-        event.preventDefault();
+  const entries: MenuEntry[] = [
+    { key: "dashboard", label: text.dashboard, icon: "layoutDashboard", enabled: false },
+    { key: "download", label: text.download, icon: "download", enabled: false },
+    {
+      key: "feedback",
+      label: text.feedback,
+      icon: "messageSquare",
+      enabled: true,
+      onSelect: () => {
         setOpen(false);
-        button.current?.focus();
-        return;
-      case "Tab":
-        setOpen(false);
-        return;
-    }
-  }
-
-  function choose(item: Item) {
-    if (!item.enabled) return;
-    setOpen(false);
-    if (item.key === "feedback") onFeedback();
-  }
+        onFeedback();
+      },
+    },
+  ];
 
   return (
     <div className={styles.more} ref={root}>
@@ -116,28 +72,17 @@ export function MoreMenu({
       >
         <FieldIcon name="moreHorizontal" />
       </button>
-      <div className={styles.menu} hidden={!open} onKeyDown={onMenuKeyDown}>
-        <ul id={menuId} role="menu" aria-label={text.menuLabel}>
-          {MORE_MENU_ITEMS.map((item, index) => (
-            <li key={item.key} role="none">
-              <button
-                ref={(element) => {
-                  items.current[index] = element;
-                }}
-                type="button"
-                role="menuitem"
-                tabIndex={-1}
-                className={styles.item}
-                aria-disabled={item.enabled ? undefined : true}
-                onClick={() => choose(item)}
-              >
-                <FieldIcon name={item.icon} />
-                {text[item.key]}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <MenuPanel
+        id={menuId}
+        label={text.menuLabel}
+        open={open}
+        entries={entries}
+        className={styles.menu}
+        onClose={(focusButton) => {
+          setOpen(false);
+          if (focusButton) button.current?.focus();
+        }}
+      />
     </div>
   );
 }

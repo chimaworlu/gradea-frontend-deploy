@@ -19,71 +19,11 @@
   height: var(--size-icon);
 }
 
-/* 200 wide, 8 inside, radius 10, the one soft shadow, 8 under the button and lined up with its
-   right edge (B8 "moreMenu"). */
+/* 200 wide, 8 under the button and lined up with its right edge (B8 "moreMenu"). The look is
+   the shared menu (components/app/menu.module.css). */
 .menu {
-  position: absolute;
   top: calc(100% + var(--space-8));
-  right: 0;
-  z-index: 30;
   width: calc(var(--space-96) * 2 + var(--space-8));
-  padding: var(--space-8);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-container-lowest);
-  box-shadow: var(--shadow-floating);
-  animation: fadeIn var(--duration-medium) var(--easing-standard);
-}
-
-.menu[hidden] {
-  display: none;
-}
-
-.menu ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* 44 tall, 12 at the sides, the 20 icon 12 from its 15px label, radius 6. */
-.item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  width: 100%;
-  min-height: var(--size-touch-target);
-  padding: 0 var(--space-12);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-on-surface);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
-  text-align: left;
-  cursor: pointer;
-}
-
-.item svg {
-  flex-shrink: 0;
-  width: var(--size-icon);
-  height: var(--size-icon);
-}
-
-.item:hover:not([aria-disabled="true"]),
-.item:focus-visible {
-  background: var(--color-primary-soft);
-}
-
-.item:active:not([aria-disabled="true"]) {
-  background: var(--color-primary-container);
-}
-
-/* Switched off: faded, and no hover fill, until the page exists. */
-.item[aria-disabled="true"] {
-  cursor: not-allowed;
-}
-
-.item[aria-disabled="true"] > * {
-  opacity: var(--opacity-disabled);
 }
 
 /* ---- D4 Feedback popup ---- */

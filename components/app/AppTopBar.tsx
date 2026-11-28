@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
 import { avatarInitial, menuStep, signOut, type MenuEvent } from "../../lib/auth/session";
 import { getContent } from "../../lib/content";
 import type { Viewer } from "../../lib/scan/upload";
-import { FieldIcon } from "../icons/FieldIcon";
 import styles from "./AppTopBar.module.css";
+import { MenuPanel, menuErrorClass, type MenuEntry } from "./MenuPanel";
 
 /**
  * S2 App top bar, shared by the upload, processing and results screens: the logo on the left;
@@ -56,9 +56,10 @@ export function AppTopBar({
 }
 
 /**
- * The avatar and its menu (S2 "Avatar menu"). The design also lists Dashboard, History, Profile
- * and Billing; they are left out until those pages exist (Build Plan Phases 5 and 6), so only
- * the email and "Sign out" show. The email is shown to its owner only, never logged.
+ * The avatar and its menu (B3 "Avatar menu"): the email, then Dashboard, History, Profile and
+ * Billing, then Sign out. The four pages come later (Build Plan Phases 5 and 6), so they are
+ * shown switched off and do nothing; Sign out works. The email is shown to its owner only,
+ * never logged.
  */
 export function AccountMenu({
   email,
@@ -74,7 +75,6 @@ export function AccountMenu({
   const [error, setError] = useState<string | undefined>(undefined);
   const root = useRef<HTMLDivElement>(null);
   const avatar = useRef<HTMLButtonElement>(null);
-  const firstItem = useRef<HTMLButtonElement>(null);
   const menuId = "account-menu";
 
   function step(event: MenuEvent) {
@@ -95,22 +95,22 @@ export function AccountMenu({
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
 
-  // Opening moves focus to the first item, so the keyboard carries on inside the menu.
-  useEffect(() => {
-    if (open) firstItem.current?.focus();
-  }, [open]);
-
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape" && open) {
-      event.preventDefault();
-      step("escape");
-    } else if (event.key === "Tab" && open) {
-      step("tabAway");
-    } else if (event.key === "ArrowDown" && !open && event.target === avatar.current) {
-      event.preventDefault();
-      setOpen(true);
-    }
-  }
+  // The four pages come later: shown switched off, in the design's order and icons.
+  const entries: MenuEntry[] = [
+    { key: "dashboard", label: text.menu.dashboard, icon: "layoutDashboard", enabled: false },
+    { key: "history", label: text.menu.history, icon: "history", enabled: false },
+    { key: "profile", label: text.menu.profile, icon: "user", enabled: false },
+    { key: "billing", label: text.menu.billing, icon: "creditCard", enabled: false },
+    {
+      key: "signOut",
+      label: signingOut ? text.menu.signOut.loading : text.menu.signOut.default,
+      icon: "logOut",
+      enabled: true,
+      busy: signingOut,
+      dividerBefore: true,
+      onSelect: () => void onSignOut(),
+    },
+  ];
 
   async function onSignOut() {
     if (signingOut) return;
@@ -124,7 +124,7 @@ export function AccountMenu({
   }
 
   return (
-    <div className={styles.account} ref={root} onKeyDown={onKeyDown}>
+    <div className={styles.account} ref={root}>
       <button
         ref={avatar}
         type="button"
@@ -134,31 +134,29 @@ export function AccountMenu({
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => step("toggle")}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" && !open) {
+            event.preventDefault();
+            setOpen(true);
+          }
+        }}
       >
         <span aria-hidden="true">{avatarInitial(email)}</span>
       </button>
-      <div className={styles.menu} hidden={!open}>
-        <p className={styles.email}>{email}</p>
-        <ul id={menuId} className={styles.items} role="menu" aria-label={text.menu.label}>
-          {/* Dashboard, History, Profile and Billing go here when their pages exist. */}
-          <li role="none">
-            <button
-              ref={firstItem}
-              type="button"
-              role="menuitem"
-              className={styles.item}
-              onClick={() => void onSignOut()}
-              aria-busy={signingOut ? true : undefined}
-            >
-              <FieldIcon name="logOut" />
-              {signingOut ? text.menu.signOut.loading : text.menu.signOut.default}
-            </button>
-          </li>
-        </ul>
-        <p className={styles.error} role="alert">
-          {error ?? ""}
-        </p>
-      </div>
+      <MenuPanel
+        id={menuId}
+        label={text.menu.label}
+        open={open}
+        entries={entries}
+        header={email}
+        className={styles.menu}
+        onClose={(focusButton) => step(focusButton ? "escape" : "tabAway")}
+        footer={
+          <p className={menuErrorClass} role="alert">
+            {error ?? ""}
+          </p>
+        }
+      />
     </div>
   );
 }

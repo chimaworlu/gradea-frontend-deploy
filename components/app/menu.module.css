@@ -1,0 +1,117 @@
+/* The one menu look, shared by the avatar menu (B3 "Avatar menu") and the More menu (B8 "More
+   menu"). Token variables only (design-system-rules). Each menu sets its own width and place. */
+
+/* White, radius 10, 8 inside, the one soft shadow (design-system-rules section 5). */
+.panel {
+  position: absolute;
+  right: 0;
+  z-index: 30;
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  animation: fadeIn var(--duration-medium) var(--easing-standard);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+/* Fade only (design-system-rules section 7); none with reduced motion. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}
+
+/* The account email over the items, shown to its owner only. */
+.header {
+  padding: var(--space-8) var(--space-12) var(--space-12);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+  overflow-wrap: anywhere;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The thin card line between groups, 4 above and below. */
+.divider {
+  height: var(--border-width);
+  margin: var(--space-4) 0;
+  background: var(--color-border-card);
+}
+
+/* 44 tall, 12 at the sides, the 20 icon 12 from its 15px label, radius 6. */
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item svg {
+  flex-shrink: 0;
+  width: var(--size-icon);
+  height: var(--size-icon);
+}
+
+.item:hover:not([aria-disabled="true"]),
+.item:focus-visible {
+  background: var(--color-primary-soft);
+}
+
+.item:active:not([aria-disabled="true"]) {
+  background: var(--color-primary-container);
+}
+
+.item[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* Switched off until its page exists: icon and label both at 40% (the A1 off strength; the
+   disabled token is 0.6), no hover fill. The focus fill stays full, so the keyboard can see
+   where it is. */
+.item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.item[aria-disabled="true"] > * {
+  opacity: calc(1 - var(--opacity-disabled));
+}
+
+/* A failed sign out, under the items. */
+.error {
+  padding: var(--space-8) var(--space-12);
+  color: var(--color-error);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.error:empty {
+  display: none;
+}

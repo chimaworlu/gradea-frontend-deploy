@@ -10,6 +10,10 @@
   },
   "menu": {
     "label": "Account",
+    "dashboard": "Dashboard",
+    "history": "History",
+    "profile": "Profile",
+    "billing": "Billing",
     "signOut": {
       "default": "Sign out",
       "loading": "Signing out..."
