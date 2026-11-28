@@ -285,7 +285,7 @@ describe("C1 lines to tailor", () => {
     ],
   });
 
-  it("Free: shows the open group's lines, three first, and only the counts of the locked ones", () => {
+  it("Free: shows the open group's lines, three first, and nothing of the locked ones", () => {
     const html = render(free);
     expect(html).toContain(text.tailor.heading);
     // The card: section and role, the CV's own words, then the reason. No AutoFix button.
@@ -297,10 +297,9 @@ describe("C1 lines to tailor", () => {
     expect(html).not.toContain("Reason for line 3.");
     expect(html).toContain("Show 1 more");
     expect(html).not.toContain("AutoFix");
-    expect(html).toContain("3 more lines to tailor unlock with PRO.");
-    expect(html).toContain("2 lines in Soft skills");
-    expect(html).toContain("1 line in Industry language");
-    expect(html).not.toContain("0 lines in");
+    // The C1 Free design shows no note or row for the locked groups, not even their counts.
+    expect(html).not.toMatch(/lines? to tailor unlocks? with PRO|lines? in /);
+    expect(html).not.toContain(keywordGroupLabel("industry_language"));
     // One group open on Free: a plain list, with no group names over it.
     expect(html).not.toContain("<h3");
   });
@@ -361,6 +360,18 @@ describe("C1 lines to tailor", () => {
     expect(tailorView(empty)).toBeUndefined();
     expect(render(empty)).not.toContain(text.tailor.heading);
     expect(render(job())).not.toContain(text.tailor.heading);
+    // Free with lines only in locked groups: nothing to show, so no section.
+    const onlyLocked = job({
+      cv,
+      tailor_groups: KeywordGroup.options.map((group) => ({
+        group,
+        line_count: group === "hard_skills" ? 0 : 2,
+        locked: group !== "hard_skills",
+        lines: [],
+      })),
+    });
+    expect(tailorView(onlyLocked)).toBeUndefined();
+    expect(render(onlyLocked)).not.toContain(text.tailor.heading);
 
     const unknown = job({
       cv,
