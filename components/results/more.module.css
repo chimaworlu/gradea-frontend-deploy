@@ -1,0 +1,248 @@
+/* B8 More menu and D4 Feedback popup. Token variables only (design-system-rules). */
+
+.more {
+  position: relative;
+}
+
+/* The "..." button: the small 36 square secondary button, like Re-score. Doubled class so it
+   wins over the A1 switch option's 44 whatever order the style files load in. */
+.moreButton.moreButton {
+  justify-content: center;
+  width: var(--size-button-small);
+  min-height: var(--size-button-small);
+  height: var(--size-button-small);
+  padding: 0;
+}
+
+.moreButton svg {
+  width: var(--size-icon);
+  height: var(--size-icon);
+}
+
+/* 200 wide, 8 inside, radius 10, the one soft shadow, 8 under the button and lined up with its
+   right edge (B8 "moreMenu"). */
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-8));
+  right: 0;
+  z-index: 30;
+  width: calc(var(--space-96) * 2 + var(--space-8));
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-container-lowest);
+  box-shadow: var(--shadow-floating);
+  animation: fadeIn var(--duration-medium) var(--easing-standard);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 44 tall, 12 at the sides, the 20 icon 12 from its 15px label, radius 6. */
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item svg {
+  flex-shrink: 0;
+  width: var(--size-icon);
+  height: var(--size-icon);
+}
+
+.item:hover:not([aria-disabled="true"]),
+.item:focus-visible {
+  background: var(--color-primary-soft);
+}
+
+.item:active:not([aria-disabled="true"]) {
+  background: var(--color-primary-container);
+}
+
+/* Switched off: faded, and no hover fill, until the page exists. */
+.item[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.item[aria-disabled="true"] > * {
+  opacity: var(--opacity-disabled);
+}
+
+/* ---- D4 Feedback popup ---- */
+
+/* 480 wide, 32 inside (D4 dev notes). Doubled class so it wins over the A1 popup's 432 and 24. */
+.popup.popup {
+  max-width: var(--layout-max-width-auth);
+  max-height: calc(100dvh - var(--space-page-gutter) * 2);
+  overflow-y: auto;
+  padding: var(--space-32);
+}
+
+/* "Send us feedback": 20px bold. */
+.title {
+  padding-right: var(--space-48);
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+}
+
+.line {
+  margin-top: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* 20 under the line, then 6 to the box. */
+.label {
+  display: block;
+  margin-top: calc(var(--space-16) + var(--space-4));
+  color: var(--color-on-surface);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* Four lines: 112 tall, 12 and 16 inside, the input outline, radius 8. */
+.message {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--space-96) + var(--space-16));
+  margin-top: calc(var(--space-4) + var(--border-width-selected));
+  padding: var(--space-12) var(--space-16);
+  border: var(--border-width) solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-body-medium);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+  resize: vertical;
+}
+
+.message::placeholder {
+  color: var(--color-on-surface-variant);
+}
+
+.message:focus-visible {
+  outline: var(--border-width-selected) solid var(--color-primary);
+  outline-offset: var(--border-width-selected);
+}
+
+.message[readonly] {
+  background: var(--color-surface);
+}
+
+/* "Reply to  chima@example.com": the label semibold grey, the email in ink, 8 apart. */
+.reply {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-8);
+  margin-top: var(--space-16);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.replyLabel {
+  color: var(--color-on-surface-variant);
+  font-weight: var(--font-weight-semibold);
+}
+
+.replyEmail {
+  color: var(--color-on-surface);
+  overflow-wrap: anywhere;
+}
+
+.replyNote {
+  margin-top: var(--space-4);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+/* What went wrong, in red above the buttons (D4 dev notes, "Failed send"). */
+.error {
+  margin-top: var(--space-16);
+}
+
+/* Cancel, then "Send feedback" at the right, 20 apart, 24 under the note. */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12) calc(var(--space-16) + var(--space-4));
+  margin-top: var(--space-24);
+}
+
+/* 44 tall, 20 at the sides, 15px semibold, sized by its words (not the A1 200 minimum). */
+.send.send {
+  min-width: 0;
+  padding: 0 calc(var(--space-16) + var(--space-4));
+  font: var(--font-body-medium);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+/* Thanks: the navy check, 32. */
+.thanksIcon {
+  display: flex;
+  color: var(--color-primary);
+}
+
+.thanksIcon svg {
+  width: var(--space-32);
+  height: var(--space-32);
+}
+
+.thanksTitle {
+  margin-top: var(--space-16);
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+}
+
+.close.close {
+  width: 100%;
+  margin-top: var(--space-24);
+  font: var(--font-body-medium);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--font-body-medium-letter-spacing);
+}
+
+@media (width < 640px) {
+  /* Drawn at 36, tapped at 44, like Re-score beside it (design-system-rules section 4). */
+  .moreButton.moreButton {
+    position: relative;
+  }
+
+  .moreButton.moreButton::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--space-4) + var(--border-width)) * -1) 0;
+  }
+
+  .popup.popup {
+    padding: var(--space-24);
+  }
+
+  .buttons {
+    justify-content: stretch;
+  }
+}

@@ -31,3 +31,11 @@ export const SCAN_TAKING_LONGER_SECONDS = 15;
  * gradea-backend); this adds room for three 5-second status checks.
  */
 export const SCAN_GIVE_UP_SECONDS = 135;
+
+/**
+ * D4: the most characters the feedback box takes. Must match FEEDBACK_MESSAGE_MAX_LENGTH in
+ * gradea-backend, which the shared API file names but does not export (it says "about 2,000").
+ * The server still refuses a longer message with feedback_message_too_long, whose wording says
+ * 2,000.
+ */
+export const FEEDBACK_MESSAGE_MAX_LENGTH = 2_000;

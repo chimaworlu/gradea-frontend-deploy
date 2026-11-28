@@ -1,5 +1,6 @@
 import accountLink from "../content/app/account-link.json";
 import auth from "../content/app/auth.json";
+import feedback from "../content/app/feedback.json";
 import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
 import jobResults from "../content/app/job-results.json";
@@ -35,6 +36,7 @@ export type ContentFileHeader = { id: string; title: string };
 const contentFiles = {
   "app/account-link": accountLink,
   "app/auth": auth,
+  "app/feedback": feedback,
   "app/forgot-password": forgotPassword,
   "app/google-signup": googleSignup,
   "app/job-results": jobResults,
