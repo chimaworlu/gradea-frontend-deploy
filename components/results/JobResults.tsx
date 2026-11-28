@@ -56,7 +56,10 @@ export function JobResults({ result }: { result: ScoredJobResult }) {
             <p className={styles.overallLabel}>{text.rail.relevancyScore}</p>
           </div>
         </aside>
-        <section className={styles.detail} aria-labelledby="keyword-match-heading">
+        <section
+          className={`${styles.detail} ${styles.jobDetail}`}
+          aria-labelledby="keyword-match-heading"
+        >
           <h1 id="keyword-match-heading" className={styles.detailHeading}>
             {text.keywordMatch.heading}
           </h1>
@@ -143,8 +146,11 @@ function KeywordGroupRow({ row, locked }: { row: KeywordRow; locked: boolean }) 
       ) : null}
       {row.missingCount > 0 ? (
         <p className={styles.missingRow}>
-          {locked ? <FieldIcon name="lock" /> : null}
-          {fillPlaceholders(text.missing, { count: row.missingCount })}
+          {/* The lock sits close to its count (4); the PRO tag is further off (8). */}
+          <span className={styles.missingCount}>
+            {locked ? <FieldIcon name="lock" /> : null}
+            {fillPlaceholders(text.missing, { count: row.missingCount })}
+          </span>
           {locked ? <ProTag /> : null}
         </p>
       ) : null}
@@ -153,9 +159,10 @@ function KeywordGroupRow({ row, locked }: { row: KeywordRow; locked: boolean }) 
 }
 
 /**
- * "Lines to tailor for this job" (PRD FR-36). Free sees the lines of one group and the counts of
- * the locked ones; PRO sees every group, each under its name. "AutoFix this line" comes with
- * AutoFix (Build Plan Phase 4). The line text is shown only, never logged or stored.
+ * "Lines to tailor for this job" (PRD FR-36). Free sees the lines of its one open group and
+ * nothing of the locked ones (C1 Free design); PRO sees every group, each under its name.
+ * "AutoFix this line" comes with AutoFix (Build Plan Phase 4). The line text is shown only, never
+ * logged or stored.
  */
 function TailorSection({
   view,
@@ -167,7 +174,6 @@ function TailorSection({
   onLineSelect: (lineId: string) => void;
 }) {
   const text = getContent("app/job-results").tailor;
-  const lockedTotal = view.locked.reduce((sum, item) => sum + item.count, 0);
   // Group names only when more than one group shows; the Free design is one plain list.
   const named = view.open.length > 1;
   return (
@@ -185,28 +191,6 @@ function TailorSection({
       <span id="tailor-show-on-cv" className={scanStyles.visuallyHidden}>
         {text.showOnCv}
       </span>
-      {lockedTotal > 0 ? (
-        <>
-          <p className={styles.detailBody}>
-            {fillPlaceholders(lockedTotal === 1 ? text.locked.body.one : text.locked.body.other, {
-              count: lockedTotal,
-            })}
-          </p>
-          {view.locked.map((item) => (
-            <p key={item.group} className={`${styles.missingRow} ${styles.tailorLocked}`}>
-              <FieldIcon name="lock" />
-              {fillPlaceholders(
-                item.count === 1 ? text.locked.group.one : text.locked.group.other,
-                {
-                  count: item.count,
-                  group: keywordGroupLabel(item.group),
-                },
-              )}
-              <ProTag label={text.locked.proLabel} />
-            </p>
-          ))}
-        </>
-      ) : null}
     </>
   );
 }
@@ -256,13 +240,13 @@ function TailorGroup({
   );
 }
 
-function ProTag({ label }: { label?: string }) {
+function ProTag() {
   const text = getContent("app/job-results").missingKeywords;
   return (
     <span className={styles.proTag}>
       <FieldIcon name="lock" />
       <span aria-hidden="true">{text.pro}</span>
-      <span className={scanStyles.visuallyHidden}>{label ?? text.proLabel}</span>
+      <span className={scanStyles.visuallyHidden}>{text.proLabel}</span>
     </span>
   );
 }

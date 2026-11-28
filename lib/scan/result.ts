@@ -187,30 +187,24 @@ export function keywordTotals(rows: readonly KeywordRow[]): {
 /** A line to tailor as shown: the CV line's own words and place, and the server's reason. */
 export type TailorCard = { lineId: string; meta: string; text: string; reason: string };
 
-/** What "Lines to tailor for this job" shows (PRD FR-36). */
-export type TailorView = {
-  /** Open groups, with their lines in the server's order. Free has at most one. */
-  open: Array<{ group: KeywordGroup; cards: TailorCard[] }>;
-  /** Locked groups with lines: only their counts were sent. */
-  locked: Array<{ group: KeywordGroup; count: number }>;
-};
+/**
+ * What "Lines to tailor for this job" shows (PRD FR-36): the open groups, with their lines in
+ * the server's order. Free has at most one. Locked groups are not shown at all (C1 Free design).
+ */
+export type TailorView = { open: Array<{ group: KeywordGroup; cards: TailorCard[] }> };
 
 /**
- * The tailor groups joined to the CV by line id, so each card shows the line's own text and its
- * section. A line the CV does not have is left out: a reason is never shown without its line.
- * Undefined when there is no line at all, so the section is hidden.
+ * The open tailor groups joined to the CV by line id, so each card shows the line's own text and
+ * its section. A line the CV does not have is left out: a reason is never shown without its line.
+ * Undefined when no open group has a line, so the section is hidden.
  */
 export function tailorView(result: JobResultResponse): TailorView | undefined {
   const cvLines = new Map(
     result.cv.flatMap((section) => section.lines.map((line) => [line.line_id, line] as const)),
   );
   const open: TailorView["open"] = [];
-  const locked: TailorView["locked"] = [];
   for (const item of result.tailor_groups) {
-    if (item.locked) {
-      if (item.line_count > 0) locked.push({ group: item.group, count: item.line_count });
-      continue;
-    }
+    if (item.locked) continue;
     const cards = item.lines.flatMap((line) => {
       const cvLine = cvLines.get(line.line_id);
       if (cvLine === undefined) return [];
@@ -220,7 +214,7 @@ export function tailorView(result: JobResultResponse): TailorView | undefined {
     });
     if (cards.length > 0) open.push({ group: item.group, cards });
   }
-  return open.length === 0 && locked.length === 0 ? undefined : { open, locked };
+  return open.length === 0 ? undefined : { open };
 }
 
 /** "Experience, Product Designer at Acme", or just "Experience" when the line has no role. */
