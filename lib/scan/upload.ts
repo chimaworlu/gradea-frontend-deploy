@@ -156,6 +156,32 @@ export function uploadCv(
 ): Promise<ApiResult<ScanUploadResponse>> {
   const form = new FormData();
   form.append(SCAN_UPLOAD_FILE_FIELD, file, file.name);
+  return sendScan(form, fields, {}, fetchFn);
+}
+
+/**
+ * The same two endpoints with no file: scan_session_id names an earlier scan by the same person,
+ * whose stored CV is scanned again (PRD FR-28, the General / Job-specific switch). A guest sends
+ * that scan's token in its header, as on the claim, never in the address (SRS Section 5).
+ */
+export function rescanCv(
+  scanSessionId: string,
+  fields: { careerLevel?: CareerLevel; jobDescription?: string; guestToken?: string },
+  fetchFn?: typeof fetch,
+): Promise<ApiResult<ScanUploadResponse>> {
+  const form = new FormData();
+  form.append("scan_session_id", scanSessionId);
+  const headers: Record<string, string> =
+    fields.guestToken === undefined ? {} : { [GUEST_TOKEN_HEADER]: fields.guestToken };
+  return sendScan(form, fields, headers, fetchFn);
+}
+
+function sendScan(
+  form: FormData,
+  fields: { careerLevel?: CareerLevel; botToken?: string; jobDescription?: string },
+  headers: Record<string, string>,
+  fetchFn: typeof fetch | undefined,
+): Promise<ApiResult<ScanUploadResponse>> {
   if (fields.careerLevel !== undefined) form.append("career_level", fields.careerLevel);
   if (fields.botToken !== undefined) form.append("bot_token", fields.botToken);
   if (fields.jobDescription !== undefined) form.append("job_description", fields.jobDescription);
@@ -163,6 +189,7 @@ export function uploadCv(
     method: "POST",
     path: fields.jobDescription === undefined ? "/api/scan/general" : "/api/scan/smart-target",
     form,
+    headers,
     response: ScanUploadResponse,
     fetchFn,
   });
@@ -194,6 +221,8 @@ export type UploadOutcome =
   | { kind: "fileError"; message: string }
   | { kind: "jobDescriptionError"; code: JobDescriptionCode }
   | { kind: "scanError"; code: ScanErrorCode }
+  /** A scan sent again by its id that is gone, out of time or not this person's. */
+  | { kind: "scanNotFound"; message: string }
   | { kind: "failed"; message: string };
 
 /** Problems the browser could have caught: shown under the upload box (A1 error frames). */
@@ -242,6 +271,9 @@ export function uploadOutcome(result: ApiResult<ScanUploadResponse>): UploadOutc
   }
   const jobCode = JOB_DESCRIPTION_CODES.find((known) => known === result.code);
   if (jobCode !== undefined) return { kind: "jobDescriptionError", code: jobCode };
+  if (result.code === "not_found") {
+    return { kind: "scanNotFound", message: errorMessage(result.code) };
+  }
   return { kind: "failed", message: errorMessage(result.code) };
 }
 

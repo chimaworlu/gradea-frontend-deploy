@@ -1,0 +1,167 @@
+/* B6 Re-score popup and the results top bar's switch. Token variables only (design-system-rules).
+   The switch, upload box, job description and buttons keep the A1 classes. */
+
+/* 520 wide in the B6 frames, 24 inside; it scrolls inside on a short window. The class is
+   doubled so it wins over the A1 popup's 432 whatever order the style files load in. */
+.popup.popup {
+  max-width: calc(var(--layout-max-width-auth) + var(--space-32) + var(--space-8));
+  max-height: calc(100dvh - var(--space-page-gutter) * 2);
+  overflow-y: auto;
+}
+
+/* "Re-score your CV": 20px bold. */
+.title {
+  padding-right: var(--space-48);
+  color: var(--color-on-surface);
+  font: var(--font-title-large);
+  letter-spacing: var(--font-title-large-letter-spacing);
+}
+
+/* "Current score: 74": the soft navy chip, 14px semibold. */
+.scoreChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--space-32) + var(--space-4));
+  margin-top: var(--space-16);
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  color: var(--color-on-surface);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+  font-variant-numeric: tabular-nums;
+}
+
+/* "Leave this empty...": under the box when the CV from these results can be used again. */
+.sameCv {
+  margin-top: var(--space-8);
+  color: var(--color-on-surface-variant);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+/* "Career level: Entry level" on the left, "Change" at the far right, the level not bold. */
+.career > div {
+  justify-content: space-between;
+  margin-top: var(--space-24);
+}
+
+.career > div > p > span {
+  font-weight: var(--font-body-medium-weight);
+}
+
+.usage {
+  margin-top: var(--space-16);
+}
+
+/* Cancel, the note when the button is off, then "Scan my CV" at the right. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12) var(--space-24);
+  margin-top: var(--space-32);
+}
+
+/* Sized by its words here, so Cancel, the note and the button fit on one row as drawn. */
+.actions > button:last-child {
+  min-width: 0;
+}
+
+.uploadLink {
+  margin-left: var(--space-8);
+  color: var(--color-primary);
+  font: var(--font-label-large);
+  letter-spacing: var(--font-label-large-letter-spacing);
+}
+
+/* ---- Top bar ---- */
+
+/* Two small buttons, 8 apart (modeSwitch). */
+.modeSwitch {
+  display: flex;
+  gap: var(--space-8);
+}
+
+/* The A1 switch option at the small 36 size, with 16 at the sides (doubled class, so it wins
+   over the A1 44 whatever order the two style files load in). */
+.modeOption.modeOption,
+.rescore.rescore {
+  min-height: var(--size-button-small);
+  padding: 0 var(--space-16);
+}
+
+.rescore {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* "Opening your General results" or the not found message, in a row under the top bar. */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-page-gutter);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  font: var(--font-body-small);
+  letter-spacing: var(--font-body-small-letter-spacing);
+}
+
+.noticeError {
+  color: var(--color-error);
+}
+
+@media (width < 640px) {
+  .actions {
+    justify-content: stretch;
+  }
+
+  /* On its own row under the logo: one joined control across the full width, 36 tall, in the
+     B6 popup's option style (A1 switchOption: the input outline, the selected navy fill). The
+     two halves share one outline in the middle; the outer corners keep radius 8. */
+  .modeSwitch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .modeOption.modeOption {
+    position: relative;
+    min-height: var(--size-button-small);
+    padding: 0 var(--space-12);
+    border-radius: 0;
+  }
+
+  .modeOption.modeOption:first-child {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  }
+
+  .modeOption.modeOption:last-child {
+    margin-left: calc(var(--border-width) * -1);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  /* The selected half's navy outline shows on the shared middle line. */
+  .modeOption.modeOption[aria-pressed="true"] {
+    z-index: 1;
+  }
+
+  /* A fixed 36, not a minimum, so it is exactly the avatar's height. */
+  .rescore.rescore {
+    position: relative;
+    height: var(--size-button-small);
+    padding: 0 var(--space-12);
+  }
+
+  /* Drawn at 36, tapped at 44 (design-system-rules section 4): the touch area reaches 4 past
+     the top and bottom (plus the 1 border it starts inside), within the 12 between the rows. */
+  .modeOption.modeOption::after,
+  .rescore.rescore::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--space-4) + var(--border-width)) * -1) 0;
+  }
+}

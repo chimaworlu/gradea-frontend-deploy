@@ -1,0 +1,22 @@
+{
+  "id": "B6",
+  "title": "Re-score popup",
+  "topBar": {
+    "modeSwitchLabel": "Type of results",
+    "switching": "Opening your General results",
+    "rescore": "Re-score",
+    "uploadLink": "Upload a CV"
+  },
+  "popup": {
+    "title": "Re-score your CV",
+    "close": "Close",
+    "currentScore": {
+      "same": "Current score: {score}",
+      "other": "Current score: {score} ({mode})"
+    },
+    "sameCv": "Leave this empty to scan the CV from these results.",
+    "careerLevel": "Career level: {level}",
+    "fileMissing": "Add your CV to continue",
+    "cancel": "Cancel"
+  }
+}

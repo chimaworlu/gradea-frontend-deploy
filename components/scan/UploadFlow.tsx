@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CareerLevel, UsageResponse } from "../../lib/api/shared";
 import { isCareerLevel } from "../../lib/auth/forms";
-import { fillPlaceholders, getContent } from "../../lib/content";
+import { getContent } from "../../lib/content";
 import {
-  ACCEPT_ATTRIBUTE,
   UPLOAD_PATH,
   checkFiles,
   checkJobDescription,
@@ -15,9 +14,7 @@ import {
   claimScan,
   fetchViewer,
   fileProblemMessage,
-  fileSizeLabel,
   uploadCv,
-  uploadHelperText,
   uploadOutcome,
   viewerFrom,
   type JobDescriptionCode,
@@ -39,6 +36,7 @@ import { AppTopBar } from "../app/AppTopBar";
 import { BotCheck } from "../auth/BotCheck";
 import { FieldIcon } from "../icons/FieldIcon";
 import { CareerLevelMenu } from "./CareerLevelMenu";
+import { CvUploadBox } from "./CvUploadBox";
 import { JobDescriptionField } from "./JobDescriptionField";
 import { LimitPopup } from "./LimitPopup";
 import { ScanAction } from "./ScanAction";
@@ -84,7 +82,6 @@ export function UploadFlow() {
   const [expired, setExpired] = useState(false);
   const [usage, setUsage] = useState<UsageResponse | undefined>(undefined);
   const router = useRouter();
-  const fileInput = useRef<HTMLInputElement>(null);
   const jobTextArea = useRef<HTMLTextAreaElement>(null);
   const scanButton = useRef<HTMLButtonElement>(null);
   // A ref as well as state, so a double click or a second drop never sends two uploads.
@@ -215,7 +212,9 @@ export function UploadFlow() {
         setFile(undefined);
         setBoxProblem(outcome.message);
         return;
+      case "scanNotFound":
       case "failed":
+        // A file upload names no earlier scan, so not_found is a plain failure here.
         setStatus("failed");
         setFailedMessage(outcome.message);
         return;
@@ -282,12 +281,6 @@ export function UploadFlow() {
       window.removeEventListener("drop", drop);
     };
   }, []);
-
-  function onInputChange(event: ChangeEvent<HTMLInputElement>) {
-    takeFiles(Array.from(event.target.files ?? []));
-    // Cleared so choosing the same file again still counts as a change.
-    event.target.value = "";
-  }
 
   function removeFile() {
     clearWaitingScan();
@@ -370,15 +363,6 @@ export function UploadFlow() {
     );
   }
 
-  const boxClass = [
-    styles.box,
-    dragging ? styles.boxDragging : "",
-    !dragging && boxProblem !== undefined ? styles.boxError : "",
-    !dragging && boxProblem === undefined && file !== undefined ? styles.boxChosen : "",
-    !dragging && boxProblem === undefined && file === undefined ? styles.boxEmpty : "",
-  ].join(" ");
-
-  const showFile = file !== undefined && !dragging;
   const uploading = status === "uploading";
   const jobSpecific = scanType === "smart_target";
   const usageText = usage === undefined ? undefined : usageLine(usage, scanType);
@@ -417,78 +401,15 @@ export function UploadFlow() {
           {jobSpecific ? text.modeSwitch.jobSpecificHelper : text.modeSwitch.generalHelper}
         </p>
 
-        <section className={boxClass} aria-label={text.uploadBox.label}>
-          <input
-            ref={fileInput}
-            id="cv-file"
-            className={styles.fileInput}
-            type="file"
-            accept={ACCEPT_ATTRIBUTE}
-            onChange={onInputChange}
-            disabled={busy}
-            tabIndex={-1}
-            aria-hidden="true"
-          />
-          <span className={styles.boxIcon}>
-            <FieldIcon name={showFile ? "file" : "upload"} />
-          </span>
-          {showFile ? (
-            <>
-              <p className={styles.fileName}>
-                {fillPlaceholders(text.uploadBox.fileSummary, {
-                  name: file.name,
-                  size: fileSizeLabel(file.size),
-                })}
-              </p>
-              <div className={styles.fileActions}>
-                <button
-                  type="button"
-                  className={styles.textButton}
-                  onClick={removeFile}
-                  disabled={busy}
-                >
-                  {text.uploadBox.remove}
-                </button>
-                <button
-                  type="button"
-                  className={styles.textButton}
-                  onClick={() => fileInput.current?.click()}
-                  disabled={busy}
-                >
-                  {text.uploadBox.chooseDifferent}
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className={styles.boxTitle}>
-                {dragging ? text.uploadBox.draggingTitle : text.uploadBox.title}
-              </p>
-              <p className={styles.boxOr}>{text.uploadBox.or}</p>
-              <button
-                type="button"
-                className={styles.chooseButton}
-                onClick={() => fileInput.current?.click()}
-                disabled={busy}
-                aria-describedby="cv-file-helper cv-file-problem"
-              >
-                {text.uploadBox.choose}
-              </button>
-              <p id="cv-file-helper" className={styles.boxHelper}>
-                {uploadHelperText()}
-              </p>
-            </>
-          )}
-        </section>
-        <p
-          id="cv-file-problem"
-          className={styles.boxProblem}
-          aria-live="polite"
-          hidden={boxProblem === undefined}
-        >
-          <FieldIcon name="alert" />
-          {boxProblem ?? ""}
-        </p>
+        <CvUploadBox
+          idBase="cv-file"
+          file={file}
+          problem={boxProblem}
+          dragging={dragging}
+          disabled={busy}
+          onFiles={takeFiles}
+          onRemove={removeFile}
+        />
 
         {jobSpecific ? (
           <JobDescriptionField

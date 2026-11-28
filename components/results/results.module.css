@@ -816,4 +816,10 @@ button.lineCard:hover {
   .primary {
     width: 100%;
   }
+
+  /* The top bar's own 12 under the switch is the gap above the score, the same 12 as between
+     the bar's two rows. */
+  .rail {
+    padding-top: 0;
+  }
 }
