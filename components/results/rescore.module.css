@@ -119,14 +119,47 @@
     justify-content: stretch;
   }
 
-  /* On its own row under the logo: the two halves share the width, at the 44 touch size. */
+  /* On its own row under the logo: one joined control across the full width, 36 tall, in the
+     B6 popup's option style (A1 switchOption: the input outline, the selected navy fill). The
+     two halves share one outline in the middle; the outer corners keep radius 8. */
   .modeSwitch {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 0;
   }
 
-  .modeOption.modeOption,
+  .modeOption.modeOption {
+    position: relative;
+    min-height: var(--size-button-small);
+    padding: 0 var(--space-12);
+    border-radius: 0;
+  }
+
+  .modeOption.modeOption:first-child {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  }
+
+  .modeOption.modeOption:last-child {
+    margin-left: calc(var(--border-width) * -1);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  /* The selected half's navy outline shows on the shared middle line. */
+  .modeOption.modeOption[aria-pressed="true"] {
+    z-index: 1;
+  }
+
   .rescore.rescore {
-    min-height: var(--size-touch-target);
+    position: relative;
+    padding: 0 var(--space-12);
+  }
+
+  /* Drawn at 36, tapped at 44 (design-system-rules section 4): the touch area reaches 4 past
+     the top and bottom (plus the 1 border it starts inside), within the 12 between the rows. */
+  .modeOption.modeOption::after,
+  .rescore.rescore::after {
+    content: "";
+    position: absolute;
+    inset: calc((var(--space-4) + var(--border-width)) * -1) 0;
   }
 }

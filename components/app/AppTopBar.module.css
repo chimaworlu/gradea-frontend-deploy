@@ -174,8 +174,21 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-12);
     height: auto;
-    min-height: var(--layout-nav-height);
+    min-height: 0;
     padding-block: var(--space-12);
+  }
+
+  /* There the avatar matches the 36 Re-score button; it is still tapped at 44. */
+  .topBar:has(.side:first-child > :nth-child(2)) .avatar {
+    position: relative;
+    width: var(--size-button-small);
+    height: var(--size-button-small);
+  }
+
+  .topBar:has(.side:first-child > :nth-child(2)) .avatar::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--space-4) * -1);
   }
 
   .topBar:has(.side:first-child > :nth-child(2)) > .side:first-child {
