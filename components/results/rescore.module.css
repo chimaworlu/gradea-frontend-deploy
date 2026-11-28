@@ -149,8 +149,10 @@
     z-index: 1;
   }
 
+  /* A fixed 36, not a minimum, so it is exactly the avatar's height. */
   .rescore.rescore {
     position: relative;
+    height: var(--size-button-small);
     padding: 0 var(--space-12);
   }
 

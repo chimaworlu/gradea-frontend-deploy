@@ -28,7 +28,9 @@ export function AppTopBar({
 }) {
   const text = getContent("shared/account-menu");
   return (
-    <header className={styles.topBar}>
+    <header
+      className={`${styles.topBar} ${afterLogo === undefined || afterLogo === null ? "" : styles.withSwitch}`}
+    >
       <div className={styles.side}>
         {/* Logo / Lockup, used exactly as exported (never redrawn). */}
         <Image

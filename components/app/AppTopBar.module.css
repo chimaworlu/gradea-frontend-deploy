@@ -167,9 +167,10 @@
     height: var(--size-touch-target);
   }
 
-  /* Results on a phone: the logo and the account side on the first row, the switch on its own
-     full row under them, so nothing overlaps. */
-  .topBar:has(.side:first-child > :nth-child(2)) {
+  /* Results on a phone (the bar with the switch, marked by its own class, so no browser needs
+     :has() to lay it out): the logo and the account side on the first row, the switch on its
+     own full row under them. */
+  .withSwitch {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-12);
@@ -178,29 +179,35 @@
     padding-block: var(--space-12);
   }
 
-  /* There the avatar matches the 36 Re-score button; it is still tapped at 44. */
-  .topBar:has(.side:first-child > :nth-child(2)) .avatar {
+  /* Re-score and the avatar: the same 36 box, centred on the logo row. The avatar is still
+     tapped at 44. */
+  .withSwitch > .side:last-child {
+    align-self: center;
+    align-items: center;
+  }
+
+  .withSwitch .avatar {
     position: relative;
     width: var(--size-button-small);
     height: var(--size-button-small);
   }
 
-  .topBar:has(.side:first-child > :nth-child(2)) .avatar::after {
+  .withSwitch .avatar::after {
     content: "";
     position: absolute;
     inset: calc(var(--space-4) * -1);
   }
 
-  .topBar:has(.side:first-child > :nth-child(2)) > .side:first-child {
+  .withSwitch > .side:first-child {
     display: contents;
   }
 
-  .topBar:has(.side:first-child > :nth-child(2)) > .side:first-child > :nth-child(2) {
+  .withSwitch > .side:first-child > :nth-child(2) {
     grid-column: 1 / -1;
     grid-row: 2;
   }
 
-  .topBar:has(.side:first-child > :nth-child(2)) > .side:last-child {
+  .withSwitch > .side:last-child {
     grid-column: 2;
     grid-row: 1;
   }
