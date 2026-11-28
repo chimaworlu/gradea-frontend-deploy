@@ -4,6 +4,7 @@ import forgotPassword from "../content/app/forgot-password.json";
 import googleSignup from "../content/app/google-signup.json";
 import jobResults from "../content/app/job-results.json";
 import processing from "../content/app/processing.json";
+import rescore from "../content/app/rescore.json";
 import results from "../content/app/results.json";
 import scanError from "../content/app/scan-error.json";
 import sessionExpired from "../content/app/session-expired.json";
@@ -38,6 +39,7 @@ const contentFiles = {
   "app/google-signup": googleSignup,
   "app/job-results": jobResults,
   "app/processing": processing,
+  "app/rescore": rescore,
   "app/results": results,
   "app/scan-error": scanError,
   "app/session-expired": sessionExpired,

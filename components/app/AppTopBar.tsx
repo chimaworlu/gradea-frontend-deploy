@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { LOGIN_PATH, problemMessage } from "../../lib/auth/forms";
 import { avatarInitial, menuStep, signOut, type MenuEvent } from "../../lib/auth/session";
 import { getContent } from "../../lib/content";
@@ -15,24 +15,40 @@ import styles from "./AppTopBar.module.css";
  * on the right "Log in" for a guest, or the avatar and its account menu once signed in. Nothing
  * shows on the right while the session is still being checked.
  */
-export function AppTopBar({ viewer }: { viewer: Viewer | undefined }) {
+export function AppTopBar({
+  viewer,
+  afterLogo,
+  beforeAccount,
+}: {
+  viewer: Viewer | undefined;
+  /** Results only: the General / Job-specific switch (B3 and C1 "modeSwitch"). */
+  afterLogo?: ReactNode;
+  /** Results only: the Re-score button. */
+  beforeAccount?: ReactNode;
+}) {
   const text = getContent("shared/account-menu");
   return (
     <header className={styles.topBar}>
-      {/* Logo / Lockup, used exactly as exported (never redrawn). */}
-      <Image
-        src="/brand/gradea-logo-light.svg"
-        alt={text.topBar.logoAlt}
-        width={107}
-        height={32}
-        priority
-      />
-      {viewer?.kind === "guest" ? (
-        <Link className={styles.logIn} href={LOGIN_PATH}>
-          {text.topBar.logIn}
-        </Link>
-      ) : null}
-      {viewer?.kind === "signedIn" ? <AccountMenu email={viewer.user.email} /> : null}
+      <div className={styles.side}>
+        {/* Logo / Lockup, used exactly as exported (never redrawn). */}
+        <Image
+          src="/brand/gradea-logo-light.svg"
+          alt={text.topBar.logoAlt}
+          width={107}
+          height={32}
+          priority
+        />
+        {afterLogo}
+      </div>
+      <div className={styles.side}>
+        {beforeAccount}
+        {viewer?.kind === "guest" ? (
+          <Link className={styles.logIn} href={LOGIN_PATH}>
+            {text.topBar.logIn}
+          </Link>
+        ) : null}
+        {viewer?.kind === "signedIn" ? <AccountMenu email={viewer.user.email} /> : null}
+      </div>
     </header>
   );
 }

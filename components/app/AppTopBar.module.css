@@ -9,6 +9,19 @@
   background: var(--color-surface-container-lowest);
 }
 
+/* The logo with what follows it on the left; the account side on the right. 24 apart on the
+   left and 12 on the right, as in the C1 frame's top bar. */
+.side {
+  display: flex;
+  align-items: center;
+  gap: var(--space-24);
+  min-width: 0;
+}
+
+.side:last-child {
+  gap: var(--space-12);
+}
+
 /* Guests: "Log in" as the small secondary button (A1 dev notes). */
 .logIn {
   display: inline-flex;
@@ -152,6 +165,31 @@
   .avatar {
     width: var(--size-touch-target);
     height: var(--size-touch-target);
+  }
+
+  /* Results on a phone: the logo and the account side on the first row, the switch on its own
+     full row under them, so nothing overlaps. */
+  .topBar:has(.side:first-child > :nth-child(2)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-12);
+    height: auto;
+    min-height: var(--layout-nav-height);
+    padding-block: var(--space-12);
+  }
+
+  .topBar:has(.side:first-child > :nth-child(2)) > .side:first-child {
+    display: contents;
+  }
+
+  .topBar:has(.side:first-child > :nth-child(2)) > .side:first-child > :nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .topBar:has(.side:first-child > :nth-child(2)) > .side:last-child {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 

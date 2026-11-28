@@ -25,10 +25,13 @@ export function CareerLevelMenu({
   value,
   onValueChange,
   disabled,
+  wording,
 }: {
   value: CareerLevel;
   onValueChange: (level: CareerLevel) => void;
   disabled?: boolean;
+  /** The line with its {level} placeholder; "Scoring as {level}" on A1. */
+  wording?: string;
 }) {
   const text = getContent("app/upload").careerLevel;
   const labels = CAREER_LEVELS.map((level) => careerLevelLabel(level));
@@ -87,7 +90,7 @@ export function CareerLevelMenu({
   return (
     <div className={styles.careerLine} ref={root}>
       <p id="scan-career-level-label">
-        {placeholderParts<ReactNode>(text.scoringAs, {
+        {placeholderParts<ReactNode>(wording ?? text.scoringAs, {
           level: <span className={styles.careerLevel}>{labels[selected]}</span>,
         }).map((part, index) => (
           <Fragment key={index}>{part}</Fragment>

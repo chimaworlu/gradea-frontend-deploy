@@ -43,6 +43,7 @@ import { SessionExpired } from "../scan/SessionExpired";
 import scanStyles from "../scan/scan.module.css";
 import { CvPage, cvLineId } from "./CvPage";
 import { JobResults } from "./JobResults";
+import { ResultsTopBar } from "./ResultsTopBar";
 import { ScoreRing } from "./ScoreRing";
 import styles from "./results.module.css";
 
@@ -193,7 +194,22 @@ export function ResultsScreen({ scanSessionId }: { scanSessionId: string }) {
 
   return (
     <div className={styles.page}>
-      <ViewerTopBar />
+      {/* The switch and Re-score, with the score as this page shows it for the popup's chip. */}
+      {view.kind === "jobReady" ? (
+        <ResultsTopBar
+          scanSessionId={scanSessionId}
+          scanType="smart_target"
+          score={fillPlaceholders(getContent("app/job-results").rail.percent, {
+            score: view.result.relevancy_score,
+          })}
+        />
+      ) : (
+        <ResultsTopBar
+          scanSessionId={scanSessionId}
+          scanType="general"
+          score={String(view.result.overall_score ?? 0)}
+        />
+      )}
       {view.kind === "jobReady" ? (
         <JobResults result={view.result} />
       ) : (
