@@ -16,11 +16,19 @@ export type FieldIconName =
   | "logOut"
   | "circle"
   | "clock"
-  | "flag";
+  | "flag"
+  | "moreHorizontal"
+  | "layoutDashboard"
+  | "download"
+  | "messageSquare"
+  | "history"
+  | "user"
+  | "creditCard";
 
 /**
  * Lucide outline icons at 1.5px stroke (design tokens "icons"): eye, eye-off, chevron-down,
- * chevron-up, check, circle-check, upload, file-text, circle-alert, x, lock, loader-circle, log-out, circle, clock and flag.
+ * chevron-up, check, circle-check, upload, file-text, circle-alert, x, lock, loader-circle, log-out, circle, clock, flag,
+ * ellipsis, layout-dashboard, download, message-square, history, user and credit-card.
  * Decorative only: the control around an icon carries the accessible name.
  */
 export function FieldIcon({ name, className }: { name: FieldIconName; className?: string }) {
@@ -96,6 +104,50 @@ export function FieldIcon({ name, className }: { name: FieldIconName; className?
       )}
       {name === "loader" && <path d="M21 12a9 9 0 1 1-6.219-8.56" />}
       {name === "circle" && <circle cx="12" cy="12" r="10" />}
+      {name === "moreHorizontal" && (
+        <>
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
+        </>
+      )}
+      {name === "layoutDashboard" && (
+        <>
+          <rect width="7" height="9" x="3" y="3" rx="1" />
+          <rect width="7" height="5" x="14" y="3" rx="1" />
+          <rect width="7" height="9" x="14" y="12" rx="1" />
+          <rect width="7" height="5" x="3" y="16" rx="1" />
+        </>
+      )}
+      {name === "download" && (
+        <>
+          <path d="M12 15V3" />
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <path d="m7 10 5 5 5-5" />
+        </>
+      )}
+      {name === "history" && (
+        <>
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+          <path d="M12 7v5l4 2" />
+        </>
+      )}
+      {name === "user" && (
+        <>
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </>
+      )}
+      {name === "creditCard" && (
+        <>
+          <rect width="20" height="14" x="2" y="5" rx="2" />
+          <path d="M2 10h20" />
+        </>
+      )}
+      {name === "messageSquare" && (
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      )}
       {name === "flag" && (
         <>
           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />

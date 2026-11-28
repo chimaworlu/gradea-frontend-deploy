@@ -42,16 +42,26 @@ describe("S2 account menu", () => {
     expect(guest).not.toContain('aria-haspopup="menu"');
   });
 
-  it("lists only the email and Sign out; pages that do not exist yet are hidden", () => {
+  it("shows the email, the four later pages switched off, and Sign out on (B3 Avatar menu)", () => {
     const html = renderToStaticMarkup(
       createElement(AccountMenu, { email: user.email, initiallyOpen: true }),
     );
     expect(html).toContain(user.email);
-    expect(html).toContain(text.menu.signOut.default);
-    expect(html.match(/role="menuitem"/g)).toHaveLength(1);
-    for (const hidden of ["Dashboard", "History", "Profile", "Billing"]) {
-      expect(html).not.toContain(hidden);
-    }
+    const items = [...html.matchAll(/<button[^>]*role="menuitem"[^>]*>.*?<\/button>/g)].map(
+      ([item]) => item,
+    );
+    // All shown, none hidden, in the design's order.
+    expect(items.map((item) => item.replace(/<[^>]+>/g, ""))).toEqual([
+      text.menu.dashboard,
+      text.menu.history,
+      text.menu.profile,
+      text.menu.billing,
+      text.menu.signOut.default,
+    ]);
+    for (const off of items.slice(0, 4)) expect(off).toContain('aria-disabled="true"');
+    expect(items[4]).not.toContain("aria-disabled");
+    // A line under the email and one before Sign out.
+    expect(html.match(/role="separator"|role="presentation"/g)).toHaveLength(2);
   });
 });
 

@@ -75,89 +75,11 @@
   box-shadow: inset 0 0 0 var(--border-width) var(--color-primary);
 }
 
-/* 4px under the avatar, right edges lined up, the one soft shadow (S2 design). */
+/* 8 under the avatar, right edges lined up, 240 wide (B3 "Avatar menu"). The look is the
+   shared menu (menu.module.css). */
 .menu {
-  position: absolute;
-  top: calc(100% + var(--space-4));
-  right: 0;
-  z-index: 30;
+  top: calc(100% + var(--space-8));
   width: calc(var(--layout-results-rail) - var(--space-8));
-  padding: var(--space-4);
-  border: var(--border-width) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-container-lowest);
-  box-shadow: var(--shadow-floating);
-  animation: fadeIn var(--duration-medium) var(--easing-standard);
-}
-
-.menu[hidden] {
-  display: none;
-}
-
-.email {
-  padding: var(--space-12);
-  border-bottom: var(--border-width) solid var(--color-border-card);
-  color: var(--color-on-surface-variant);
-  font: var(--font-body-small);
-  letter-spacing: var(--font-body-small-letter-spacing);
-  overflow-wrap: anywhere;
-}
-
-.items {
-  margin: var(--space-4) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  width: 100%;
-  min-height: var(--size-touch-target);
-  padding: 0 var(--space-12);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-on-surface);
-  font: var(--font-body-medium);
-  letter-spacing: var(--font-body-medium-letter-spacing);
-  text-align: left;
-  cursor: pointer;
-}
-
-.item:hover:not(:disabled),
-.item:focus-visible {
-  background: var(--color-primary-soft);
-}
-
-.item:active:not(:disabled) {
-  background: var(--color-primary-container);
-}
-
-.item[aria-busy="true"] {
-  cursor: progress;
-}
-
-.error {
-  padding: var(--space-8) var(--space-12);
-  color: var(--color-error);
-  font: var(--font-body-small);
-  letter-spacing: var(--font-body-small-letter-spacing);
-}
-
-.error:empty {
-  display: none;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 
 /* Phones: the avatar is a full touch target. */

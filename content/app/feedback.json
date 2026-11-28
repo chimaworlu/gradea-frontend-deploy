@@ -1,0 +1,23 @@
+{
+  "id": "D4",
+  "title": "Feedback form",
+  "form": {
+    "title": "Send us feedback",
+    "line": "Tell us what's working, what's not, or what you'd like to see.",
+    "label": "What would you like to tell us?",
+    "placeholder": "Write your message here",
+    "replyTo": "Reply to",
+    "replyNote": "We'll only use your email to reply.",
+    "cancel": "Cancel",
+    "send": {
+      "default": "Send feedback",
+      "loading": "Sending..."
+    },
+    "close": "Close"
+  },
+  "thanks": {
+    "title": "Thank you",
+    "line": "We read every message.",
+    "close": "Close"
+  }
+}

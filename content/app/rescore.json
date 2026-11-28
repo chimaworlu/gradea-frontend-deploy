@@ -5,7 +5,14 @@
     "modeSwitchLabel": "Type of results",
     "switching": "Opening your General results",
     "rescore": "Re-score",
-    "uploadLink": "Upload a CV"
+    "uploadLink": "Upload a CV",
+    "more": {
+      "button": "More",
+      "menuLabel": "More",
+      "dashboard": "Dashboard",
+      "download": "Download CV",
+      "feedback": "Feedback"
+    }
   },
   "popup": {
     "title": "Re-score your CV",

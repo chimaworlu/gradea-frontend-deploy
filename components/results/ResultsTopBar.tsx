@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { UsageResponse } from "../../lib/api/shared";
 import { errorMessage, getContent } from "../../lib/content";
+import { resultsFeedbackPage } from "../../lib/feedback";
 import { saveScanFileInfo } from "../../lib/scan/scan-file-info";
 import { rememberScanType } from "../../lib/scan/scan-type";
 import {
@@ -21,6 +22,8 @@ import { AppTopBar } from "../app/AppTopBar";
 import { FieldIcon } from "../icons/FieldIcon";
 import { LimitPopup } from "../scan/LimitPopup";
 import uploadStyles from "../scan/upload.module.css";
+import { FeedbackPopup } from "./FeedbackPopup";
+import { MoreMenu } from "./MoreMenu";
 import { RescorePopup, type RescoreStarted } from "./RescorePopup";
 import styles from "./rescore.module.css";
 
@@ -59,6 +62,8 @@ export function ResultsTopBar({
   // The button that opened a popup, so closing it puts focus back there. Kept here, not read
   // from the page's focus, because a click does not focus a button in every browser.
   const opener = useRef<HTMLButtonElement | null>(null);
+  const moreButton = useRef<HTMLButtonElement | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   function closePopups() {
     setPopupMode(undefined);
@@ -92,7 +97,8 @@ export function ResultsTopBar({
    */
   async function openOn(mode: ScanType) {
     const known = await knownUsage();
-    const left = known === undefined ? null : known[mode === "general" ? "general" : "job_specific"];
+    const left =
+      known === undefined ? null : known[mode === "general" ? "general" : "job_specific"];
     if (known !== undefined && left !== null && left.remaining === 0) {
       setPopupMode(undefined);
       setLimit({ resetAt: known.reset_at, scanType: mode });
@@ -189,9 +195,17 @@ export function ResultsTopBar({
     </button>
   ) : null;
 
+  // Re-score, then "..." before the avatar, as in the B8 top bar (Get PRO comes with billing).
+  const accountSide = signedIn ? (
+    <>
+      {rescore}
+      <MoreMenu button={moreButton} onFeedback={() => setFeedbackOpen(true)} />
+    </>
+  ) : null;
+
   return (
     <>
-      <AppTopBar viewer={viewer} afterLogo={modeSwitch} beforeAccount={rescore} />
+      <AppTopBar viewer={viewer} afterLogo={modeSwitch} beforeAccount={accountSide} />
       {notice !== undefined ? (
         <p
           className={`${styles.notice} ${notice.kind === "error" ? styles.noticeError : ""}`}
@@ -233,10 +247,16 @@ export function ResultsTopBar({
         />
       ) : null}
       {limit !== undefined ? (
-        <LimitPopup
-          resetAt={limit.resetAt}
-          scanType={limit.scanType}
-          onClose={closePopups}
+        <LimitPopup resetAt={limit.resetAt} scanType={limit.scanType} onClose={closePopups} />
+      ) : null}
+      {feedbackOpen && viewer?.kind === "signedIn" ? (
+        <FeedbackPopup
+          email={viewer.user.email}
+          page={resultsFeedbackPage(scanType)}
+          onClose={() => {
+            setFeedbackOpen(false);
+            moreButton.current?.focus();
+          }}
         />
       ) : null}
     </>
